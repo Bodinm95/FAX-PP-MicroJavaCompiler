@@ -76,7 +76,7 @@ import java_cup.runtime.Symbol;
 "}"		{ return symbol(sym.RBRACE, yytext()); }
 
 [0-9]+							{ return symbol(sym.NUM, new Integer (yytext())); }
-\"[^\"]*\"						{ return symbol(sym.CHAR, yytext()); }
+"'"[\040-\176]"'"				{ return symbol(sym.CHAR, new Character (yytext().charAt(1))); }
 ("true"|"false")				{ return symbol(sym.BOOL, yytext()); }
 
 ([a-z]|[A-Z])[a-z|A-Z|0-9|_]*	{ return symbol(sym.IDENT, yytext()); }
