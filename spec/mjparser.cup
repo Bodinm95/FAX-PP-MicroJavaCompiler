@@ -42,7 +42,7 @@ scan with {:
 	return s;
 :}
 
-terminal PROGRAM, BREAK, CLASS, ELSE, IF, NEW, PRINT, READ, RETURN, VOID, DO, WHILE, EXTENDS, CONTINUE;
+terminal PROGRAM, BREAK, CONTINUE, CLASS, EXTENDS, IF, ELSE, DO, WHILE, RETURN, NEW, PRINT, READ, VOID;
 terminal ADD, SUB, MUL, DIV, MOD, EQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR, ASSIGN, INC, DEC;
 terminal SEMI, COMMA, DOT;
 terminal LPAREN, RPAREN, LSQUARE, RSQUARE, LBRACE, RBRACE;
@@ -97,13 +97,15 @@ ConstDeclAlt ::= NUM
 
 // ------------------------------------------------- //
 
-VarDecl ::= Type VarDeclList SEMI;
+VarDecl ::= Type VarDeclList SEMI
+         |  error SEMI;
 
-VarDeclList ::= VarDeclList VarDeclPart
+VarDeclList ::= VarDeclList COMMA VarDeclPart
              |  VarDeclPart;
 
 VarDeclPart ::= IDENT
-             |  IDENT LSQUARE RSQUARE;
+             |  IDENT LSQUARE RSQUARE
+             |  error;
 
 ListVarDecl ::= ListVarDecl VarDecl
              |  /* epsilon */;
@@ -115,7 +117,8 @@ ClassDecl ::= CLASS ClassId ExtendsDecl LBRACE ListVarDecl ClassMethodDecl RBRAC
 ClassId ::= IDENT;
 
 ExtendsDecl ::= EXTENDS Type
-             |  /* epsilon */;
+             |  /* epsilon */
+             |  error;
 
 ClassMethodDecl ::= LBRACE MethodDeclList RBRACE
                  |  /* epsilon */;
@@ -137,7 +140,8 @@ FormParsList ::= FormParsList COMMA FormParsPart
               |  FormParsPart;
 
 FormParsPart ::= Type IDENT
-              |  Type IDENT LSQUARE RSQUARE;
+              |  Type IDENT LSQUARE RSQUARE
+              |  error;
 
 Type ::= IDENT;
 
@@ -168,6 +172,7 @@ PrintOption ::= SEMI NUM
 // ------------------------------------------------- //
 
 DesignatorStatement ::= Designator ASSIGN Expr
+                     |  Designator ASSIGN error
                      |  Designator LPAREN ActPars RPAREN
                      |  Designator INC
                      |  Designator DEC;
@@ -191,7 +196,8 @@ CondTerm ::= CondTerm AND CondFact
           |  CondFact;
 
 CondFact ::= Expr
-          |  Expr Relop Expr;
+          |  Expr Relop Expr
+          |  error;
 
 // ------------------------------------------------- //
 
