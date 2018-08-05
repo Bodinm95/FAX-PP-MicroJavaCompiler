@@ -29,8 +29,8 @@ parser code {:
 
 	public void report_info(String message, Object info) {
 		StringBuilder msg = new StringBuilder(message); 
-		if (info instanceof Symbol)
-			msg.append(" on line ").append(((Symbol)info).left);
+		if (info instanceof Symbol && ((Symbol)info).value != null)
+			msg.append(" '" + ((Symbol)info).value.toString() + "'").append(" on line ").append(((Symbol)info).left);
 		System.out.println(msg.toString());
 	}
 :}
