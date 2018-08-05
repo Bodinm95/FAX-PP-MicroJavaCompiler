@@ -1,0 +1,230 @@
+package rs.ac.bg.etf.pp1;
+
+import java_cup.runtime.*;
+
+parser code {:
+
+	boolean error = false;
+
+	public void report_fatal_error(String message, Object info) throws java.lang.Exception {
+		done_parsing();
+		report_error(message, info);
+	}
+
+	public void syntax_error(Symbol cur_token) {
+		report_error("\nSyntax error", cur_token);
+	}
+
+	public void unrecovered_syntax_error(Symbol cur_token) throws java.lang.Exception {
+		report_fatal_error("Fatal error, parsing cannot be continued", cur_token);
+	}
+
+	public void report_error(String message, Object info) {
+		error = true;
+		StringBuilder msg = new StringBuilder(message); 
+		if (info instanceof Symbol)
+			msg.append(" on line ").append(((Symbol)info).left);
+		System.out.println(msg.toString());
+	}
+
+	public void report_info(String message, Object info) {
+		StringBuilder msg = new StringBuilder(message); 
+		if (info instanceof Symbol)
+			msg.append(" on line ").append(((Symbol)info).left);
+		System.out.println(msg.toString());
+	}
+:}
+
+scan with {:
+	Symbol s = this.getScanner().next_token();
+	if (s != null && s.value != null)
+		System.out.println(s.toString() + " " + s.value.toString());
+	return s;
+:}
+
+terminal PROGRAM, BREAK, CLASS, ELSE, IF, NEW, PRINT, READ, RETURN, VOID, DO, WHILE, EXTENDS, CONTINUE;
+terminal ADD, SUB, MUL, DIV, MOD, EQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR, ASSIGN, INC, DEC;
+terminal SEMI, COMMA, DOT;
+terminal LPAREN, RPAREN, LSQUARE, RSQUARE, LBRACE, RBRACE;
+terminal CONST;
+
+terminal Integer NUM;
+terminal Character CHAR;
+terminal Boolean BOOL;
+terminal String IDENT;
+
+non terminal Program, ProgId;
+non terminal DeclList, DeclPart;
+non terminal ConstDecl, ConstDeclList, ConstDeclPart, ConstDeclAlt;
+non terminal VarDecl, VarDeclList, VarDeclPart, ListVarDecl;
+non terminal ClassDecl, ClassId, ExtendsDecl, ClassMethodDecl;
+non terminal MethodDeclList, MethodDecl, ReturnType, FormPars, FormParsList, FormParsPart, Type;
+non terminal StatementList, Statement, ElseOption, ReturnOption, PrintOption;
+non terminal DesignatorStatement, Designator, ActPars, ActParsList;
+non terminal Condition, CondTerm, CondFact;
+non terminal Expr, ExprList, Term, Factor;
+non terminal Relop, Addop, Mulop;
+
+precedence left ELSE;
+
+// ------------------------------------------------- //
+
+Program ::=  PROGRAM ProgId DeclList LBRACE MethodDeclList RBRACE;
+
+ProgId ::=  IDENT;
+
+// ------------------------------------------------- //
+
+DeclList ::= DeclList DeclPart
+          |  /* epsilon */;
+
+DeclPart ::= ConstDecl
+          |  VarDecl
+          |  ClassDecl;
+
+// ------------------------------------------------- //
+
+ConstDecl ::= CONST Type ConstDeclList SEMI;
+
+ConstDeclList ::= ConstDeclList COMMA ConstDeclPart
+               |  ConstDeclPart;
+
+ConstDeclPart ::= IDENT ASSIGN ConstDeclAlt;
+
+ConstDeclAlt ::= NUM
+              |  CHAR
+              |  BOOL;
+
+// ------------------------------------------------- //
+
+VarDecl ::= Type VarDeclList SEMI;
+
+VarDeclList ::= VarDeclList VarDeclPart
+             |  VarDeclPart;
+
+VarDeclPart ::= IDENT
+             |  IDENT LSQUARE RSQUARE;
+
+ListVarDecl ::= ListVarDecl VarDecl
+             |  /* epsilon */;
+
+// ------------------------------------------------- //
+
+ClassDecl ::= CLASS ClassId ExtendsDecl LBRACE ListVarDecl ClassMethodDecl RBRACE;
+
+ClassId ::= IDENT;
+
+ExtendsDecl ::= EXTENDS Type
+             |  /* epsilon */;
+
+ClassMethodDecl ::= LBRACE MethodDeclList RBRACE
+                 |  /* epsilon */;
+
+// ------------------------------------------------- //
+
+MethodDeclList ::= MethodDeclList MethodDecl
+                |  /* epsilon */;
+
+MethodDecl ::= ReturnType IDENT LPAREN FormPars RPAREN ListVarDecl LBRACE StatementList RBRACE;
+
+ReturnType ::= Type
+            |  VOID;
+
+FormPars ::= FormParsList
+          |  /* epsilon */;
+
+FormParsList ::= FormParsList COMMA FormParsPart
+              |  FormParsPart;
+
+FormParsPart ::= Type IDENT
+              |  Type IDENT LSQUARE RSQUARE;
+
+Type ::= IDENT;
+
+// ------------------------------------------------- //
+
+StatementList ::= StatementList Statement
+               |  /* epsilon */;
+
+Statement ::= DesignatorStatement SEMI
+           |  IF LPAREN Condition RPAREN Statement ElseOption
+           |  DO Statement WHILE LPAREN Condition RPAREN SEMI
+           |  BREAK SEMI
+           |  CONTINUE SEMI
+           |  RETURN ReturnOption SEMI
+           |  READ LPAREN Designator RPAREN SEMI
+           |  PRINT LPAREN Expr PrintOption RPAREN SEMI
+           |  LBRACE StatementList RBRACE;
+
+ElseOption ::= ELSE Statement
+            |  /* epsilon */;
+
+ReturnOption ::= Expr
+              |  /* epsilon */;
+
+PrintOption ::= SEMI NUM
+             |  /* epsilon */;
+
+// ------------------------------------------------- //
+
+DesignatorStatement ::= Designator ASSIGN Expr
+                     |  Designator LPAREN ActPars RPAREN
+                     |  Designator INC
+                     |  Designator DEC;
+
+Designator ::= Designator DOT IDENT
+            |  Designator LSQUARE Expr RSQUARE
+            |  IDENT;
+
+ActPars ::= ActParsList
+         |  /* epsilon */;
+
+ActParsList ::= ActParsList COMMA Expr
+             |  Expr;
+
+// ------------------------------------------------- //
+
+Condition ::= Condition OR CondTerm
+           |  CondTerm;
+
+CondTerm ::= CondTerm AND CondFact
+          |  CondFact;
+
+CondFact ::= Expr
+          |  Expr Relop Expr;
+
+// ------------------------------------------------- //
+
+Expr ::= ExprList
+      |  SUB ExprList;
+
+ExprList ::= ExprList Addop Term
+          |  Term;
+
+Term ::= Term Mulop Factor
+      |  Factor;
+
+Factor ::= Designator
+        |  Designator LPAREN ActPars RPAREN
+        |  NUM
+        |  CHAR
+        |  BOOL
+        |  NEW Type
+        |  NEW Type LSQUARE Expr RSQUARE
+        |  LPAREN Expr RPAREN;
+
+// ------------------------------------------------- //
+
+Relop ::= EQ
+       |  NEQ
+       |  GR
+       |  GREQ
+       |  LS
+       |  LSEQ;
+
+Addop ::= ADD
+       |  SUB;
+
+Mulop ::= MUL
+       |  DIV
+       |  MOD;
