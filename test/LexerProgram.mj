@@ -1,0 +1,62 @@
+program LexerProgram
+	int x; int y;
+	const bool flag;
+{
+	
+	class Test extends Object {
+		int array[10];
+	}
+	
+	int k () int c; {
+		c = 1;
+		return c+2;
+	}
+	
+	bool check(int i, bool flag) {
+		i = (i + 1) % 10; // Comment
+		char text = 'A';
+		flag = true;
+		
+		"asdasd" // Lexical error
+		
+		if (i <= 10 && i >= 0)
+			flag = false;
+		
+		if (i > 10 || i < 0 || i == 5)
+			return flag != 'T';
+
+		i++;
+		i--;
+
+		i = i / 2;
+		
+		>>===<==
+
+		while (flag) {
+			Test.array[i] = 0;
+			i++;
+			if (i == 10)
+				break;
+			else
+				continue;
+		}
+		
+		do { 
+			i++;
+		} while (flag == true);
+		
+	}
+	
+	int main() {
+		y = 2;
+		x = y + 2;
+		y = k() - 3*10;
+		x = read();
+		
+		Test t = new Test();
+		t.check(y, flag);
+		
+		print(y);
+		return 0;
+	}
+}
