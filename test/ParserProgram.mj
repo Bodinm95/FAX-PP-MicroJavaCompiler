@@ -1,0 +1,74 @@
+program ParserProgram	// Program
+
+	// ConstDecl //
+	const bool flag = true;
+	const int num_1 = 1, num_2 = 2;
+	const char char_1 = 'A', char_2 = 'B';
+	
+	// VarDecl //
+	int x, y, array[];
+	
+	int e globalErrorComma, z;			// Global variable Syntax Error recovery on COMMA
+	int err globalErrorSemi;			// Global variable Syntax Error recovery on SEMI
+	
+	// ClassDecl //
+	class TestOne extends Object {
+	
+		// VarDecl //
+		int varOne, varTwo;
+		char varArray[];
+		bool varFlag;
+		
+		{
+			// MethodDecl //
+			int getVarOne() {
+				// Statement //
+				return varOne;	// RETURN Expr
+			}
+
+			// MethodDecl - FormPars - VarDecl //
+			int sum(int A, int B) int mul; {
+				if (A >= B) {					// IF Condition
+					mul = 2;					// DesignatorStatement
+					return (A + B) * mul;		// Expr - Term - Factor
+				}
+				else {							// ELSE Statement
+					return A + B;
+				}
+			}
+
+			// MetodDecl - FormPars //
+			void error(int as formErrComma, int valid, bool e formErrParen) {	// Formal Parameter Syntax Error recovery on COMMA and RPAREN
+			
+				valid = this.getVarOne();		// DesignatorStatement - Designator = IDENT.IDENT()
+				valid = this.varArray[1+2];		// DesignatorStatement - Designator = IDENT.IDENT[Expr]
+				
+				err = asda assignErrSemi;		// Assignment expression Syntax Error recovery on SEMI
+
+				if (cond errAnd && cond)		// If Condition Syntax Error recovery on AND
+					if (cond errOr || cond)		// If Condition Syntax Error recovery on OR
+						if (cond errParen)		// If Condition Syntax Error recovery on RPAREN
+							return;
+			}
+		}
+	}
+	
+	// ClassDecl //
+	class TestError extends Object extendsErr {	// Class Extends Syntax Error recovery on LBRACE
+		
+		// VarDecl //
+		int x fieldErr;		// Class Field Syntax Error recovery on SEMI
+
+		{
+			void methodDecl() {
+				return;
+			}
+		}
+	}
+{
+	void main() {
+		print(1);
+		print(2);
+		z = y + 1;
+	}
+}
