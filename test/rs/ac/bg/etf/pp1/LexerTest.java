@@ -14,7 +14,6 @@ public class LexerTest {
 	
 	private static String symbolName(int id) {
 		Field[] fields = sym.class.getDeclaredFields();
-		String name = "";
 		try {
 			for (int i = 0; i < fields.length; i++)
 				if (fields[i].getInt(null) == id)
@@ -43,6 +42,6 @@ public class LexerTest {
 		finally { 
 			if (br != null) 
 				try { br.close(); } catch (IOException e) { System.out.println(e.getMessage()); }
-			}
+		}
 	}
 }
