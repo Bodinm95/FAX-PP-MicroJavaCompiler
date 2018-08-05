@@ -46,6 +46,7 @@ import java_cup.runtime.Symbol;
 "while"     { return symbol(sym.WHILE, yytext()); }
 "extends"   { return symbol(sym.EXTENDS, yytext()); }
 "continue"  { return symbol(sym.CONTINUE, yytext()); }
+"const"     { return symbol(sym.CONST, yytext()); }
 
 "+"     { return symbol(sym.ADD, yytext()); }
 "-"     { return symbol(sym.SUB, yytext()); }
