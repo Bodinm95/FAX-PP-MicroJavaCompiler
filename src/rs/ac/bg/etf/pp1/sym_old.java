@@ -5,18 +5,18 @@ public class sym_old {
 	// Keywords 
 	public static final int PROGRAM = 2;
 	public static final int BREAK = 3;
-	public static final int CLASS = 4;
-	public static final int ELSE = 5;
-	public static final int IF = 6;
-	public static final int NEW = 7;
-	public static final int PRINT = 8;
-	public static final int READ = 9;
-	public static final int RETURN = 10;
-	public static final int VOID = 11;
-	public static final int DO = 12;
-	public static final int WHILE = 13;
-	public static final int EXTENDS = 14;
-	public static final int CONTINUE = 15;
+	public static final int CONTINUE = 4;
+	public static final int CLASS = 5;
+	public static final int EXTENDS = 6;
+	public static final int IF = 7;
+	public static final int ELSE = 8;
+	public static final int DO = 9;
+	public static final int WHILE = 10;
+	public static final int RETURN = 11;
+	public static final int NEW = 12;
+	public static final int PRINT = 13;
+	public static final int READ = 14;
+	public static final int VOID = 15;
 	
 	// Identifiers
 	public static final int IDENT = 16;
