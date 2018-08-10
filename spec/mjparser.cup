@@ -3,6 +3,7 @@ package rs.ac.bg.etf.pp1;
 import java_cup.runtime.*;
 
 import rs.ac.bg.etf.pp1.ast.*;
+import java.lang.reflect.Field;
 
 parser code {:
 
@@ -25,22 +26,33 @@ parser code {:
 		error = true;
 		StringBuilder msg = new StringBuilder(message);
 		if (info instanceof Symbol && ((Symbol)info).value != null)
-			msg.append(" '" + ((Symbol)info).value.toString() + "'").append(" on line ").append(((Symbol)info).left);
-		System.out.println(msg.toString());
+			msg.append(" '" + ((Symbol)info).value.toString() + "'").append(" on line:").append(((Symbol)info).left);
+		System.err.println(msg.toString());
 	}
 
 	public void report_info(String message, Object info) {
 		StringBuilder msg = new StringBuilder(message); 
 		if (info instanceof Symbol && ((Symbol)info).value != null)
-			msg.append(" '" + ((Symbol)info).value.toString() + "'").append(" on line ").append(((Symbol)info).left);
-		System.out.println(msg.toString());
+			msg.append(" '" + ((Symbol)info).value.toString() + "'").append(" on line:").append(((Symbol)info).left);
+		System.err.println(msg.toString());
+	}
+
+	public String symbolName(int id) {
+		Field[] fields = sym.class.getDeclaredFields();
+		try {
+			for (int i = 0; i < fields.length; i++)
+				if (fields[i].getInt(null) == id)
+					return fields[i].getName();
+		} 
+		catch (Exception e) { e.printStackTrace(); };
+		return null;
 	}
 :}
 
 scan with {:
 	Symbol s = this.getScanner().next_token();
 	if (s != null && s.value != null)
-		System.out.println(s.left + ": " + s.toString() + "	" + s.value.toString());
+		System.out.println(s.left + ": " + symbolName(s.sym) + " " + s.toString() + "		" + s.value.toString());
 	return s;
 :}
 
