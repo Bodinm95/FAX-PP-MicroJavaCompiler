@@ -22,6 +22,14 @@ public class ParserTest {
 			Yylex lexer = new Yylex(br);
 			MJParser parser = new MJParser(lexer);
 			Symbol sym = parser.parse();
+			
+			if (parser.error) {
+				System.out.println("Parsing NOT successful: Syntax errors detected!");
+			}
+			else {
+				System.out.println("Parsing successfully done!");
+				System.out.println("\nSyntax tree:" + sym.value.toString());
+			}
 		}
 		catch (Exception e) { e.printStackTrace(); }
 		finally { 
