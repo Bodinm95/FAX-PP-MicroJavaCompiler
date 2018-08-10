@@ -10,25 +10,26 @@ import java_cup.runtime.Symbol;
 
 public class ParserTest {
 
-	public static void main(String[] args) {
-		
+	public static void parse(String filename) {
+
 		Reader br = null;
+		File sourceCode = new File(filename);
+
 		try {
-			File sourceCode = new File("test/ParserProgram.mj");
 			System.out.println("Compiling source file: " + sourceCode.getAbsolutePath());
-			
+
 			br = new BufferedReader(new FileReader(sourceCode));
-			
+
 			Yylex lexer = new Yylex(br);
 			MJParser parser = new MJParser(lexer);
 			Symbol sym = parser.parse();
-			
+
 			if (parser.error) {
-				System.out.println("Parsing NOT successful: Syntax errors detected!");
+				System.err.println("\nParsing NOT successful: Syntax errors detected!");
 			}
 			else {
-				System.out.println("Parsing successfully done!");
-				System.out.println("\nSyntax tree:" + sym.value.toString());
+				System.out.println("\nParsing successfully done!");
+				System.out.println("\nSyntax tree:\n" + sym.value.toString());
 			}
 		}
 		catch (Exception e) { e.printStackTrace(); }
@@ -38,4 +39,9 @@ public class ParserTest {
 		}
 	}
 
+	public static void main(String[] args) {
+		parse("test/ParserProgram.mj");
+		System.out.println("");
+		parse("test/ParserProgramError.mj");
+	}
 }
