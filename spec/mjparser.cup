@@ -34,7 +34,7 @@ parser code {:
 		StringBuilder msg = new StringBuilder(message); 
 		if (info instanceof Symbol && ((Symbol)info).value != null)
 			msg.append(" '" + ((Symbol)info).value.toString() + "'").append(" on line:").append(((Symbol)info).left);
-		System.err.println(msg.toString());
+		System.out.println(msg.toString());
 	}
 
 	public String symbolName(int id) {
@@ -68,7 +68,7 @@ terminal String BOOL;
 terminal String IDENT;
 
 nonterminal Prog;
-nonterminal ProgId;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj ProgId;
 
 nonterminal DeclList;
 nonterminal DeclPart;
@@ -76,7 +76,6 @@ nonterminal DeclPart;
 nonterminal ConstDecl;
 nonterminal ConstDeclList;
 nonterminal ConstDeclPart;
-nonterminal ConstDeclAlt;
 
 nonterminal VarDecl;
 nonterminal VarDeclList;
@@ -94,7 +93,7 @@ nonterminal RetType;
 nonterminal FormPars;
 nonterminal FormParsList;
 nonterminal FormParsPart;
-nonterminal Type;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Type;
 
 nonterminal StmtList;
 nonterminal Stmt;
@@ -126,7 +125,7 @@ precedence left ELSE;
 
 Prog ::= (Program) PROGRAM ProgId DeclList LBRACE MethodDeclList RBRACE;
 
-ProgId ::= (ProgramId) IDENT;
+ProgId ::= (ProgramId) IDENT:name;
 
 // ------------------------------------------------- //
 
@@ -144,11 +143,9 @@ ConstDecl ::= (ConstDeclaration) CONST Type ConstDeclList SEMI;
 ConstDeclList ::= (ConstDeclarationList) ConstDeclList COMMA ConstDeclPart
                |  (SingleConstDeclaration) ConstDeclPart;
 
-ConstDeclPart ::= (ConstDeclarationPart) IDENT ASSIGN ConstDeclAlt;
-
-ConstDeclAlt ::= (ConstDeclarationNum) NUM
-              |  (ConstDeclarationChar) CHAR
-              |  (ConstDeclarationBool) BOOL;
+ConstDeclPart ::= (ConstDeclarationNum) IDENT:name ASSIGN NUM:value
+               |  (ConstDeclarationChar) IDENT:name ASSIGN CHAR:value
+               |  (ConstDeclarationBool) IDENT:name ASSIGN BOOL:value;
 
 // ------------------------------------------------- //
 
@@ -158,8 +155,8 @@ VarDecl ::= (VarDeclaration) Type VarDeclList SEMI
 VarDeclList ::= (VarDeclarationList) VarDeclList COMMA VarDeclPart
              |  (SingleVarDeclaration) VarDeclPart;
 
-VarDeclPart ::= (VarDeclarationPart) IDENT
-             |  (VarDeclarationPartArray) IDENT LSQUARE RSQUARE
+VarDeclPart ::= (VarDeclarationPart) IDENT:name
+             |  (VarDeclarationPartArray) IDENT:name LSQUARE RSQUARE
              |  (ErrorVarDeclarationPart) error;
 
 ListVarDecl ::= (ListVarDeclaration) ListVarDecl VarDecl
@@ -169,7 +166,7 @@ ListVarDecl ::= (ListVarDeclaration) ListVarDecl VarDecl
 
 ClassDecl ::= (ClassDeclaration) CLASS ClassId ExtendsDecl LBRACE ListVarDecl ClassMethodDecl RBRACE;
 
-ClassId ::= (ClassId) IDENT;
+ClassId ::= (ClassId) IDENT:name;
 
 ExtendsDecl ::= (ExtendsDeclaration) EXTENDS Type
              |  (EmptyExtendsDeclaration) /* epsilon */
@@ -198,7 +195,7 @@ FormParsPart ::= (FormalParamPart) Type IDENT
               |  (FormalParamPartArray) Type IDENT LSQUARE RSQUARE
               |  (ErrorFormalParamPart) error;
 
-Type ::= (Type) IDENT;
+Type ::= (Type) IDENT:name;
 
 // ------------------------------------------------- //
 

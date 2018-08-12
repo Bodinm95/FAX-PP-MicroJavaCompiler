@@ -34,9 +34,9 @@ parser code {:
 		StringBuilder msg = new StringBuilder(message); 
 		if (info instanceof Symbol && ((Symbol)info).value != null)
 			msg.append(" '" + ((Symbol)info).value.toString() + "'").append(" on line:").append(((Symbol)info).left);
-		System.err.println(msg.toString());
+		System.out.println(msg.toString());
 	}
-	
+
 	public String symbolName(int id) {
 		Field[] fields = sym.class.getDeclaredFields();
 		try {
@@ -68,7 +68,7 @@ terminal String BOOL;
 terminal String IDENT;
 
 nonterminal Prog Prog;
-nonterminal ProgId ProgId;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj ProgId;
 
 nonterminal DeclList DeclList;
 nonterminal DeclPart DeclPart;
@@ -76,7 +76,6 @@ nonterminal DeclPart DeclPart;
 nonterminal ConstDecl ConstDecl;
 nonterminal ConstDeclList ConstDeclList;
 nonterminal ConstDeclPart ConstDeclPart;
-nonterminal ConstDeclAlt ConstDeclAlt;
 
 nonterminal VarDecl VarDecl;
 nonterminal VarDeclList VarDeclList;
@@ -94,7 +93,7 @@ nonterminal RetType RetType;
 nonterminal FormPars FormPars;
 nonterminal FormParsList FormParsList;
 nonterminal FormParsPart FormParsPart;
-nonterminal Type Type;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Type;
 
 nonterminal StmtList StmtList;
 nonterminal Stmt Stmt;
@@ -124,9 +123,9 @@ precedence left ELSE;
 
 // ------------------------------------------------- //
 
-Prog ::= (Program) PROGRAM ProgId:P1 DeclList:D2 LBRACE MethodDeclList:M3 RBRACE {: RESULT=new Program(P1, D2, M3); RESULT.setLine(P1left); :};
+Prog ::= (Program) PROGRAM ProgId:program DeclList:D1 LBRACE MethodDeclList:M2 RBRACE {: RESULT=new Program(program, D1, M2); RESULT.setLine(programleft); :};
 
-ProgId ::= (ProgramId) IDENT:I1 {: RESULT=new ProgramId(I1); RESULT.setLine(I1left); :};
+ProgId ::= (ProgramId) IDENT:name {: RESULT=new ProgramId(name); RESULT.setLine(nameleft); :};
 
 // ------------------------------------------------- //
 
@@ -144,11 +143,9 @@ ConstDecl ::= (ConstDeclaration) CONST Type:T1 ConstDeclList:C2 SEMI {: RESULT=n
 ConstDeclList ::= (ConstDeclarationList) ConstDeclList:C1 COMMA ConstDeclPart:C2 {: RESULT=new ConstDeclarationList(C1, C2); RESULT.setLine(C1left); :}
                |  (SingleConstDeclaration) ConstDeclPart:C1 {: RESULT=new SingleConstDeclaration(C1); RESULT.setLine(C1left); :};
 
-ConstDeclPart ::= (ConstDeclarationPart) IDENT:I1 ASSIGN ConstDeclAlt:C2 {: RESULT=new ConstDeclarationPart(I1, C2); RESULT.setLine(I1left); :};
-
-ConstDeclAlt ::= (ConstDeclarationNum) NUM:N1 {: RESULT=new ConstDeclarationNum(N1); RESULT.setLine(N1left); :}
-              |  (ConstDeclarationChar) CHAR:C1 {: RESULT=new ConstDeclarationChar(C1); RESULT.setLine(C1left); :}
-              |  (ConstDeclarationBool) BOOL:B1 {: RESULT=new ConstDeclarationBool(B1); RESULT.setLine(B1left); :};
+ConstDeclPart ::= (ConstDeclarationNum) IDENT:name ASSIGN NUM:value {: RESULT=new ConstDeclarationNum(name, value); RESULT.setLine(nameleft); :}
+               |  (ConstDeclarationChar) IDENT:name ASSIGN CHAR:value {: RESULT=new ConstDeclarationChar(name, value); RESULT.setLine(nameleft); :}
+               |  (ConstDeclarationBool) IDENT:name ASSIGN BOOL:value {: RESULT=new ConstDeclarationBool(name, value); RESULT.setLine(nameleft); :};
 
 // ------------------------------------------------- //
 
@@ -158,8 +155,8 @@ VarDecl ::= (VarDeclaration) Type:T1 VarDeclList:V2 SEMI {: RESULT=new VarDeclar
 VarDeclList ::= (VarDeclarationList) VarDeclList:V1 COMMA VarDeclPart:V2 {: RESULT=new VarDeclarationList(V1, V2); RESULT.setLine(V1left); :}
              |  (SingleVarDeclaration) VarDeclPart:V1 {: RESULT=new SingleVarDeclaration(V1); RESULT.setLine(V1left); :};
 
-VarDeclPart ::= (VarDeclarationPart) IDENT:I1 {: RESULT=new VarDeclarationPart(I1); RESULT.setLine(I1left); :}
-             |  (VarDeclarationPartArray) IDENT:I1 LSQUARE RSQUARE {: RESULT=new VarDeclarationPartArray(I1); RESULT.setLine(I1left); :}
+VarDeclPart ::= (VarDeclarationPart) IDENT:name {: RESULT=new VarDeclarationPart(name); RESULT.setLine(nameleft); :}
+             |  (VarDeclarationPartArray) IDENT:name LSQUARE RSQUARE {: RESULT=new VarDeclarationPartArray(name); RESULT.setLine(nameleft); :}
              |  (ErrorVarDeclarationPart) error {: RESULT=new ErrorVarDeclarationPart(); :};
 
 ListVarDecl ::= (ListVarDeclaration) ListVarDecl:L1 VarDecl:V2 {: RESULT=new ListVarDeclaration(L1, V2); RESULT.setLine(L1left); :}
@@ -169,7 +166,7 @@ ListVarDecl ::= (ListVarDeclaration) ListVarDecl:L1 VarDecl:V2 {: RESULT=new Lis
 
 ClassDecl ::= (ClassDeclaration) CLASS ClassId:C1 ExtendsDecl:E2 LBRACE ListVarDecl:L3 ClassMethodDecl:C4 RBRACE {: RESULT=new ClassDeclaration(C1, E2, L3, C4); RESULT.setLine(C1left); :};
 
-ClassId ::= (ClassId) IDENT:I1 {: RESULT=new ClassId(I1); RESULT.setLine(I1left); :};
+ClassId ::= (ClassId) IDENT:name {: RESULT=new ClassId(name); RESULT.setLine(nameleft); :};
 
 ExtendsDecl ::= (ExtendsDeclaration) EXTENDS Type:T1 {: RESULT=new ExtendsDeclaration(T1); RESULT.setLine(T1left); :}
              |  (EmptyExtendsDeclaration) {: RESULT=new EmptyExtendsDeclaration(); :} /* epsilon */
@@ -198,7 +195,7 @@ FormParsPart ::= (FormalParamPart) Type:T1 IDENT:I2 {: RESULT=new FormalParamPar
               |  (FormalParamPartArray) Type:T1 IDENT:I2 LSQUARE RSQUARE {: RESULT=new FormalParamPartArray(T1, I2); RESULT.setLine(T1left); :}
               |  (ErrorFormalParamPart) error {: RESULT=new ErrorFormalParamPart(); :};
 
-Type ::= (Type) IDENT:I1 {: RESULT=new Type(I1); RESULT.setLine(I1left); :};
+Type ::= (Type) IDENT:name {: RESULT=new Type(name); RESULT.setLine(nameleft); :};
 
 // ------------------------------------------------- //
 
