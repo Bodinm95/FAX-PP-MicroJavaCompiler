@@ -48,3 +48,47 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		currType = Type.struct;
 	}
 
+// ----------------------------------------------------------------------------------------------------------------------------- //
+
+	public void visit(ConstDeclarationNum ConstDeclarationNum) {
+		if (!currType.equals(TabSym.intType)) {
+			print_error(ConstDeclarationNum.getLine(), ConstDeclarationNum.getName(), "Incompatible types, expected int!");
+			return;
+		}
+		if (TabSym.currentScope().findSymbol(ConstDeclarationNum.getName()) != null) {
+			print_error(ConstDeclarationNum.getLine(), ConstDeclarationNum.getName(), "Symbol '" + ConstDeclarationNum.getName() + "' already defined in current scope!");
+			return;
+		}
+		Obj constant = TabSym.insert(Obj.Con, ConstDeclarationNum.getName(), currType);
+		constant.setAdr(ConstDeclarationNum.getValue().intValue());
+		System.out.println("Symbolic num constant '" + ConstDeclarationNum.getName() + " = " + ConstDeclarationNum.getValue() + "' declared at line:" + ConstDeclarationNum.getLine());
+	}
+
+	public void visit(ConstDeclarationChar ConstDeclarationChar) {
+		if (!currType.equals(TabSym.charType)) {
+			print_error(ConstDeclarationChar.getLine(), ConstDeclarationChar.getName(), "Incompatible types, expected char!");
+			return;
+		}
+		if (TabSym.currentScope().findSymbol(ConstDeclarationChar.getName()) != null) {
+			print_error(ConstDeclarationChar.getLine(), ConstDeclarationChar.getName(), "Symbol '" + ConstDeclarationChar.getName() + "' already defined in current scope!");
+			return;
+		}
+		Obj constant = TabSym.insert(Obj.Con, ConstDeclarationChar.getName(), currType);
+		constant.setAdr(ConstDeclarationChar.getValue().charValue());
+		System.out.println("Symbolic char constant '" + ConstDeclarationChar.getName() + " = " + ConstDeclarationChar.getValue() + "' declared at line:" + ConstDeclarationChar.getLine());
+	}
+
+	public void visit(ConstDeclarationBool ConstDeclarationBool) {
+		if (!currType.equals(TabSym.boolType)) {
+			print_error(ConstDeclarationBool.getLine(), ConstDeclarationBool.getName(), "Incompatible types, expected bool!");
+			return;
+		}
+		if (TabSym.currentScope().findSymbol(ConstDeclarationBool.getName()) != null) {
+			print_error(ConstDeclarationBool.getLine(), ConstDeclarationBool.getName(), "Symbol '" + ConstDeclarationBool.getName() + "' already defined in current scope!");
+			return;
+		}
+		Obj constant = TabSym.insert(Obj.Con, ConstDeclarationBool.getName(), currType);
+		constant.setAdr((ConstDeclarationBool.getValue().equals("true")) ? 1 : 0);
+		System.out.println("Symbolic char constant '" + ConstDeclarationBool.getName() + " = " + ConstDeclarationBool.getValue() + "' declared at line:" + ConstDeclarationBool.getLine());
+	}
+
