@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/7/2018 13:1:29
+// 12/7/2018 20:53:14
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -10,6 +10,8 @@ public abstract class ProgId implements SyntaxNode {
     private SyntaxNode parent;
 
     private int line;
+
+    public rs.etf.pp1.symboltable.concepts.Obj obj = null;
 
     public SyntaxNode getParent() {
         return parent;

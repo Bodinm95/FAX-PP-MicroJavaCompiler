@@ -1,24 +1,34 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/7/2018 13:1:29
+// 12/7/2018 20:53:14
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ConstDeclarationNum extends ConstDeclAlt {
+public class ConstDeclarationNum extends ConstDeclPart {
 
-    private Integer N1;
+    private String name;
+    private Integer value;
 
-    public ConstDeclarationNum (Integer N1) {
-        this.N1=N1;
+    public ConstDeclarationNum (String name, Integer value) {
+        this.name=name;
+        this.value=value;
     }
 
-    public Integer getN1() {
-        return N1;
+    public String getName() {
+        return name;
     }
 
-    public void setN1(Integer N1) {
-        this.N1=N1;
+    public void setName(String name) {
+        this.name=name;
+    }
+
+    public Integer getValue() {
+        return value;
+    }
+
+    public void setValue(Integer value) {
+        this.value=value;
     }
 
     public void accept(Visitor visitor) {
@@ -41,7 +51,10 @@ public class ConstDeclarationNum extends ConstDeclAlt {
         buffer.append(tab);
         buffer.append("ConstDeclarationNum(\n");
 
-        buffer.append(" "+tab+N1);
+        buffer.append(" "+tab+name);
+        buffer.append("\n");
+
+        buffer.append(" "+tab+value);
         buffer.append("\n");
 
         buffer.append(tab);

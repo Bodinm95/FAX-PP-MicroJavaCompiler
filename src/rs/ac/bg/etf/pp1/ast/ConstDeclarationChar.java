@@ -1,24 +1,34 @@
 // generated with ast extension for cup
 // version 0.8
-// 10/7/2018 13:1:29
+// 12/7/2018 20:53:14
 
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ConstDeclarationChar extends ConstDeclAlt {
+public class ConstDeclarationChar extends ConstDeclPart {
 
-    private Character C1;
+    private String name;
+    private Character value;
 
-    public ConstDeclarationChar (Character C1) {
-        this.C1=C1;
+    public ConstDeclarationChar (String name, Character value) {
+        this.name=name;
+        this.value=value;
     }
 
-    public Character getC1() {
-        return C1;
+    public String getName() {
+        return name;
     }
 
-    public void setC1(Character C1) {
-        this.C1=C1;
+    public void setName(String name) {
+        this.name=name;
+    }
+
+    public Character getValue() {
+        return value;
+    }
+
+    public void setValue(Character value) {
+        this.value=value;
     }
 
     public void accept(Visitor visitor) {
@@ -41,7 +51,10 @@ public class ConstDeclarationChar extends ConstDeclAlt {
         buffer.append(tab);
         buffer.append("ConstDeclarationChar(\n");
 
-        buffer.append(" "+tab+C1);
+        buffer.append(" "+tab+name);
+        buffer.append("\n");
+
+        buffer.append(" "+tab+value);
         buffer.append("\n");
 
         buffer.append(tab);
