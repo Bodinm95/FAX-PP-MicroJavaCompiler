@@ -92,3 +92,37 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		System.out.println("Symbolic char constant '" + ConstDeclarationBool.getName() + " = " + ConstDeclarationBool.getValue() + "' declared at line:" + ConstDeclarationBool.getLine());
 	}
 
+// ----------------------------------------------------------------------------------------------------------------------------- //
+
+	public void visit(VarDeclarationPart VarDeclarationPart) {
+		if (TabSym.currentScope().findSymbol(VarDeclarationPart.getName()) != null) {
+			print_error(VarDeclarationPart.getLine(), VarDeclarationPart.getName(), "Symbol '" + VarDeclarationPart.getName() + "' already defined in current scope!");
+			return;
+		}
+		if (!currType.equals(TabSym.noType)) {
+			TabSym.insert(Obj.Var, VarDeclarationPart.getName(), currType);
+			switch (state) {
+			case GLOBAL: System.out.println("Global variable '" + VarDeclarationPart.getName() + "' declared at line:" + VarDeclarationPart.getLine()); break;
+			case LOCAL: System.out.println("Local variable '" + VarDeclarationPart.getName() + "' declared in function '" + currMethod.getName() + "' at line:" + VarDeclarationPart.getLine()); break;
+			case CLASS: System.out.println(""); break;
+			case METHOD: System.out.println(""); break;
+			}
+		}
+	}
+
+	public void visit(VarDeclarationPartArray VarDeclarationPartArray) {
+		if (TabSym.currentScope().findSymbol(VarDeclarationPartArray.getName()) != null) {
+			print_error(VarDeclarationPartArray.getLine(), VarDeclarationPartArray.getName(), "Symbol '" + VarDeclarationPartArray.getName() + "' already defined in current scope!");
+			return;
+		}
+		if (!currType.equals(TabSym.noType)) {
+			TabSym.insert(Obj.Var, VarDeclarationPartArray.getName(), new Struct(Struct.Array, currType));
+			switch (state) {
+			case GLOBAL: System.out.println("Global variable '" + VarDeclarationPartArray.getName() + "[]' declared at line:" + VarDeclarationPartArray.getLine()); break;
+			case LOCAL: System.out.println("Local variable '" + VarDeclarationPartArray.getName() + "[]' declared in function '" + currMethod.getName() +"' at line:" + VarDeclarationPartArray.getLine()); break;
+			case CLASS: System.out.println(""); break;
+			case METHOD: System.out.println(""); break;
+			}
+		}
+	}
+
