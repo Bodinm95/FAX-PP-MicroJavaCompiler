@@ -126,3 +126,40 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 	}
 
+// ----------------------------------------------------------------------------------------------------------------------------- //
+
+	public void visit(ClassDeclaration ClassDeclaration) {
+		TabSym.chainLocalSymbols(currClass);
+		TabSym.closeScope();
+		state = Scope.GLOBAL;
+		System.out.println("Class '" + ClassDeclaration.getClassId().getName() + "' successfully processed.");
+		currClass = null;
+	}
+
+	public void visit(ClassId ClassId) {
+		if (TabSym.currentScope().findSymbol(ClassId.getName()) != null) {
+			print_error(ClassId.getLine(), ClassId.getName(), "Symbol '" + ClassId.getName() + "' already defined in current scope!");
+			return;
+		}
+		currClass = TabSym.insert(Obj.Type, ClassId.getName(), new Struct(Struct.Class));
+		System.out.println("Class '" + ClassId.getName() + "' declared at line:" + ClassId.getLine());
+		TabSym.openScope();
+		TabSym.insert(Obj.Fld, "this", currClass.getType());
+		state = Scope.CLASS;
+	}
+
+	public void visit(ExtendsDeclaration ExtendsDeclaration) {
+		Obj parent = TabSym.find(ExtendsDeclaration.getType().getName());
+		if (parent == TabSym.noObj || parent.getType().getKind() != Struct.Class) {
+			print_error(ExtendsDeclaration.getLine(), ExtendsDeclaration.getType().getName(), "Symbol '" + ExtendsDeclaration.getType().getName() + "' is not a declared class!");
+			TabSym.currentScope.getLocals().deleteKey("this");
+			TabSym.currentScope.getOuter().getLocals().deleteKey(currClass.getName());
+			return;
+		}
+		for (Obj field : parent.getLocalSymbols())
+			if (!field.getName().equals("this")) {
+				TabSym.insert(Obj.Fld, field.getName(), field.getType());
+			}
+		System.out.println("Class '" + currClass.getName() + "' extends class '" + ExtendsDeclaration.getType().getName() + "'");
+	}
+}
