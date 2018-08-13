@@ -1,35 +1,10 @@
 program SemanticProgram
-	const asd ErrType = 1;					// unknown type error
-	const char CHAR = 'A';
-	const int ErrNum = 'A', NUM = 5;		// int type error
-	const bool BOOL = true, ErrBool = 10;	// bool type error
-	const bool BOOL = false;				// already defined error
 
-	char charVar;
-	bool boolVar;
-	int num, intVar;
-	int intVar; 	// already defined error
-	int arr[];
-
-	class ExtendsErr extends int { 	// extends class type error
-		int A, A;
-		{
-			int error(int err, int err) { }
-		}
-	}
 	class SemTest {
 		int fieldNum;
 		bool fieldFlag;
 		{
 			void sum(int a, int b) { }
-
-			int vec_sum(int v[], int s) { }
 		}
 	}
-	
-	class Child extends SemTest { }
-{
-	void main() 
-		int mainVar;
-	{ }
-}
+{ }
