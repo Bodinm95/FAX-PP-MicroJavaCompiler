@@ -23,7 +23,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		System.err.println("Semantic error '" + name + "' at line:" + line + " - " + msg);
 	}
 
-// ----------------------------------------------------------------------------------------------------------------------------- //
+// ----------------------------------------------- Program ----------------------------------------------------------- //
 
 	public void visit(Program Program) {
 		String name = ((ProgramId)Program.getProgId()).getName();
@@ -57,7 +57,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			currType = typeObj.getType();
 	}
 
-// ----------------------------------------------------------------------------------------------------------------------------- //
+	// ----------------------------------------------- ConstDecl ----------------------------------------------------------- //
 
 	public void visit(ConstDeclarationNum ConstDeclarationNum) {
 		String name = ConstDeclarationNum.getName();
@@ -113,7 +113,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		System.out.println("Symbolic char constant '" + name + " = " + value + "' declared at line:" + line);
 	}
 
-// ----------------------------------------------------------------------------------------------------------------------------- //
+	// ----------------------------------------------- VarDecl ----------------------------------------------------------- //
 
 	public void visit(VarDeclarationPart VarDeclarationPart) {
 		String name = VarDeclarationPart.getName();
@@ -155,7 +155,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 	}
 
-// ----------------------------------------------------------------------------------------------------------------------------- //
+	// ----------------------------------------------- ClassDecl ----------------------------------------------------------- //
 
 	public void visit(ClassDeclaration ClassDeclaration) {
 		String name = ClassDeclaration.getClassId().getName();
