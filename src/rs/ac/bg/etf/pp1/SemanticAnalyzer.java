@@ -282,9 +282,29 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(MethodDeclaration MethodDeclaration)
 	{
 		String name = methodName(MethodDeclaration);
+		String methodName = currMethod.getName();
+		String returnName = methodType.equals(TabSym.noType) ? "void" : ((ReturnType)MethodDeclaration.getRetType()).getType().getName();
+		int line = MethodDeclaration.getLine();
 
 		TabSym.chainLocalSymbols(currMethod);
 		TabSym.closeScope();
+
+		if (methodType.equals(TabSym.noType))
+			if (!retType.equals(TabSym.noType) && !retType.equals(TabSym.nullType)) {
+				print_error(line, methodName, "Void function must have empty or no return statements!");
+				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
+			}
+
+		if (!methodType.equals(TabSym.noType)) {
+			if (retType.equals(TabSym.nullType) && !methodType.isRefType()) {
+				print_error(line, methodName, "Return statement missing!");
+				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
+			}
+			else if (!methodType.compatibleWith(retType)) {
+				print_error(line, methodName, "Incompatible return type, expected " + returnName + "!");
+				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
+			}
+		}
 
 		switch (state) {
 		case METHOD:
