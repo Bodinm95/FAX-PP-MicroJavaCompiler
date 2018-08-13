@@ -14,7 +14,8 @@ program SemanticProgram
 	class ExtendsErr extends int { }	// extends class type error
 	
 	class SemTest {
-	
+		int fieldNum;
+		bool fieldFlag;
 	}
 	
 	class Child extends SemTest { }

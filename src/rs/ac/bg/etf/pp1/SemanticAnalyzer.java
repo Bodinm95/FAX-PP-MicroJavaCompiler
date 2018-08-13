@@ -123,11 +123,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 		}
 		if (!currType.equals(TabSym.noType)) {
-			TabSym.insert(Obj.Var, name, currType);
+			int kind = (state.equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
+			TabSym.insert(kind, name, currType);
 			switch (state) {
 			case GLOBAL: System.out.println("Global variable '" + name + "' declared at line:" + line); break;
 			case LOCAL: System.out.println("Local variable '" + name + "' declared in function '" + currMethod.getName() + "' at line:" + line); break;
-			case CLASS: System.out.println(""); break;
+			case CLASS: System.out.println("Field '" + name + "' declared in class '" + currClass.getName() + "' at line:" + line); break;
 			case METHOD: System.out.println(""); break;
 			}
 		}
@@ -142,7 +143,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 		}
 		if (!currType.equals(TabSym.noType)) {
-			TabSym.insert(Obj.Var, name, new Struct(Struct.Array, currType));
+			int kind = (state.equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
+			TabSym.insert(kind, name, new Struct(Struct.Array, currType));
 			switch (state) {
 			case GLOBAL: System.out.println("Global variable '" + name + "[]' declared at line:" + line); break;
 			case LOCAL: System.out.println("Local variable '" + name + "[]' declared in function '" + currMethod.getName() +"' at line:" + line); break;
@@ -157,7 +159,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(ClassDeclaration ClassDeclaration) {
 		String name = ClassDeclaration.getClassId().getName();
 
-		TabSym.chainLocalSymbols(currClass);
+		TabSym.chainLocalSymbols(currClass.getType());
 		TabSym.closeScope();
 		state = Scope.GLOBAL;
 		System.out.println("Class '" + name + "' successfully processed.");
@@ -175,7 +177,6 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		currClass = TabSym.insert(Obj.Type, name, new Struct(Struct.Class));
 		System.out.println("Class '" + name + "' declared at line:" + line);
 		TabSym.openScope();
-		TabSym.insert(Obj.Fld, "this", currClass.getType());
 		state = Scope.CLASS;
 	}
 
@@ -188,10 +189,59 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "Symbol '" + name + "' is not a declared class!");
 			return;
 		}
-		for (Obj field : parent.getLocalSymbols())
+		for (Obj field : parent.getType().getMembers())
 			if (!field.getName().equals("this")) {
 				TabSym.insert(Obj.Fld, field.getName(), field.getType());
 			}
 		System.out.println("Class '" + currClass.getName() + "' extends class '" + name + "'");
 	}
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
