@@ -194,8 +194,8 @@ FormPars ::= (FormalParams) FormParsList
 FormParsList ::= (FormalParamList) FormParsList COMMA FormParsPart
               |  (SingleFormalParam) FormParsPart;
 
-FormParsPart ::= (FormalParamPart) Type IDENT
-              |  (FormalParamPartArray) Type IDENT LSQUARE RSQUARE
+FormParsPart ::= (FormalParamPart) Type IDENT:name
+              |  (FormalParamPartArray) Type IDENT:name LSQUARE RSQUARE
               |  (ErrorFormalParamPart) error;
 
 Type ::= (Type) IDENT:name;

@@ -194,8 +194,8 @@ FormPars ::= (FormalParams) FormParsList:F1 {: RESULT=new FormalParams(F1); RESU
 FormParsList ::= (FormalParamList) FormParsList:F1 COMMA FormParsPart:F2 {: RESULT=new FormalParamList(F1, F2); RESULT.setLine(F1left); :}
               |  (SingleFormalParam) FormParsPart:F1 {: RESULT=new SingleFormalParam(F1); RESULT.setLine(F1left); :};
 
-FormParsPart ::= (FormalParamPart) Type:T1 IDENT:I2 {: RESULT=new FormalParamPart(T1, I2); RESULT.setLine(T1left); :}
-              |  (FormalParamPartArray) Type:T1 IDENT:I2 LSQUARE RSQUARE {: RESULT=new FormalParamPartArray(T1, I2); RESULT.setLine(T1left); :}
+FormParsPart ::= (FormalParamPart) Type:T1 IDENT:name {: RESULT=new FormalParamPart(T1, name); RESULT.setLine(T1left); :}
+              |  (FormalParamPartArray) Type:T1 IDENT:name LSQUARE RSQUARE {: RESULT=new FormalParamPartArray(T1, name); RESULT.setLine(T1left); :}
               |  (ErrorFormalParamPart) error {: RESULT=new ErrorFormalParamPart(); :};
 
 Type ::= (Type) IDENT:name {: RESULT=new Type(name); RESULT.setLine(nameleft); :};
