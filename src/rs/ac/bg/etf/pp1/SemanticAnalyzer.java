@@ -30,6 +30,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		System.err.println("Semantic error '" + name + "' at line:" + line + " - " + msg);
 	}
 
+	public void print_info(String msg) {
+		System.out.println(msg);
+		System.out.println("");
+	}
 // ----------------------------------------------- Program ----------------------------------------------------------- //
 
 	public void visit(Program Program)
@@ -41,7 +45,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		state = Scope.GLOBAL;
 
-		System.out.println("Program '" + name + "' " + (global_error ? "" : "successfully ") + "processed.");
+		print_info("Program '" + name + "' " + (global_error ? "" : "successfully ") + "processed.");
 	}
 
 	public void visit(ProgramId ProgramId)
@@ -55,7 +59,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		error = false;
 		state = Scope.GLOBAL;
 
-		System.out.println("Program '" + name + "' declared at line:" + line);
+		print_info("Program '" + name + "' declared at line:" + line);
 	}
 
 	public void visit(Type Type)
@@ -72,7 +76,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			currType = typeObj.getType();
 	}
 
-	// ----------------------------------------------- ConstDecl ----------------------------------------------------------- //
+// ----------------------------------------------- ConstDecl ----------------------------------------------------------- //
 
 	public void visit(ConstDeclarationNum ConstDeclarationNum)
 	{
@@ -93,7 +97,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Obj constant = TabSym.insert(Obj.Con, name, currType);
 		constant.setAdr(value);
 
-		System.out.println("Symbolic num constant '" + name + " = " + value + "' declared at line:" + line);
+		print_info("Symbolic num constant '" + name + " = " + value + "' declared at line:" + line);
 	}
 
 	public void visit(ConstDeclarationChar ConstDeclarationChar)
@@ -115,7 +119,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Obj constant = TabSym.insert(Obj.Con, name, currType);
 		constant.setAdr(value);
 
-		System.out.println("Symbolic char constant '" + name + " = " + value + "' declared at line:" + line);
+		print_info("Symbolic char constant '" + name + " = " + value + "' declared at line:" + line);
 	}
 
 	public void visit(ConstDeclarationBool ConstDeclarationBool)
@@ -137,10 +141,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Obj constant = TabSym.insert(Obj.Con, name, currType);
 		constant.setAdr((value.equals("true")) ? 1 : 0);
 
-		System.out.println("Symbolic char constant '" + name + " = " + value + "' declared at line:" + line);
+		print_info("Symbolic char constant '" + name + " = " + value + "' declared at line:" + line);
 	}
 
-	// ----------------------------------------------- VarDecl ----------------------------------------------------------- //
+// ----------------------------------------------- VarDecl ----------------------------------------------------------- //
 
 	public void visit(VarDeclarationPart VarDeclarationPart)
 	{
@@ -157,10 +161,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			TabSym.insert(kind, name, currType);
 
 			switch (state) {
-			case GLOBAL: System.out.println("Global variable '" + name + "' declared at line:" + line); break;
-			case LOCAL: System.out.println("Local variable '" + name + "' declared in function '" + currMethod.getName() + "' at line:" + line); break;
-			case CLASS: System.out.println("Field '" + name + "' declared in class '" + currClass.getName() + "' at line:" + line); break;
-			case METHOD: System.out.println("Local variable '" + name + "' declared in class '" + currClass.getName() + "' method '" + currMethod.getName() + "' at line:" + line); break;
+			case GLOBAL: print_info("Global variable '" + name + "' declared at line:" + line); break;
+			case LOCAL: print_info("Local variable '" + name + "' declared in function '" + currMethod.getName() + "' at line:" + line); break;
+			case CLASS: print_info("Field '" + name + "' declared in class '" + currClass.getName() + "' at line:" + line); break;
+			case METHOD: print_info("Local variable '" + name + "' declared in class '" + currClass.getName() + "' method '" + currMethod.getName() + "' at line:" + line); break;
 			}
 		}
 	}
@@ -180,15 +184,15 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			TabSym.insert(kind, name, new Struct(Struct.Array, currType));
 
 			switch (state) {
-			case GLOBAL: System.out.println("Global variable '" + name + "[]' declared at line:" + line); break;
-			case LOCAL: System.out.println("Local variable '" + name + "[]' declared in function '" + currMethod.getName() +"' at line:" + line); break;
-			case CLASS: System.out.println(""); break;
-			case METHOD: System.out.println(""); break;
+			case GLOBAL: print_info("Global variable '" + name + "[]' declared at line:" + line); break;
+			case LOCAL: print_info("Local variable '" + name + "[]' declared in function '" + currMethod.getName() +"' at line:" + line); break;
+			case CLASS: print_info(""); break;
+			case METHOD: print_info(""); break;
 			}
 		}
 	}
 
-	// ----------------------------------------------- ClassDecl ----------------------------------------------------------- //
+// ----------------------------------------------- ClassDecl ----------------------------------------------------------- //
 
 	public void visit(ClassDeclaration ClassDeclaration)
 	{
@@ -200,7 +204,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		state = Scope.GLOBAL;
 		currClass = null;
 
-		System.out.println("Class '" + name + "' " + (error ? "" : "successfully ") + "processed.");
+		print_info("Class '" + name + "' " + (error ? "" : "successfully ") + "processed.");
 	}
 
 	public void visit(ClassId ClassId)
@@ -214,7 +218,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 		else {
 			currClass = TabSym.insert(Obj.Type, name, new Struct(Struct.Class));
-			System.out.println("Class '" + name + "' declared at line:" + line);
+			print_info("Class '" + name + "' declared at line:" + line);
 		}
 
 		TabSym.openScope();
@@ -242,10 +246,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				TabSym.insert(Obj.Fld, field.getName(), field.getType());
 			}
 
-		System.out.println("Class '" + currClass.getName() + "' extends class '" + name + "'");
+		print_info("Class '" + currClass.getName() + "' extends class '" + name + "'");
 	}
 
-	// ----------------------------------------------- MethodDecl ----------------------------------------------------------- //
+// ----------------------------------------------- MethodDecl ----------------------------------------------------------- //
 
 	public String methodName(MethodDeclaration MethodDeclaration) {
 		StringBuilder name = new StringBuilder();
@@ -284,12 +288,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		switch (state) {
 		case METHOD:
-			System.out.println("Method '" + name + "' " + (error ? "" : "successfully ") + "processed.");
+			print_info("Method '" + name + "' " + (error ? "" : "successfully ") + "processed.");
 			state = Scope.CLASS;
 			currMethod.setLevel(formParamList.size() + 1);	// increment for implicit parameter this
 			break;
 		case LOCAL:
-			System.out.println("Function '" + name + "' " + (error ? "" : "successfully ") + "processed.");
+			print_info("Function '" + name + "' " + (error ? "" : "successfully ") + "processed.");
 			state = Scope.GLOBAL;
 			currMethod.setLevel(formParamList.size());	// set number of formal parameters
 			break;
@@ -317,10 +321,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 			switch (state) {
 			case GLOBAL:
-				System.out.println("Function '" + name + "' declared at line:" + line);
+				print_info("Function '" + name + "' declared at line:" + line);
 				break;
 			case CLASS: 
-				System.out.println("Method '" + name + "' declared in class '" + currClass.getName() + "' at line:" + line);
+				print_info("Method '" + name + "' declared in class '" + currClass.getName() + "' at line:" + line);
 				break;
 			default :
 				break;
@@ -370,7 +374,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			formParam.setFpPos(currMethod.getLevel());	// formal param position
 			formParamList.add(FormalParamPart);
 
-			System.out.println("Formal parameter '" + typeName + " " + name + "' of method '" + currMethod.getName() + "' declared at line:" + line);
+			print_info("Formal parameter '" + typeName + " " + name + "' of method '" + currMethod.getName() + "' declared at line:" + line);
 		}
 	}
 
@@ -390,7 +394,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			formParam.setFpPos(currMethod.getLevel());	// formal param position
 			formParamList.add(FormalParamPartArray);
 
-			System.out.println("Formal parameter '" + typeName + " " + name + "[]' of method '" + currMethod.getName() + "' declared at line:" + line);
+			print_info("Formal parameter '" + typeName + " " + name + "[]' of method '" + currMethod.getName() + "' declared at line:" + line);
 		}
 	
 	}

@@ -1,0 +1,11 @@
+program SemanticProgram
+
+	class SemTest {
+		int fieldNum;
+		bool fieldFlag;
+		{
+			int sum(int a, int b) { }
+		}
+	}
+{
+}
