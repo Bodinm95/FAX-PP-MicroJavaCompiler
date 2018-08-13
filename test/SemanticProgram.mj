@@ -21,7 +21,7 @@ program SemanticProgram
 		int fieldNum;
 		bool fieldFlag;
 		{
-			int sum(int a, int b) { }
+			void sum(int a, int b) { }
 
 			int vec_sum(int v[], int s) { }
 		}
