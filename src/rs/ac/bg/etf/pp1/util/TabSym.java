@@ -50,7 +50,7 @@ public class TabSym extends Tab {
 
 	public static Obj insert(int kind, String name, Struct type) {
 		// create a new Object node with kind, name, type
-		Obj newObj = new Obj(kind, name, type, 0, ((currentLevel != 0)? 1 : 0)); 
+		Obj newObj = new Obj(kind, name, type, 0, currentLevel); 
 		
 		// append the node to the end of the symbol list
 		if (!currentScope.addToLocals(newObj)) {
