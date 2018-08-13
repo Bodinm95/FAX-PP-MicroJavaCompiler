@@ -71,7 +71,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String name = Type.getName();
 		int line = Type.getLine();
 		
-		currType = TabSym.nullType;
+		currType = TabSym.noType;
 		Obj typeObj = TabSym.find(name);
 
 		if (typeObj == TabSym.noObj || typeObj.getKind() != Obj.Type)
@@ -160,7 +160,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 		}
 
-		if (!currType.equals(TabSym.nullType)) {
+		if (!currType.equals(TabSym.noType)) {
 			int kind = (state.equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
 			TabSym.insert(kind, name, currType);
 
@@ -183,7 +183,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 		}
 
-		if (!currType.equals(TabSym.nullType)) {
+		if (!currType.equals(TabSym.noType)) {
 			int kind = (state.equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
 			TabSym.insert(kind, name, new Struct(Struct.Array, currType));
 
@@ -283,32 +283,45 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		return name.toString();
 	}
 
-	public void visit(MethodDeclaration MethodDeclaration)
-	{
-		String name = methodName(MethodDeclaration);
+	public void returnTypeCheck(MethodDeclaration MethodDeclaration) {
 		String methodName = currMethod.getName();
 		String returnName = methodType.equals(TabSym.noType) ? "void" : ((ReturnType)MethodDeclaration.getRetType()).getType().getName();
 		int line = MethodDeclaration.getLine();
 
+		if (retType == null || methodType.equals(TabSym.nullType)) {
+			print_error(line, methodName, "Invalid return type!");
+			TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
+			return;
+		}
+		if (methodType.equals(TabSym.noType))		// void method
+			if (!retType.equals(TabSym.noType)) {
+				print_error(line, methodName, "Void function must have empty or no return statements!");
+				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
+				return;
+			}
+
+		if (!methodType.equals(TabSym.noType)) {	// regular method
+			if (retType.equals(TabSym.noType)) {
+				print_error(line, methodName, "Return statement missing!");
+				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
+				return;
+			}
+			if (!methodType.compatibleWith(retType)) {
+				print_error(line, methodName, "Incompatible return type, expected " + returnName + "!");
+				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
+				return;
+			}
+		}
+	}
+
+	public void visit(MethodDeclaration MethodDeclaration)
+	{
+		String name = methodName(MethodDeclaration);
+
 		TabSym.chainLocalSymbols(currMethod);
 		TabSym.closeScope();
 
-		if (methodType.equals(TabSym.noType))
-			if (!retType.equals(TabSym.noType) && !retType.equals(TabSym.nullType)) {
-				print_error(line, methodName, "Void function must have empty or no return statements!");
-				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
-			}
-
-		if (!methodType.equals(TabSym.noType)) {
-			if (retType.equals(TabSym.nullType) && !methodType.isRefType()) {
-				print_error(line, methodName, "Return statement missing!");
-				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
-			}
-			else if (!methodType.compatibleWith(retType)) {
-				print_error(line, methodName, "Incompatible return type, expected " + returnName + "!");
-				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
-			}
-		}
+		returnTypeCheck(MethodDeclaration);
 
 		switch (state) {
 		case METHOD:
@@ -342,7 +355,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		else {
 			currMethod = TabSym.insert(Obj.Meth, name, methodType);
 			formParamList = new ArrayList<FormParsPart>();
-			retType = TabSym.nullType;
+			retType = TabSym.noType;
 
 			switch (state) {
 			case GLOBAL:
@@ -375,7 +388,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(ReturnType ReturnType) 
 	{
-		methodType = currType;
+		if (currType.equals(Tab.noType))
+			methodType = Tab.nullType;
+		else
+			methodType = currType;
 	}
 
 	public void visit(ReturnTypeVoid ReturnTypeVoid)
