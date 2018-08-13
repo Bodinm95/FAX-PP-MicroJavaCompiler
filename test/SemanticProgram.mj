@@ -11,13 +11,25 @@ program SemanticProgram
 	int intVar; 	// already defined error
 	int arr[];
 
-	class ExtendsErr extends int { }	// extends class type error
-	
+	class ExtendsErr extends int { 	// extends class type error
+		int A, A;
+		{
+			int error(int err, int err) { }
+		}
+	}
 	class SemTest {
 		int fieldNum;
 		bool fieldFlag;
+		{
+			int sum(int a, int b) { }
+
+			int vec_sum(int v[], int s) { }
+		}
 	}
 	
 	class Child extends SemTest { }
 {
+	void main() 
+		int mainVar;
+	{ }
 }
