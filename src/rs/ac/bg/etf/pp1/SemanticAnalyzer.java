@@ -25,32 +25,40 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 // ----------------------------------------------- Program ----------------------------------------------------------- //
 
-	public void visit(Program Program) {
+	public void visit(Program Program)
+	{
 		String name = ((ProgramId)Program.getProgId()).getName();
 
 		TabSym.chainLocalSymbols(Program.getProgId().obj);
 		TabSym.closeScope();
+
 		state = Scope.GLOBAL;
+
 		System.out.println("Program '" + name + "' " + (global_error ? "" : "successfully ") + "processed.");
 	}
 
-	public void visit(ProgramId ProgramId) {
+	public void visit(ProgramId ProgramId)
+	{
 		String name = ProgramId.getName();
 		int line = ProgramId.getLine();
 
 		ProgramId.obj = TabSym.insert(Obj.Prog, name, TabSym.noType);
-		System.out.println("Program '" + name + "' declared at line:" + line);
 		TabSym.openScope();
+		
 		error = false;
 		state = Scope.GLOBAL;
+
+		System.out.println("Program '" + name + "' declared at line:" + line);
 	}
 
-	public void visit(Type Type) {
+	public void visit(Type Type)
+	{
 		String name = Type.getName();
 		int line = Type.getLine();
-
-		currType = TabSym.noType;
+		
+		currType = TabSym.nullType;
 		Obj typeObj = TabSym.find(name);
+
 		if (typeObj == TabSym.noObj || typeObj.getKind() != Obj.Type)
 			print_error(line, name, "Symbol '" + name + "' is not a type!");
 		else
@@ -59,7 +67,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	// ----------------------------------------------- ConstDecl ----------------------------------------------------------- //
 
-	public void visit(ConstDeclarationNum ConstDeclarationNum) {
+	public void visit(ConstDeclarationNum ConstDeclarationNum)
+	{
 		String name = ConstDeclarationNum.getName();
 		int line = ConstDeclarationNum.getLine();
 		int value = ConstDeclarationNum.getValue().intValue();
@@ -68,16 +77,20 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "Incompatible types, expected int!");
 			return;
 		}
+
 		if (TabSym.currentScope().findSymbol(name) != null) {
 			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
 			return;
 		}
+
 		Obj constant = TabSym.insert(Obj.Con, name, currType);
 		constant.setAdr(value);
+
 		System.out.println("Symbolic num constant '" + name + " = " + value + "' declared at line:" + line);
 	}
 
-	public void visit(ConstDeclarationChar ConstDeclarationChar) {
+	public void visit(ConstDeclarationChar ConstDeclarationChar)
+	{
 		String name = ConstDeclarationChar.getName();
 		int line = ConstDeclarationChar.getLine();
 		char value = ConstDeclarationChar.getValue().charValue();
@@ -86,16 +99,20 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "Incompatible types, expected char!");
 			return;
 		}
+
 		if (TabSym.currentScope().findSymbol(name) != null) {
 			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
 			return;
 		}
+
 		Obj constant = TabSym.insert(Obj.Con, name, currType);
 		constant.setAdr(value);
+
 		System.out.println("Symbolic char constant '" + name + " = " + value + "' declared at line:" + line);
 	}
 
-	public void visit(ConstDeclarationBool ConstDeclarationBool) {
+	public void visit(ConstDeclarationBool ConstDeclarationBool)
+	{
 		String name = ConstDeclarationBool.getName();
 		int line = ConstDeclarationBool.getLine();
 		String value = ConstDeclarationBool.getValue();
@@ -104,18 +121,22 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "Incompatible types, expected bool!");
 			return;
 		}
+
 		if (TabSym.currentScope().findSymbol(name) != null) {
 			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
 			return;
 		}
+
 		Obj constant = TabSym.insert(Obj.Con, name, currType);
 		constant.setAdr((value.equals("true")) ? 1 : 0);
+
 		System.out.println("Symbolic char constant '" + name + " = " + value + "' declared at line:" + line);
 	}
 
 	// ----------------------------------------------- VarDecl ----------------------------------------------------------- //
 
-	public void visit(VarDeclarationPart VarDeclarationPart) {
+	public void visit(VarDeclarationPart VarDeclarationPart)
+	{
 		String name = VarDeclarationPart.getName();
 		int line = VarDeclarationPart.getLine();
 
@@ -123,9 +144,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
 			return;
 		}
-		if (!currType.equals(TabSym.noType)) {
+
+		if (!currType.equals(TabSym.nullType)) {
 			int kind = (state.equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
 			TabSym.insert(kind, name, currType);
+
 			switch (state) {
 			case GLOBAL: System.out.println("Global variable '" + name + "' declared at line:" + line); break;
 			case LOCAL: System.out.println("Local variable '" + name + "' declared in function '" + currMethod.getName() + "' at line:" + line); break;
@@ -135,7 +158,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 	}
 
-	public void visit(VarDeclarationPartArray VarDeclarationPartArray) {
+	public void visit(VarDeclarationPartArray VarDeclarationPartArray)
+	{
 		String name = VarDeclarationPartArray.getName();
 		int line = VarDeclarationPartArray.getLine();
 
@@ -143,9 +167,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
 			return;
 		}
-		if (!currType.equals(TabSym.noType)) {
+
+		if (!currType.equals(TabSym.nullType)) {
 			int kind = (state.equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
 			TabSym.insert(kind, name, new Struct(Struct.Array, currType));
+
 			switch (state) {
 			case GLOBAL: System.out.println("Global variable '" + name + "[]' declared at line:" + line); break;
 			case LOCAL: System.out.println("Local variable '" + name + "[]' declared in function '" + currMethod.getName() +"' at line:" + line); break;
@@ -157,17 +183,21 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	// ----------------------------------------------- ClassDecl ----------------------------------------------------------- //
 
-	public void visit(ClassDeclaration ClassDeclaration) {
+	public void visit(ClassDeclaration ClassDeclaration)
+	{
 		String name = ClassDeclaration.getClassId().getName();
 
 		TabSym.chainLocalSymbols(currClass.getType());
 		TabSym.closeScope();
+
 		state = Scope.GLOBAL;
-		System.out.println("Class '" + name + "' " + (error ? "" : "successfully ") + "processed.");
 		currClass = null;
+
+		System.out.println("Class '" + name + "' " + (error ? "" : "successfully ") + "processed.");
 	}
 
-	public void visit(ClassId ClassId) {
+	public void visit(ClassId ClassId)
+	{
 		String name = ClassId.getName();
 		int line = ClassId.getLine();
 
