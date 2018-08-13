@@ -5,13 +5,13 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class Type implements SyntaxNode {
+public class MethodId implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
     private String name;
 
-    public Type (String name) {
+    public MethodId (String name) {
         this.name=name;
     }
 
@@ -57,13 +57,13 @@ public class Type implements SyntaxNode {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("Type(\n");
+        buffer.append("MethodId(\n");
 
         buffer.append(" "+tab+name);
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [Type]");
+        buffer.append(") [MethodId]");
         return buffer.toString();
     }
 }

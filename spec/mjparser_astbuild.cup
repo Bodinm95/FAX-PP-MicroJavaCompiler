@@ -89,11 +89,12 @@ nonterminal ClassMethodDecl ClassMethodDecl;
 
 nonterminal MethodDeclList MethodDeclList;
 nonterminal MethodDecl MethodDecl;
+nonterminal MethodId MethodId;
 nonterminal RetType RetType;
 nonterminal FormPars FormPars;
 nonterminal FormParsList FormParsList;
 nonterminal FormParsPart FormParsPart;
-nonterminal rs.etf.pp1.symboltable.concepts.Struct Type;
+nonterminal Type Type;
 
 nonterminal StmtList StmtList;
 nonterminal Stmt Stmt;
@@ -123,7 +124,7 @@ precedence left ELSE;
 
 // ------------------------------------------------- //
 
-Prog ::= (Program) PROGRAM ProgId:program DeclList:D1 LBRACE MethodDeclList:M2 RBRACE {: RESULT=new Program(program, D1, M2); RESULT.setLine(programleft); :};
+Prog ::= (Program) PROGRAM ProgId:P1 DeclList:D2 LBRACE MethodDeclList:M3 RBRACE {: RESULT=new Program(P1, D2, M3); RESULT.setLine(P1left); :};
 
 ProgId ::= (ProgramId) IDENT:name {: RESULT=new ProgramId(name); RESULT.setLine(nameleft); :};
 
@@ -180,7 +181,9 @@ ClassMethodDecl ::= (ClassMethodDeclaration) LBRACE MethodDeclList:M1 RBRACE {: 
 MethodDeclList ::= (MethodDeclarationList) MethodDeclList:M1 MethodDecl:M2 {: RESULT=new MethodDeclarationList(M1, M2); RESULT.setLine(M1left); :}
                 |  (EmptyMethodDeclarationList) {: RESULT=new EmptyMethodDeclarationList(); :} /* epsilon */;
 
-MethodDecl ::= (MethodDeclaration) RetType:R1 IDENT:I2 LPAREN FormPars:F3 RPAREN ListVarDecl:L4 LBRACE StmtList:S5 RBRACE {: RESULT=new MethodDeclaration(R1, I2, F3, L4, S5); RESULT.setLine(R1left); :};
+MethodDecl ::= (MethodDeclaration) RetType:R1 MethodId:M2 LPAREN FormPars:F3 RPAREN ListVarDecl:L4 LBRACE StmtList:S5 RBRACE {: RESULT=new MethodDeclaration(R1, M2, F3, L4, S5); RESULT.setLine(R1left); :};
+
+MethodId ::= (MethodId) IDENT:name {: RESULT=new MethodId(name); RESULT.setLine(nameleft); :};
 
 RetType ::= (ReturnType) Type:T1 {: RESULT=new ReturnType(T1); RESULT.setLine(T1left); :}
          |  (ReturnTypeVoid) VOID {: RESULT=new ReturnTypeVoid(); :};
