@@ -19,10 +19,14 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	Struct currType;
 	Obj currClass;
 	Obj currMethod;
+
 	Struct methodType;
 	Struct retType;
 
 	List<FormParsPart> formParamList;
+
+	boolean doWhile = false;
+	int doWhileLevel = 0;
 
 	public void print_error(int line, String name, String msg) {
 		global_error = true;
@@ -420,4 +424,49 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	
 	}
 
+	// ----------------------------------------------- Statement ----------------------------------------------------------- //
+
+		public void visit(BreakStatement BreakStatement)
+		{
+			int line = BreakStatement.getLine();
+			if (doWhile == false)
+				print_error(line, "break", "Break statement must be inside do-while loop!");
+		}
+
+		public void visit(ContinueStatement ContinueStatement)
+		{
+			int line = ContinueStatement.getLine();
+			if (doWhile == false)
+				print_error(line, "continue", "Continue statement must be inside do-while loop!");
+		}
+
+		public void visit(ReturnOption ReturnOption) {
+			int line = ReturnOption.getLine();
+
+			if (currMethod == null) {
+				print_error(line, "return", "Return statement must be inside method or global function!");
+				return;
+			}
+
+			retType = ReturnOption.getExpr().struct;
+		}
+
+		public void visit(EmptyReturnOption EmptyReturnOption) {
+			int line = EmptyReturnOption.getLine();
+
+			if (currMethod == null) {
+				print_error(line, "return", "Return statement must be inside method or global function!");
+				return;
+			}
+
+			retType = TabSym.noType;
+		}
+
+		public void visit(ReadStatement ReadStatement) {
+			
+		}
+
+		public void visit(PrintStatement PrintStatement) {
+			
+		}
 }
