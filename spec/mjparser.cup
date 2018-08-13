@@ -111,10 +111,10 @@ nonterminal Cond;
 nonterminal CondTerm;
 nonterminal CondFact;
 
-nonterminal Expr;
-nonterminal ExprList;
-nonterminal Term;
-nonterminal Factor;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Expr;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct ExprList;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Term;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Factor;
 
 nonterminal Relop;
 nonterminal Addop;
