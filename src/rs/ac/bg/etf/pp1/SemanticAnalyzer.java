@@ -255,7 +255,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		StringBuilder name = new StringBuilder();
 
 		String methodName = currMethod.getName();
-		String returnName = methodType.equals(Tab.noType) ? "void" : ((ReturnType)MethodDeclaration.getRetType()).getType().getName();
+		String returnName = methodType.equals(TabSym.noType) ? "void" : ((ReturnType)MethodDeclaration.getRetType()).getType().getName();
 
 		name.append(returnName + " " + methodName + "(");
 
@@ -310,7 +310,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String name = MethodId.getName();
 		int line = MethodId.getLine();
 
-		if (TabSym.currentScope().findSymbol(name) != null || methodType.equals(Tab.nullType)) {
+		if (TabSym.currentScope().findSymbol(name) != null || methodType.equals(TabSym.nullType)) {
 			currMethod = new Obj(Obj.Meth, name, methodType);
 			if (TabSym.currentScope().findSymbol(name) != null)
 				print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
@@ -318,6 +318,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		else {
 			currMethod = TabSym.insert(Obj.Meth, name, methodType);
 			formParamList = new ArrayList<FormParsPart>();
+			retType = TabSym.nullType;
 
 			switch (state) {
 			case GLOBAL:
