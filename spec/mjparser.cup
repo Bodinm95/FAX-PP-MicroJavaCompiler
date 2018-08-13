@@ -93,7 +93,7 @@ nonterminal RetType;
 nonterminal FormPars;
 nonterminal FormParsList;
 nonterminal FormParsPart;
-nonterminal rs.etf.pp1.symboltable.concepts.Struct Type;
+nonterminal Type;
 
 nonterminal StmtList;
 nonterminal Stmt;

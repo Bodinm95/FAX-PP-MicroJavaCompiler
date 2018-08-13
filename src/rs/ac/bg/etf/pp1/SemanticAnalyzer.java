@@ -49,14 +49,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String name = Type.getName();
 		int line = Type.getLine();
 
-		Type.struct = TabSym.noType;
+		currType = TabSym.noType;
 		Obj typeObj = TabSym.find(name);
 		if (typeObj == TabSym.noObj || typeObj.getKind() != Obj.Type)
 			print_error(line, name, "Symbol '" + name + "' is not a type!");
 		else
-			Type.struct = typeObj.getType();
-
-		currType = Type.struct;
+			currType = typeObj.getType();
 	}
 
 // ----------------------------------------------------------------------------------------------------------------------------- //
