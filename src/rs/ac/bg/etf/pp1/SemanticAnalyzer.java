@@ -578,7 +578,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		public void visit(FactorProcCall FactorProcCall)
 		{
 			Obj procCall = FactorProcCall.getDesignator().obj;
-			String name = FactorProcCall.getDesignator().obj.getName();
+			String name = FactorProcCall.getDesignator().obj.getName() + (actParamList.isEmpty() ? "()" : "(...)");
 			int line = FactorProcCall.getLine();
 
 			if (procCall.getKind() != Obj.Meth) {
@@ -590,6 +590,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			actualParamCheck(line, procCall);
 
 			FactorProcCall.struct = procCall.getType();
+			print_info("Function call '" + name + "' detected at line:" + line);
 		}
 
 		public void visit(FactorNum FactorNum)
