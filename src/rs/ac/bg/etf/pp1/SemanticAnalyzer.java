@@ -503,7 +503,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		public void visit(NegExpresions NegExpresions)
 		{
 			int line = NegExpresions.getLine();
-			NegExpresions.struct = TabSym.noType;
+			NegExpresions.struct = null;
+
+			if (NegExpresions.getExprList().struct == null)
+				return;
 
 			if (NegExpresions.getExprList().struct.equals(TabSym.intType))
 				NegExpresions.struct = NegExpresions.getExprList().struct;
@@ -518,7 +521,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 			Struct ExprList = ExpressionList.getExprList().struct;
 			Struct Term = ExpressionList.getTerm().struct;
-			ExpressionList.struct = TabSym.noType;
+			ExpressionList.struct = null;
 
 			if (ExprList == null || Term == null)
 				return;
@@ -542,7 +545,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 			Struct Term = TermList.getTerm().struct;
 			Struct Factor = TermList.getFactor().struct;
-			TermList.struct = TabSym.noType;
+			TermList.struct = null;
 
 			if (Term == null || Factor == null)
 				return;
@@ -631,6 +634,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			}
 			if (classType.getType().getKind() != Struct.Class) {
 				print_error(line, "", "Type '" + name + "' is not a declared class!");
+				FactorNew.struct = null;
 				return;
 			}
 
@@ -651,10 +655,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			}
 			if (!FactorNewArray.getExpr().struct.equals(TabSym.intType)) {
 				print_error(line, "", "Array size must be type int!");
-				return;
 			}
 
-			FactorNewArray.struct = type.getType();
+			FactorNewArray.struct = new Struct(Struct.Array, type.getType());
 			print_info("Creation of array of '" + type.getName() + "' detected at line:" + line);
 		}
 
