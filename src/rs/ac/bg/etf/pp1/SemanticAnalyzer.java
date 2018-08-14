@@ -623,8 +623,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				return;
 			}
 
-			print_info("Creation of class '" + classType.getName() + "' object detected at line:" + line);
 			FactorNew.struct = classType.getType();
+			print_info("Creation of class '" + classType.getName() + "' object detected at line:" + line);
 		}
 
 		public void visit(FactorNewArray FactorNewArray)
@@ -643,8 +643,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				return;
 			}
 
-			print_info("Creation of array of '" + type.getName() + "' detected at line:" + line);
 			FactorNewArray.struct = type.getType();
+			print_info("Creation of array of '" + type.getName() + "' detected at line:" + line);
 		}
 
 		public void visit(FactorExpression FactorExpression)
