@@ -621,7 +621,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 			for (int i = 0; i < actParamList.size(); i++)
 				if (!actParamList.get(i).assignableTo(formParamList.get(i).getType())) {
-					print_error(line, name, "Actual parameter " + i + " does not match formal parameter!");
+					print_error(line, name, "Actual parameter " + (i + 1) + " does not match formal parameter!");
 				}
 
 			actParamList.clear();
