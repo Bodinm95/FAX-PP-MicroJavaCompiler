@@ -633,6 +633,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			String name = FactorProcCall.getDesignator().obj.getName() + (actParamList.isEmpty() ? "()" : "(...)");
 			int line = FactorProcCall.getLine();
 
+			if (FactorProcCall.getDesignator().obj.equals(TabSym.noObj)) {
+				FactorProcCall.struct = null;
+				return;
+			}
+
 			if (procCall.getKind() != Obj.Meth) {
 				print_error(line, name, "Designator '" + name + "' is not a declared function!");
 				FactorProcCall.struct = null;
