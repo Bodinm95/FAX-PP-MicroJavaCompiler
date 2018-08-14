@@ -1,7 +1,33 @@
 program SemanticProgram
+	const int N = 10;
+	int global;
+
+	class Object {
+		int ID;
+	}
 	class Math {
+		int PI;
 		{
-			void sum(int a, int b){ }
+			void sum(int a, int b)
+				int ret;
+				int arr[];
+			{
+				// Designator test //
+				ret = temp;     // Undeclared symbol error
+				ret = N;        // Symbolic constant detected
+				ret = global;   // Global variable detected
+				ret = ret;      // Local variable detected
+				ret = a;        // Formal argument detected
+				ret = PI;       // Field detected
+
+				ret = a[10];       // not an array error
+				ret = arr[true];   // index type error
+				ret = arr[10];     // Array element access detected
+
+				ret = b.PI;        // not a class type error
+				ret = Math.E;      // not a class field error
+				ret = Object.ID;   // class field access detected
+			}
 		}
 	}
 {
