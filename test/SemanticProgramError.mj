@@ -32,14 +32,18 @@ program SemanticProgram
 {
 	void main() 
 		int mainVar;
+		int array[];
 	{ 
 		mainVar = new asdasS;	// new type error
 		mainVar = new int;			// not class type error
 		mainVar = new SemTest;
-		mainVar = new int[10];
+		array = new int[10];
 		mainVar = new int['A'];		// array size not int error
 		
 		mainVar = - (10 + 'A' * 10);	// expression type error
 		
+		if ('A' > 3) return;	// incompatible comparison types
+		
+		if ( new int[5] >= new int[10]) return;	// invalid relational operator
 	}
 }
