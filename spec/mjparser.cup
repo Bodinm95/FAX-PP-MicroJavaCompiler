@@ -232,9 +232,9 @@ DesignatorStatement ::= (Assignment) Designator ASSIGN Expr
                      |  (Increment) Designator INC
                      |  (Decrement) Designator DEC;
 
-Designator ::= (DesignatorField) Designator DOT IDENT
+Designator ::= (DesignatorField) Designator DOT IDENT:name
             |  (DesignatorArray) Designator LSQUARE Expr RSQUARE
-            |  (DesignatorIdent) IDENT;
+            |  (DesignatorIdent) IDENT:name;
 
 ActPars ::= (ActualParams) ActParsList
          |  (EmptyActualParams) /* epsilon */;

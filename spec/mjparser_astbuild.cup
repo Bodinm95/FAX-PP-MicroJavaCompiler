@@ -232,9 +232,9 @@ DesignatorStatement ::= (Assignment) Designator:D1 ASSIGN Expr:E2 {: RESULT=new 
                      |  (Increment) Designator:D1 INC {: RESULT=new Increment(D1); RESULT.setLine(D1left); :}
                      |  (Decrement) Designator:D1 DEC {: RESULT=new Decrement(D1); RESULT.setLine(D1left); :};
 
-Designator ::= (DesignatorField) Designator:D1 DOT IDENT:I2 {: RESULT=new DesignatorField(D1, I2); RESULT.setLine(D1left); :}
+Designator ::= (DesignatorField) Designator:D1 DOT IDENT:name {: RESULT=new DesignatorField(D1, name); RESULT.setLine(D1left); :}
             |  (DesignatorArray) Designator:D1 LSQUARE Expr:E2 RSQUARE {: RESULT=new DesignatorArray(D1, E2); RESULT.setLine(D1left); :}
-            |  (DesignatorIdent) IDENT:I1 {: RESULT=new DesignatorIdent(I1); RESULT.setLine(I1left); :};
+            |  (DesignatorIdent) IDENT:name {: RESULT=new DesignatorIdent(name); RESULT.setLine(nameleft); :};
 
 ActPars ::= (ActualParams) ActParsList:A1 {: RESULT=new ActualParams(A1); RESULT.setLine(A1left); :}
          |  (EmptyActualParams) {: RESULT=new EmptyActualParams(); :} /* epsilon */;
