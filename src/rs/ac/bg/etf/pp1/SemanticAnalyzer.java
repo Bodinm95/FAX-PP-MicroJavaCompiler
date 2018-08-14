@@ -534,7 +534,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				print_error(line, relop, "Invalid relational operator, expected '==' or '!=' for reference types!");
 		}
 
-// ----------------------------------------------- Expression Term Factor ----------------------------------------------------------- //
+// ----------------------------------------------------------- Expression ----------------------------------------------------------- //
 
 		public void visit(Expressions Expressions)
 		{
@@ -544,13 +544,15 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		public void visit(NegExpresions NegExpresions)
 		{
 			int line = NegExpresions.getLine();
+
+			Struct ExprList = NegExpresions.getExprList().struct;
 			NegExpresions.struct = null;
 
-			if (NegExpresions.getExprList().struct == null)
+			if (ExprList == null)	// ExprList error pass up
 				return;
 
 			if (NegExpresions.getExprList().struct.equals(TabSym.intType))
-				NegExpresions.struct = NegExpresions.getExprList().struct;
+				NegExpresions.struct = TabSym.intType;
 			else
 				print_error(line, "", "Incompatible type in negative expression, expected int!");
 		}
@@ -564,7 +566,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			Struct Term = ExpressionList.getTerm().struct;
 			ExpressionList.struct = null;
 
-			if (ExprList == null || Term == null)
+			if (ExprList == null || Term == null)	// Term error pass up
 				return;
 
 			if (ExprList.equals(Term) && ExprList.equals(TabSym.intType) && Term.equals(TabSym.intType))
