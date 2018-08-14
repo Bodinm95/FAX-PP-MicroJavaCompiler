@@ -440,7 +440,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	
 	}
 
-	// ----------------------------------------------- Statement ----------------------------------------------------------- //
+// ----------------------------------------------- Statement ----------------------------------------------------------- //
 
 		public void visit(BreakStatement BreakStatement)
 		{
@@ -456,7 +456,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				print_error(line, "continue", "Continue statement must be inside do-while loop!");
 		}
 
-		public void visit(ReturnOption ReturnOption) {
+		public void visit(ReturnOption ReturnOption)
+		{
 			int line = ReturnOption.getLine();
 
 			if (currMethod == null) {
@@ -467,7 +468,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			retType = ReturnOption.getExpr().struct;
 		}
 
-		public void visit(EmptyReturnOption EmptyReturnOption) {
+		public void visit(EmptyReturnOption EmptyReturnOption)
+		{
 			int line = EmptyReturnOption.getLine();
 
 			if (currMethod == null) {
@@ -478,21 +480,25 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			retType = TabSym.noType;
 		}
 
-		public void visit(ReadStatement ReadStatement) {
-			
+		public void visit(ReadStatement ReadStatement)
+		{
+
 		}
 
-		public void visit(PrintStatement PrintStatement) {
+		public void visit(PrintStatement PrintStatement)
+		{
 			
 		}
 
 // ----------------------------------------------- Expression Term Factor ----------------------------------------------------------- //
 
-		public void visit(Expressions Expressions) {
+		public void visit(Expressions Expressions)
+		{
 			Expressions.struct = Expressions.getExprList().struct;
 		}
 
-		public void visit(NegExpresions NegExpresions) {
+		public void visit(NegExpresions NegExpresions)
+		{
 			int line = NegExpresions.getLine();
 			NegExpresions.struct = TabSym.noType;
 
@@ -502,7 +508,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				print_error(line, "neg expr", "Incompatible type in negative expression, expected int!");
 		}
 
-		public void visit(ExpressionList ExpressionList) {
+		public void visit(ExpressionList ExpressionList)
+		{
 			int line = ExpressionList.getLine();
 			Struct ExprList = ExpressionList.getExprList().struct;
 			Struct Term = ExpressionList.getTerm().struct;
@@ -517,11 +524,13 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				print_error(line, "addop", "Incompatible types in arithmetic expression, expected int!");
 		}
 
-		public void visit(SingleExpression SingleExpression) {
+		public void visit(SingleExpression SingleExpression)
+		{
 			SingleExpression.struct = SingleExpression.getTerm().struct;
 		}
 
-		public void visit(TermList TermList) {
+		public void visit(TermList TermList)
+		{
 			int line = TermList.getLine();
 			Struct Term = TermList.getTerm().struct;
 			Struct Factor = TermList.getFactor().struct;
@@ -536,11 +545,13 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				print_error(line, "mulop", "Incompatible types in arithmetic expression, expected int!");
 		}
 
-		public void visit(SingleTerm SingleTerm) {
+		public void visit(SingleTerm SingleTerm)
+		{
 			SingleTerm.struct = SingleTerm.getFactor().struct;
 		}
 
-		public void visit(FactorDesignator FactorDesignator) {
+		public void visit(FactorDesignator FactorDesignator)
+		{
 			FactorDesignator.struct = FactorDesignator.getDesignator().obj.getType();
 		}
 
@@ -564,7 +575,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			actParamList.clear();
 		}
 
-		public void visit(FactorProcCall FactorProcCall) {
+		public void visit(FactorProcCall FactorProcCall)
+		{
 			Obj procCall = FactorProcCall.getDesignator().obj;
 			String name = FactorProcCall.getDesignator().obj.getName();
 			int line = FactorProcCall.getLine();
@@ -580,19 +592,23 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			FactorProcCall.struct = procCall.getType();
 		}
 
-		public void visit(FactorNum FactorNum) {
+		public void visit(FactorNum FactorNum)
+		{
 			FactorNum.struct = TabSym.intType;
 		}
 
-		public void visit(FactorChar FactorChar) {
+		public void visit(FactorChar FactorChar)
+		{
 			FactorChar.struct = TabSym.charType;
 		}
 
-		public void visit(FactorBool FactorBool) {
+		public void visit(FactorBool FactorBool)
+		{
 			FactorBool.struct = TabSym.boolType;
 		}
 
-		public void visit(FactorNew FactorNew) {
+		public void visit(FactorNew FactorNew)
+		{
 			String name = FactorNew.getType().getName();
 			int line = FactorNew.getLine();
 
@@ -611,7 +627,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			FactorNew.struct = classType.getType();
 		}
 
-		public void visit(FactorNewArray FactorNewArray) {
+		public void visit(FactorNewArray FactorNewArray)
+		{
 			String name = FactorNewArray.getType().getName();
 			int line = FactorNewArray.getLine();
 
@@ -630,7 +647,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			FactorNewArray.struct = type.getType();
 		}
 
-		public void visit(FactorExpression FactorExpression) {
+		public void visit(FactorExpression FactorExpression)
+		{
 			FactorExpression.struct = FactorExpression.getExpr().struct;
 		}
 }
