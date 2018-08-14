@@ -23,7 +23,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	Struct methodType;
 	Struct retType;
 
-	List<FormParsPart> formParamList;
+	List<FormParsPart> formParamList = new ArrayList<FormParsPart>();;
+	List<Struct> actParamList = new ArrayList<Struct>();
 
 	boolean doWhile = false;
 	int doWhileLevel = 0;
@@ -338,7 +339,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			break;
 		}
 
-		formParamList = null;
+		formParamList.clear();
 		currMethod = null;
 	}
 
@@ -354,7 +355,6 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 		else {
 			currMethod = TabSym.insert(Obj.Meth, name, methodType);
-			formParamList = new ArrayList<FormParsPart>();
 			retType = TabSym.noType;
 
 			switch (state) {
