@@ -495,16 +495,18 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			
 		}
 
-// ----------------------------------------------- Condition ----------------------------------------------------------- //
+// ----------------------------------------------------------- Condition ----------------------------------------------------------- //
 
 		public void visit(ConditionFact ConditionFact)
 		{
 			int line = ConditionFact.getLine();
 
-			if (ConditionFact.getExpr().struct == null)
+			Struct Expr = ConditionFact.getExpr().struct;
+
+			if (Expr == null)	// Expr error pass up
 				return;
 
-			if (!ConditionFact.getExpr().struct.equals(TabSym.boolType))
+			if (!Expr.equals(TabSym.boolType))
 				print_error(line, "", "Condition expression must have bool type!");
 		}
 
@@ -523,7 +525,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			Struct ExprFirst = ConditionFactRelop.getExpr().struct;
 			Struct ExprSecond = ConditionFactRelop.getExpr1().struct;
 
-			if (ExprFirst == null || ExprSecond == null)
+			if (ExprFirst == null || ExprSecond == null)	// Expr error pass up
 				return;
 
 			if (!ExprFirst.compatibleWith(ExprSecond)) {
