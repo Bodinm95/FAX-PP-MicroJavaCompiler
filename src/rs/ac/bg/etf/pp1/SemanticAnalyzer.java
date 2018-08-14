@@ -145,7 +145,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Obj constant = TabSym.insert(Obj.Con, name, currType);
 		constant.setAdr((value.equals("true")) ? 1 : 0);
 
-		print_info("Symbolic char constant '" + name + " = " + value + "' declared at line:" + line);
+		print_info("Symbolic bool constant '" + name + " = " + value + "' declared at line:" + line);
 	}
 
 // ----------------------------------------------- VarDecl ----------------------------------------------------------- //
