@@ -677,7 +677,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				return;
 			}
 			if (classType.getType().getKind() != Struct.Class) {
-				print_error(line, "", "Type '" + name + "' is not a declared class!");
+				print_error(line, "", "Designator '" + name + "' is not a declared class!");
 				FactorNew.struct = null;
 				return;
 			}
