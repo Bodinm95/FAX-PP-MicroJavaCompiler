@@ -697,12 +697,13 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				FactorNewArray.struct = null;
 				return;
 			}
-			if (!FactorNewArray.getExpr().struct.equals(TabSym.intType)) {
+			if (!FactorNewArray.getExpr().struct.equals(TabSym.intType))
 				print_error(line, "", "Array size must be type int!");
-			}
+			else 
+				print_info("Creation of array of '" + type.getName() + "' detected at line:" + line);
 
 			FactorNewArray.struct = new Struct(Struct.Array, type.getType());
-			print_info("Creation of array of '" + type.getName() + "' detected at line:" + line);
+
 		}
 
 		public void visit(FactorExpression FactorExpression)
