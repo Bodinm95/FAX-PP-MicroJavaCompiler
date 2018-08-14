@@ -26,6 +26,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	List<FormParsPart> formParamList = new ArrayList<FormParsPart>();;
 	List<Struct> actParamList = new ArrayList<Struct>();
 
+	String methodClass = "";
+
 	boolean doWhile = false;
 	int doWhileLevel = 0;
 
@@ -600,6 +602,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			SingleTerm.struct = SingleTerm.getFactor().struct;
 		}
 
+// ----------------------------------------------------------- Factor ----------------------------------------------------------- //		
+
 		public void visit(FactorDesignator FactorDesignator)
 		{
 			FactorDesignator.struct = FactorDesignator.getDesignator().obj.getType();
@@ -629,25 +633,28 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		public void visit(FactorProcCall FactorProcCall)
 		{
-			Obj procCall = FactorProcCall.getDesignator().obj;
-			String name = FactorProcCall.getDesignator().obj.getName() + (actParamList.isEmpty() ? "()" : "(...)");
 			int line = FactorProcCall.getLine();
+			String name = FactorProcCall.getDesignator().obj.getName() + (actParamList.isEmpty() ? "()" : "(...)");
+			String type = (methodClass.equals("") ? "Global function" : "Method");
 
-			if (FactorProcCall.getDesignator().obj.equals(TabSym.noObj)) {
-				FactorProcCall.struct = null;
+			Obj procCall = FactorProcCall.getDesignator().obj;
+			FactorProcCall.struct = null;
+
+			if (procCall.equals(TabSym.noObj))	// Undeclared designator error
 				return;
-			}
 
 			if (procCall.getKind() != Obj.Meth) {
 				print_error(line, name, "Designator '" + name + "' is not a declared function!");
-				FactorProcCall.struct = null;
 				return;
 			}
 
 			actualParamCheck(line, procCall);
 
+			name = (methodClass.equals("") ? name : methodClass + "." + name);
+			methodClass = "";
+
+			print_info(type + " call '" + name + "' detected at line:" + line);
 			FactorProcCall.struct = procCall.getType();
-			print_info("Function call '" + name + "' detected at line:" + line);
 		}
 
 		public void visit(FactorNum FactorNum)
@@ -667,43 +674,40 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		public void visit(FactorNew FactorNew)
 		{
-			String name = FactorNew.getType().getName();
 			int line = FactorNew.getLine();
+			String name = FactorNew.getType().getName();
 
-			Obj classType = TabSym.find(name);
+			FactorNew.struct = null;
 
-			if (currType.equals(TabSym.noType)) {
-				FactorNew.struct = null;
+			if (currType.equals(TabSym.noType))	// Type error
 				return;
-			}
-			if (classType.getType().getKind() != Struct.Class) {
+
+			if (currType.getKind() != Struct.Class) {
 				print_error(line, "", "Designator '" + name + "' is not a declared class!");
-				FactorNew.struct = null;
 				return;
 			}
 
-			FactorNew.struct = classType.getType();
-			print_info("Creation of class '" + classType.getName() + "' object detected at line:" + line);
+			print_info("Creation of class " + name + " object detected at line:" + line);
+			FactorNew.struct = currType;
 		}
 
 		public void visit(FactorNewArray FactorNewArray)
 		{
-			String name = FactorNewArray.getType().getName();
 			int line = FactorNewArray.getLine();
+			String name = FactorNewArray.getType().getName();
 
-			Obj type = TabSym.find(name);
+			Struct Expr = FactorNewArray.getExpr().struct;
+			FactorNewArray.struct = null;
 
-			if (currType.equals(TabSym.noType)) {
-				FactorNewArray.struct = null;
+			if (currType.equals(TabSym.noType))	// Type error
 				return;
-			}
-			if (!FactorNewArray.getExpr().struct.equals(TabSym.intType))
+
+			if (!Expr.equals(TabSym.intType))
 				print_error(line, "", "Array size must be type int!");
 			else 
-				print_info("Creation of array of '" + type.getName() + "' detected at line:" + line);
+				print_info("Creation of " + name + " array detected at line:" + line);
 
-			FactorNewArray.struct = new Struct(Struct.Array, type.getType());
-
+			FactorNewArray.struct = new Struct(Struct.Array, currType);
 		}
 
 		public void visit(FactorExpression FactorExpression)
