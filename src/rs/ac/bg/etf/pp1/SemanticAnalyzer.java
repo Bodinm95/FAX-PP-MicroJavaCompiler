@@ -32,7 +32,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void print_error(int line, String name, String msg) {
 		global_error = true;
 		error = true;
-		System.err.println("Semantic error '" + name + "' at line:" + line + " - " + msg);
+		name = (name.equals("") ? name : "'" + name + "' ");
+		
+		System.err.println("Semantic error " + name + "at line:" + line + " - " + msg);
 	}
 
 	public void print_info(String msg) {
@@ -76,7 +78,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Obj typeObj = TabSym.find(name);
 
 		if (typeObj == TabSym.noObj || typeObj.getKind() != Obj.Type)
-			print_error(line, name, "Symbol '" + name + "' is not a type!");
+			print_error(line, name, "'" + name + "' is not a valid type!");
 		else
 			currType = typeObj.getType();
 	}
@@ -191,8 +193,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			switch (state) {
 			case GLOBAL: print_info("Global variable '" + name + "[]' declared at line:" + line); break;
 			case LOCAL: print_info("Local variable '" + name + "[]' declared in function '" + currMethod.getName() +"' at line:" + line); break;
-			case CLASS: print_info(""); break;
-			case METHOD: print_info(""); break;
+			case CLASS: print_info("Field '" + name + "[]' declared in class '" + currClass.getName() + "' at line:" + line); break;
+			case METHOD: print_info("Local variable '" + name + "[]' declared in class '" + currClass.getName() + "' method '" + currMethod.getName() + "' at line:" + line); break;
 			}
 		}
 	}
@@ -240,7 +242,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Obj parent = TabSym.find(name);
 
 		if (parent == TabSym.noObj || parent.getType().getKind() != Struct.Class) {
-			print_error(line, name, "Symbol '" + name + "' is not a declared class!");
+			print_error(line, name, "'" + name + "' is not a declared class!");
 			TabSym.currentScope.getOuter().getLocals().deleteKey(currClass.getName());
 
 			return;
@@ -285,30 +287,31 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 
 	public void returnTypeCheck(MethodDeclaration MethodDeclaration) {
-		String methodName = currMethod.getName();
 		String returnName = methodType.equals(TabSym.noType) ? "void" : ((ReturnType)MethodDeclaration.getRetType()).getType().getName();
+		String methodName = currMethod.getName() + (formParamList.isEmpty() ? "()" : "(...)");
+		String name = returnName + " " + methodName;
 		int line = MethodDeclaration.getLine();
 
 		if (retType == null || methodType.equals(TabSym.nullType)) {
-			print_error(line, methodName, "Invalid return type!");
+			print_error(line, name, "Invalid return type!");
 			TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
 			return;
 		}
 		if (methodType.equals(TabSym.noType))		// void method
 			if (!retType.equals(TabSym.noType)) {
-				print_error(line, methodName, "Void function must have empty or no return statements!");
+				print_error(line, name, "Void function must have empty or no return statements!");
 				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
 				return;
 			}
 
 		if (!methodType.equals(TabSym.noType)) {	// regular method
 			if (retType.equals(TabSym.noType)) {
-				print_error(line, methodName, "Return statement missing!");
+				print_error(line, name, "Return statement missing!");
 				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
 				return;
 			}
 			if (!methodType.compatibleWith(retType)) {
-				print_error(line, methodName, "Incompatible return type, expected " + returnName + "!");
+				print_error(line, name, "Incompatible return type, expected " + returnName + "!");
 				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
 				return;
 			}
@@ -505,12 +508,14 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			if (NegExpresions.getExprList().struct.equals(TabSym.intType))
 				NegExpresions.struct = NegExpresions.getExprList().struct;
 			else
-				print_error(line, "neg expr", "Incompatible type in negative expression, expected int!");
+				print_error(line, "", "Incompatible type in negative expression, expected int!");
 		}
 
 		public void visit(ExpressionList ExpressionList)
 		{
 			int line = ExpressionList.getLine();
+			String operand = (ExpressionList.getAddop() instanceof AddopAdd) ? "+" : "-";
+
 			Struct ExprList = ExpressionList.getExprList().struct;
 			Struct Term = ExpressionList.getTerm().struct;
 			ExpressionList.struct = TabSym.noType;
@@ -521,7 +526,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			if (ExprList.equals(Term) && ExprList.equals(TabSym.intType) && Term.equals(TabSym.intType))
 				ExpressionList.struct = TabSym.intType;
 			else
-				print_error(line, "addop", "Incompatible types in arithmetic expression, expected int!");
+				print_error(line, operand, "Incompatible types in arithmetic expression, expected int!");
 		}
 
 		public void visit(SingleExpression SingleExpression)
@@ -532,6 +537,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		public void visit(TermList TermList)
 		{
 			int line = TermList.getLine();
+			String operand = (TermList.getMulop() instanceof MulopMul) ? "*" :
+			                 (TermList.getMulop() instanceof MulopDiv) ? "/" : "%";
+
 			Struct Term = TermList.getTerm().struct;
 			Struct Factor = TermList.getFactor().struct;
 			TermList.struct = TabSym.noType;
@@ -542,7 +550,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			if (Term.equals(Factor) && Term.equals(TabSym.intType) && Factor.equals(TabSym.intType))
 				TermList.struct = TabSym.intType;
 			else
-				print_error(line, "mulop", "Incompatible types in arithmetic expression, expected int!");
+				print_error(line, operand, "Incompatible types in arithmetic expression, expected int!");
 		}
 
 		public void visit(SingleTerm SingleTerm)
@@ -556,20 +564,22 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 
 		public void actualParamCheck(int line, Obj func) {
+			String name = func.getName() + (actParamList.isEmpty() ? "()" : "(...)");
+
 			List<Obj> formParamList = new ArrayList<Obj>();
 			for (Obj param : func.getLocalSymbols())
 				if (param.getFpPos() > 0)
 					formParamList.add(param);
 
 			if (actParamList.size() != formParamList.size()) {
-				print_error(line, func.getName(), "Different number of formal and actual parameters!");
+				print_error(line, name, "Different number of formal and actual parameters!");
 				actParamList.clear();
 				return;
 			}
 
 			for (int i = 0; i < actParamList.size(); i++)
 				if (!actParamList.get(i).assignableTo(formParamList.get(i).getType())) {
-					print_error(line, func.getName(), "Actual parameter " + i + " does not match formal parameter!");
+					print_error(line, name, "Actual parameter " + i + " does not match formal parameter!");
 				}
 
 			actParamList.clear();
@@ -620,7 +630,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				return;
 			}
 			if (classType.getType().getKind() != Struct.Class) {
-				print_error(line, "new", "Type '" + name + "' is not a declared class!");
+				print_error(line, "", "Type '" + name + "' is not a declared class!");
 				return;
 			}
 
@@ -640,7 +650,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				return;
 			}
 			if (!FactorNewArray.getExpr().struct.equals(TabSym.intType)) {
-				print_error(line, "new", "Array size must be type int!");
+				print_error(line, "", "Array size must be type int!");
 				return;
 			}
 
