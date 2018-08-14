@@ -1,0 +1,31 @@
+program SemanticProgram
+	class Math {
+		{
+			void sum(int a, int b){ }
+		}
+	}
+{
+	void out(int num){ }
+
+	void main()
+		int array[];
+		int num;
+		Math math;
+	{
+		// Factor, Term and Expression test //
+		array = new int['A'];    // size type error
+		array = new asd[10];     // type error
+		array = new int[10];     // array creation
+
+		math = new int;      // not a class error
+		math = new Math;     // object creation
+
+		num = int();             // not a function error
+		num = out(10);           // global function call
+		num = Math.sum(1, 2);    // method call
+
+		num = 10 + 'A';    // addop arithmetic type error
+		num = 10 * 'A';    // mulop arithmetic type error
+		num = - 'A';       // negative expression type error
+	}
+}
