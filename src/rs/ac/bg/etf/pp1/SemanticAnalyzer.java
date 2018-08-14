@@ -493,6 +493,45 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			
 		}
 
+// ----------------------------------------------- Condition ----------------------------------------------------------- //
+
+		public void visit(ConditionFact ConditionFact)
+		{
+			int line = ConditionFact.getLine();
+
+			if (ConditionFact.getExpr().struct == null)
+				return;
+
+			if (!ConditionFact.getExpr().struct.equals(TabSym.boolType))
+				print_error(line, "", "Condition expression must have bool type!");
+		}
+
+		public void visit(ConditionFactRelop ConditionFactRelop)
+		{
+			int line = ConditionFactRelop.getLine();
+
+			String relop = "";
+			if (ConditionFactRelop.getRelop() instanceof RelopEQ) relop = "==";
+			else if (ConditionFactRelop.getRelop() instanceof RelopNEQ) relop = "!=";
+			else if (ConditionFactRelop.getRelop() instanceof RelopGR) relop = ">";
+			else if (ConditionFactRelop.getRelop() instanceof RelopGREQ) relop = ">=";
+			else if (ConditionFactRelop.getRelop() instanceof RelopLS) relop = "<";
+			else if (ConditionFactRelop.getRelop() instanceof RelopLSEQ) relop = "<=";
+
+			Struct ExprFirst = ConditionFactRelop.getExpr().struct;
+			Struct ExprSecond = ConditionFactRelop.getExpr1().struct;
+
+			if (ExprFirst == null || ExprSecond == null)
+				return;
+
+			if (!ExprFirst.compatibleWith(ExprSecond)) {
+				print_error(line, relop, "Incompatible comparison types!");
+				return;
+			}
+			if (ExprFirst.isRefType() && !(relop.equals("==") || relop.equals("!=")))
+				print_error(line, relop, "Invalid relational operator, expected '==' or '!=' for reference types!");
+		}
+
 // ----------------------------------------------- Expression Term Factor ----------------------------------------------------------- //
 
 		public void visit(Expressions Expressions)
