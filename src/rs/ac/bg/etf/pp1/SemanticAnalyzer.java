@@ -578,6 +578,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			SingleExpression.struct = SingleExpression.getTerm().struct;
 		}
 
+// ----------------------------------------------------------- Term ----------------------------------------------------------- //
+
 		public void visit(TermList TermList)
 		{
 			int line = TermList.getLine();
@@ -588,7 +590,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			Struct Factor = TermList.getFactor().struct;
 			TermList.struct = null;
 
-			if (Term == null || Factor == null)
+			if (Term == null || Factor == null)	// Factor error pass up
 				return;
 
 			if (Term.equals(Factor) && Term.equals(TabSym.intType) && Factor.equals(TabSym.intType))
