@@ -103,7 +103,7 @@ nonterminal RetOpt;
 nonterminal PrintOpt;
 
 nonterminal DesignatorStatement;
-nonterminal Designator;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator;
 nonterminal ActPars;
 nonterminal ActParsList;
 
