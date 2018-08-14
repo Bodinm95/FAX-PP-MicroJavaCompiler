@@ -644,7 +644,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			if (ExprList == null)	// ExprList error pass up
 				return;
 
-			if (NegExpresions.getExprList().struct.equals(TabSym.intType))
+			if (ExprList.equals(TabSym.intType))
 				NegExpresions.struct = TabSym.intType;
 			else
 				print_error(line, "", "Incompatible type in negative expression, expected int!");
