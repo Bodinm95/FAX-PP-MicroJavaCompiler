@@ -415,8 +415,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!currType.equals(TabSym.nullType)) {
 			Obj formParam = TabSym.insert(Obj.Var, name, currType);
-			formParam.setFpPos(currMethod.getLevel());	// formal param position
 			formParamList.add(FormalParamPart);
+			formParam.setFpPos(formParamList.size());	// formal param position
 
 			print_info("Formal parameter '" + typeName + " " + name + "' of method '" + currMethod.getName() + "' declared at line:" + line);
 		}
@@ -435,8 +435,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!currType.equals(TabSym.nullType)) {
 			Obj formParam = TabSym.insert(Obj.Var, name, new Struct(Struct.Array, currType));
-			formParam.setFpPos(currMethod.getLevel());	// formal param position
 			formParamList.add(FormalParamPartArray);
+			formParam.setFpPos(formParamList.size());	// formal param position
 
 			print_info("Formal parameter '" + typeName + " " + name + "[]' of method '" + currMethod.getName() + "' declared at line:" + line);
 		}
