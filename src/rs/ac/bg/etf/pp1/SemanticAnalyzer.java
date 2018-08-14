@@ -495,6 +495,97 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			
 		}
 
+// ----------------------------------------------------------- Designator ----------------------------------------------------------- //
+
+		public void visit(DesignatorField DesignatorField)
+		{
+			int line = DesignatorField.getLine();
+			String name = DesignatorField.getName();
+
+			Obj classObj = DesignatorField.getDesignator().obj;
+			DesignatorField.obj = TabSym.noObj;
+
+			if (classObj.equals(TabSym.noObj))	// Designator error pass up
+				return;
+
+			if (classObj.getType().getKind() != Struct.Class) {
+				print_error(line, classObj.getName(), "Designator '" + classObj.getName() + "' is not a class type!");
+				return;
+			}
+
+			Obj field = classObj.getType().getMembersTable().searchKey(name);
+
+			if (field == null) {
+				print_error(line, name, "Designator '" + name + "' is not a " + classObj.getName() + " class field!");
+				return;
+			}
+
+			if (field.getKind() == Obj.Fld) {
+				String fieldName = classObj.getName() + "." + name;
+				print_info("Class field '" + fieldName + "' access detected at line:" + line);
+			}
+
+			methodClass = classObj.getName();
+			DesignatorField.obj = field;
+		}
+
+		public void visit(DesignatorArray DesignatorArray)
+		{
+			int line = DesignatorArray.getLine();
+
+			Obj array = DesignatorArray.getDesignator().obj;
+			Struct Expr = DesignatorArray.getExpr().struct;
+			DesignatorArray.obj = TabSym.noObj;
+
+			if (array.equals(TabSym.noObj))	// Designator error pass up
+				return;
+
+			if (array.getType().getKind() != Struct.Array) {
+				print_error(line, array.getName(), "Designator '" + array.getName() + "' is not an array type!");
+				return;
+			}
+			if (!Expr.equals(TabSym.intType))
+				print_error(line, array.getName(), "Index must be type int!");
+			else
+				print_info("Array '" + array.getName() + "[]' element access detected at line:" + line);
+
+			DesignatorArray.obj = new Obj(Obj.Elem, array.getName(), array.getType().getElemType());
+		}
+
+		public void visit(DesignatorIdent DesignatorIdent)
+		{
+			int line = DesignatorIdent.getLine();
+			String name = DesignatorIdent.getName();
+
+			Obj symbol = TabSym.find(name);
+			DesignatorIdent.obj = symbol;
+
+			if (symbol.equals(TabSym.noObj)) {
+				print_error(line, name, "Symbol '" + name + "' undeclared!");
+				return;
+			}
+
+			switch (symbol.getKind()) {
+				case Obj.Con:
+					print_info("Symbolic constant '" + name + "' detected at line:" + line);
+					break;
+
+				case Obj.Var:
+					if (symbol.getType().getKind() == Struct.Array)
+						break;
+					String type = (symbol.getFpPos() > 0) ? "Formal argument" :
+					              (symbol.getLevel() == 0) ? "Global variable" : "Local variable";
+					print_info(type + " '" + name + "' detected at line:" + line);
+					break;
+
+				case Obj.Fld:
+					String fieldName = currClass.getName() + "." + name;
+					String methName = currClass.getName() + "." + currMethod.getName() + (formParamList.isEmpty() ? "()" : "(...)");
+					print_info("Field '" + fieldName + "' inside method '" + methName + "' detected at line:" + line);
+					break;
+			}
+		}
+
 // ----------------------------------------------------------- Condition ----------------------------------------------------------- //
 
 		public void visit(ConditionFact ConditionFact)
