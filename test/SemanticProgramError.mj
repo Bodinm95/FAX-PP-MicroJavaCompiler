@@ -2,7 +2,8 @@ program SemanticProgram
 	const asd ErrType = 1;					// unknown type error
 	const char CHAR = 'A';
 	const int ErrNum = 'A', NUM = 5;		// int type error
-	const bool BOOL = true, ErrBool = 10;	// bool type error
+	const bool BOOL = true;
+	const int ErrBool = true;	// bool type error
 	const bool BOOL = false;				// already defined error
 
 	char charVar;
@@ -31,5 +32,14 @@ program SemanticProgram
 {
 	void main() 
 		int mainVar;
-	{ }
+	{ 
+		mainVar = new asdasS;	// new type error
+		mainVar = new int;			// not class type error
+		mainVar = new SemTest;
+		mainVar = new int[10];
+		mainVar = new int['A'];		// array size not int error
+		
+		mainVar = - (10 + 'A' * 10);	// expression type error
+		
+	}
 }
