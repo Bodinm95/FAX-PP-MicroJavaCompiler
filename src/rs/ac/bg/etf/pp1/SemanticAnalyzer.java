@@ -485,4 +485,152 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		public void visit(PrintStatement PrintStatement) {
 			
 		}
+
+// ----------------------------------------------- Expression Term Factor ----------------------------------------------------------- //
+
+		public void visit(Expressions Expressions) {
+			Expressions.struct = Expressions.getExprList().struct;
+		}
+
+		public void visit(NegExpresions NegExpresions) {
+			int line = NegExpresions.getLine();
+			NegExpresions.struct = TabSym.noType;
+
+			if (NegExpresions.getExprList().struct.equals(TabSym.intType))
+				NegExpresions.struct = NegExpresions.getExprList().struct;
+			else
+				print_error(line, "neg expr", "Incompatible type in negative expression, expected int!");
+		}
+
+		public void visit(ExpressionList ExpressionList) {
+			int line = ExpressionList.getLine();
+			Struct ExprList = ExpressionList.getExprList().struct;
+			Struct Term = ExpressionList.getTerm().struct;
+			ExpressionList.struct = TabSym.noType;
+
+			if (ExprList == null || Term == null)
+				return;
+
+			if (ExprList.equals(Term) && ExprList.equals(TabSym.intType) && Term.equals(TabSym.intType))
+				ExpressionList.struct = TabSym.intType;
+			else
+				print_error(line, "addop", "Incompatible types in arithmetic expression, expected int!");
+		}
+
+		public void visit(SingleExpression SingleExpression) {
+			SingleExpression.struct = SingleExpression.getTerm().struct;
+		}
+
+		public void visit(TermList TermList) {
+			int line = TermList.getLine();
+			Struct Term = TermList.getTerm().struct;
+			Struct Factor = TermList.getFactor().struct;
+			TermList.struct = TabSym.noType;
+
+			if (Term == null || Factor == null)
+				return;
+
+			if (Term.equals(Factor) && Term.equals(TabSym.intType) && Factor.equals(TabSym.intType))
+				TermList.struct = TabSym.intType;
+			else
+				print_error(line, "mulop", "Incompatible types in arithmetic expression, expected int!");
+		}
+
+		public void visit(SingleTerm SingleTerm) {
+			SingleTerm.struct = SingleTerm.getFactor().struct;
+		}
+
+		public void visit(FactorDesignator FactorDesignator) {
+			FactorDesignator.struct = FactorDesignator.getDesignator().obj.getType();
+		}
+
+		public void actualParamCheck(int line, Obj func) {
+			List<Obj> formParamList = new ArrayList<Obj>();
+			for (Obj param : func.getLocalSymbols())
+				if (param.getFpPos() > 0)
+					formParamList.add(param);
+
+			if (actParamList.size() != formParamList.size()) {
+				print_error(line, func.getName(), "Different number of formal and actual parameters!");
+				actParamList.clear();
+				return;
+			}
+
+			for (int i = 0; i < actParamList.size(); i++)
+				if (!actParamList.get(i).assignableTo(formParamList.get(i).getType())) {
+					print_error(line, func.getName(), "Actual parameter " + i + " does not match formal parameter!");
+				}
+
+			actParamList.clear();
+		}
+
+		public void visit(FactorProcCall FactorProcCall) {
+			Obj procCall = FactorProcCall.getDesignator().obj;
+			String name = FactorProcCall.getDesignator().obj.getName();
+			int line = FactorProcCall.getLine();
+
+			if (procCall.getKind() != Obj.Meth) {
+				print_error(line, name, "Designator '" + name + "' is not a declared function!");
+				FactorProcCall.struct = null;
+				return;
+			}
+
+			actualParamCheck(line, procCall);
+
+			FactorProcCall.struct = procCall.getType();
+		}
+
+		public void visit(FactorNum FactorNum) {
+			FactorNum.struct = TabSym.intType;
+		}
+
+		public void visit(FactorChar FactorChar) {
+			FactorChar.struct = TabSym.charType;
+		}
+
+		public void visit(FactorBool FactorBool) {
+			FactorBool.struct = TabSym.boolType;
+		}
+
+		public void visit(FactorNew FactorNew) {
+			String name = FactorNew.getType().getName();
+			int line = FactorNew.getLine();
+
+			Obj classType = TabSym.find(name);
+
+			if (currType.equals(TabSym.noType)) {
+				FactorNew.struct = null;
+				return;
+			}
+			if (classType.getType().getKind() != Struct.Class) {
+				print_error(line, "new", "Type '" + name + "' is not a declared class!");
+				return;
+			}
+
+			print_info("Creation of class '" + classType.getName() + "' object detected at line:" + line);
+			FactorNew.struct = classType.getType();
+		}
+
+		public void visit(FactorNewArray FactorNewArray) {
+			String name = FactorNewArray.getType().getName();
+			int line = FactorNewArray.getLine();
+
+			Obj type = TabSym.find(name);
+
+			if (currType.equals(TabSym.noType)) {
+				FactorNewArray.struct = null;
+				return;
+			}
+			if (!FactorNewArray.getExpr().struct.equals(TabSym.intType)) {
+				print_error(line, "new", "Array size must be type int!");
+				return;
+			}
+
+			print_info("Creation of array of '" + type.getName() + "' detected at line:" + line);
+			FactorNewArray.struct = type.getType();
+		}
+
+		public void visit(FactorExpression FactorExpression) {
+			FactorExpression.struct = FactorExpression.getExpr().struct;
+		}
 }
