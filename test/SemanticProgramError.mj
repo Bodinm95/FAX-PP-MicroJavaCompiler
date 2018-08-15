@@ -1,6 +1,7 @@
 program SemanticProgram
 	const int N = 10;
 	int global;
+	bool flag;
 
 	class Math {
 		int PI;
@@ -50,14 +51,29 @@ program SemanticProgram
 		num = 10 * 'A';    // mulop arithmetic type error
 		num = - 'A';       // negative expression type error
 
+
 		// Condition test //
 		if (10 < 'A') return;         // incompatible comparison types error
 		if (math >= math) return;    // invalid relational operator error
+
 
 		// Designator test //
 		foo = num.PI;                        // not a class type error
 		foo = Math.E;                        // not a class field error
 		foo = Math.PI;                       // class field access detected
 		foo = math.funcArray[5].sum(1, 2);   // multiple class field and array access
+
+
+		// Designator Statement test //
+		array++;    // invalid designator kind error
+		flag--;     // must be type int error
+		array[2]++;
+
+		bool();            // statement not a function error
+		out(10);           // statement global function call
+		Math.sum(1, 2);    // statement method call
+
+		array = 10;        // assignment designator kind error
+		array[2] = true;   // invalid type assignment
 	}
 }
