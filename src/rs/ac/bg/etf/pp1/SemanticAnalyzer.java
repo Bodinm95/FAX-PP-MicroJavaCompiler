@@ -540,6 +540,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (array.equals(TabSym.noObj))	// Designator error pass up
 			return;
 
+		String dataType = TabSym.findTypeName(array.getType().getElemType());
+
 		if (array.getType().getKind() != Struct.Array) {
 			print_error(line, array.getName() + "[]", "Designator '" + array.getName() + "' is not an array type!");
 			return;
@@ -547,7 +549,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (!Expr.equals(TabSym.intType))
 			print_error(line, array.getName() + "[]", "Index must be type int!");
 		else
-			print_info("Array '" + array.getName() + "[]' element access detected at line:" + line);
+			print_info("Array '" + dataType + " " + array.getName() + "[]' element access detected at line:" + line);
 
 		DesignatorArray.obj = new Obj(Obj.Elem, array.getName(), array.getType().getElemType());
 	}
