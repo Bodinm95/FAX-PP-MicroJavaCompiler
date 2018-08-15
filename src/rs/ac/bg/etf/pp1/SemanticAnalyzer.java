@@ -548,7 +548,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "Designator '" + name + "' must denote a variable, an array element or an object field!");
 			return;
 		}
-		if (right == null || !right.assignableTo(left.getType()))
+		if (!right.assignableTo(left.getType()))
 			print_error(line, name, "Invalid assignment, incompatible types!");
 	}
 
