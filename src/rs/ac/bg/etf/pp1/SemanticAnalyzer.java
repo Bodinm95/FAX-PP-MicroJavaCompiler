@@ -2,6 +2,7 @@ package rs.ac.bg.etf.pp1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import rs.ac.bg.etf.pp1.ast.*;
 import rs.ac.bg.etf.pp1.util.TabSym;
@@ -10,8 +11,8 @@ import rs.etf.pp1.symboltable.concepts.*;
 
 public class SemanticAnalyzer extends VisitorAdaptor {
 
-	public enum Scope {GLOBAL, LOCAL, CLASS, METHOD};
-	Scope state;
+	public enum Scope {GLOBAL, LOCAL, CLASS, METHOD, WHILE};
+	Stack<Scope> state = new Stack<Scope>();	
 
 	boolean global_error = false;
 	boolean error = false;
@@ -52,7 +53,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		TabSym.chainLocalSymbols(Program.getProgId().obj);
 		TabSym.closeScope();
 
-		state = Scope.GLOBAL;
+		state.pop();
 
 		print_info("Program '" + name + "' " + (global_error ? "" : "successfully ") + "processed.");
 	}
@@ -66,7 +67,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		TabSym.openScope();
 		
 		error = false;
-		state = Scope.GLOBAL;
+		state.push(Scope.GLOBAL);
 
 		print_info("Program '" + name + "' declared at line:" + line);
 	}
@@ -166,14 +167,15 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 
 		if (!currType.equals(TabSym.noType)) {
-			int kind = (state.equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
+			int kind = (state.peek().equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
 			TabSym.insert(kind, name, currType);
 
-			switch (state) {
+			switch (state.peek()) {
 			case GLOBAL: print_info("Global variable '" + name + "' declared at line:" + line); break;
 			case LOCAL: print_info("Local variable '" + name + "' declared in function '" + currMethod.getName() + "' at line:" + line); break;
 			case CLASS: print_info("Field '" + name + "' declared in class '" + currClass.getName() + "' at line:" + line); break;
 			case METHOD: print_info("Local variable '" + name + "' declared in class '" + currClass.getName() + "' method '" + currMethod.getName() + "' at line:" + line); break;
+			default: break;
 			}
 		}
 	}
@@ -189,14 +191,15 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 
 		if (!currType.equals(TabSym.noType)) {
-			int kind = (state.equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
+			int kind = (state.peek().equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
 			TabSym.insert(kind, name, new Struct(Struct.Array, currType));
 
-			switch (state) {
+			switch (state.peek()) {
 			case GLOBAL: print_info("Global variable '" + name + "[]' declared at line:" + line); break;
 			case LOCAL: print_info("Local variable '" + name + "[]' declared in function '" + currMethod.getName() +"' at line:" + line); break;
 			case CLASS: print_info("Field '" + name + "[]' declared in class '" + currClass.getName() + "' at line:" + line); break;
 			case METHOD: print_info("Local variable '" + name + "[]' declared in class '" + currClass.getName() + "' method '" + currMethod.getName() + "' at line:" + line); break;
+			default: break;
 			}
 		}
 	}
@@ -210,7 +213,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		TabSym.chainLocalSymbols(currClass.getType());
 		TabSym.closeScope();
 
-		state = Scope.GLOBAL;
+		state.pop();
 		currClass = null;
 
 		print_info("Class '" + name + "' " + (error ? "" : "successfully ") + "processed.");
@@ -233,7 +236,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		TabSym.openScope();
 
 		error = false;
-		state = Scope.CLASS;
+		state.push(Scope.CLASS);
 	}
 
 	public void visit(ExtendsDeclaration ExtendsDeclaration)
@@ -325,15 +328,15 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		returnTypeCheck(MethodDeclaration);
 
-		switch (state) {
+		switch (state.peek()) {
 		case METHOD:
 			print_info("Method '" + name + "' " + (error ? "" : "successfully ") + "processed.");
-			state = Scope.CLASS;
+			state.pop();
 			currMethod.setLevel(formParamList.size() + 1);	// increment for implicit parameter this
 			break;
 		case LOCAL:
 			print_info("Function '" + name + "' " + (error ? "" : "successfully ") + "processed.");
-			state = Scope.GLOBAL;
+			state.pop();
 			currMethod.setLevel(formParamList.size());	// set number of formal parameters
 			break;
 		default :
@@ -358,7 +361,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			currMethod = TabSym.insert(Obj.Meth, name, methodType);
 			retType = TabSym.noType;
 
-			switch (state) {
+			switch (state.peek()) {
 			case GLOBAL:
 				print_info("Function '" + name + "' declared at line:" + line);
 				break;
@@ -373,14 +376,14 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		TabSym.openScope();
 		error = false;
 
-		switch (state) {
+		switch (state.peek()) {
 		case GLOBAL:
-			state = Scope.LOCAL;
+			state.push(Scope.LOCAL);
 			break;
 		case CLASS: 
 			Obj paramThis = TabSym.insert(Obj.Var, "this", currClass.getType());	// implicit class parameter this
 			paramThis.setFpPos(0);
-			state = Scope.METHOD;
+			state.push(Scope.METHOD);
 			break;
 		default :
 			break;
