@@ -506,7 +506,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String name = left.getName();
 		int kind = left.getKind();
 
-		if (left.equals(TabSym.noObj) || right == null)	// Designator error pass up
+		if (left.equals(TabSym.noObj) || right == TabSym.noType)	// Designator error pass up
 			return;
 
 		if (kind != Obj.Var && kind != Obj.Elem && kind != Obj.Fld || left.getType().getKind() == Struct.Array) {
@@ -687,7 +687,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		Struct Expr = ConditionFact.getExpr().struct;
 
-		if (Expr == null)	// Expr error pass up
+		if (Expr == TabSym.noType)	// Expr error pass up
 			return;
 
 		if (!Expr.equals(TabSym.boolType))
@@ -709,7 +709,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Struct ExprFirst = ConditionFactRelop.getExpr().struct;
 		Struct ExprSecond = ConditionFactRelop.getExpr1().struct;
 
-		if (ExprFirst == null || ExprSecond == null)	// Expr error pass up
+		if (ExprFirst == TabSym.noType || ExprSecond == TabSym.noType)	// Expr error pass up
 			return;
 
 		if (!ExprFirst.compatibleWith(ExprSecond)) {
@@ -732,9 +732,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		int line = NegExpresions.getLine();
 
 		Struct ExprList = NegExpresions.getExprList().struct;
-		NegExpresions.struct = null;
+		NegExpresions.struct = TabSym.noType;
 
-		if (ExprList == null)	// ExprList error pass up
+		if (ExprList == TabSym.noType)	// ExprList error pass up
 			return;
 
 		if (ExprList.equals(TabSym.intType))
@@ -750,9 +750,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		Struct ExprList = ExpressionList.getExprList().struct;
 		Struct Term = ExpressionList.getTerm().struct;
-		ExpressionList.struct = null;
+		ExpressionList.struct = TabSym.noType;
 
-		if (ExprList == null || Term == null)	// Term error pass up
+		if (ExprList == TabSym.noType || Term == TabSym.noType)	// Term error pass up
 			return;
 
 		if (ExprList.equals(Term) && ExprList.equals(TabSym.intType) && Term.equals(TabSym.intType))
@@ -776,9 +776,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		Struct Term = TermList.getTerm().struct;
 		Struct Factor = TermList.getFactor().struct;
-		TermList.struct = null;
+		TermList.struct = TabSym.noType;
 
-		if (Term == null || Factor == null)	// Factor error pass up
+		if (Term == TabSym.noType || Factor == TabSym.noType)	// Factor error pass up
 			return;
 
 		if (Term.equals(Factor) && Term.equals(TabSym.intType) && Factor.equals(TabSym.intType))
@@ -828,7 +828,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String type = (methodClass.equals("") ? "Global function" : "Method");
 
 		Obj procCall = FactorProcCall.getDesignator().obj;
-		FactorProcCall.struct = null;
+		FactorProcCall.struct = TabSym.noType;
 
 		if (procCall.equals(TabSym.noObj))	// Undeclared designator error
 			return;
@@ -866,7 +866,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	{
 		int line = FactorNew.getLine();
 		String name = FactorNew.getType().getName();
-		FactorNew.struct = null;
+		FactorNew.struct = TabSym.noType;
 
 		if (currType.equals(TabSym.noType))	// Type error
 			return;
@@ -886,7 +886,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String name = FactorNewArray.getType().getName();
 
 		Struct Expr = FactorNewArray.getExpr().struct;
-		FactorNewArray.struct = null;
+		FactorNewArray.struct = TabSym.noType;
 
 		if (currType.equals(TabSym.noType))	// Type error
 			return;
