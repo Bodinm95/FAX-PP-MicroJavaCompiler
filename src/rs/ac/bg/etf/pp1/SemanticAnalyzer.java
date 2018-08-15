@@ -495,6 +495,90 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		
 	}
 
+// ----------------------------------------------------------- DesignatorStatement ----------------------------------------------------------- //
+
+	public void visit(Assignment Assignment)
+	{
+		int line = Assignment.getLine();	
+
+		Obj left = Assignment.getDesignator().obj;
+		Struct right = Assignment.getExpr().struct;
+		String name = left.getName();
+		int kind = left.getKind();
+
+		if (left.equals(TabSym.noObj) || right == null)	// Designator error pass up
+			return;
+
+		if (kind != Obj.Var && kind != Obj.Elem && kind != Obj.Fld || left.getType().getKind() == Struct.Array) {
+			print_error(line, name, "Designator '" + name + "' must denote a variable, an array element or an object field!");
+			return;
+		}
+		if (right == null || !right.assignableTo(left.getType()))
+			print_error(line, name, "Invalid assignment, incompatible types!");
+	}
+
+	public void visit(ProcCall ProcCall)
+	{
+		int line = ProcCall.getLine();
+		String name = ProcCall.getDesignator().obj.getName() + (actParamList.isEmpty() ? "()" : "(...)");
+		String type = (methodClass.equals("") ? "Global function" : "Method");
+
+		Obj procCall = ProcCall.getDesignator().obj;
+
+		if (procCall.equals(TabSym.noObj))	// Designator error pass up
+			return;
+
+		if (procCall.getKind() != Obj.Meth) {
+			print_error(line, name, "Designator '" + name + "' is not a declared function!");
+			return;
+		}
+
+		actualParamCheck(line, procCall);
+
+		name = (methodClass.equals("") ? name : methodClass + "." + name);
+		methodClass = "";
+
+		print_info(type + " call '" + name + "' detected at line:" + line);
+	}
+
+	public void visit(Increment Increment)
+	{
+		int line = Increment.getLine();
+		String name = Increment.getDesignator().obj.getName();
+
+		int kind = Increment.getDesignator().obj.getKind();
+		Struct type = Increment.getDesignator().obj.getType();
+
+		if (Increment.getDesignator().obj.equals(TabSym.noObj))	// Designator error pass up
+			return;
+
+		if (kind != Obj.Var && kind != Obj.Elem && kind != Obj.Fld || type.getKind() == Struct.Array) {
+			print_error(line, name + "++", "Designator '" + name + "' must denote a variable, an array element or an object field!");
+			return;
+		}
+		if (!type.equals(TabSym.intType))
+			print_error(line, name + "++", "Designator '" + name + "' must be type int!");
+	}
+
+	public void visit(Decrement Decrement)
+	{
+		int line = Decrement.getLine();
+		String name = Decrement.getDesignator().obj.getName();
+
+		int kind = Decrement.getDesignator().obj.getKind();
+		Struct type = Decrement.getDesignator().obj.getType();
+
+		if (Decrement.getDesignator().obj.equals(TabSym.noObj))	// Designator error pass up
+			return;
+
+		if (kind != Obj.Var && kind != Obj.Elem && kind != Obj.Fld || type.getKind() == Struct.Array) {
+			print_error(line, name + "--", "Designator '" + name + "' must denote a variable, an array element or an object field!");
+			return;
+		}
+		if (!type.equals(TabSym.intType))
+			print_error(line, name + "--", "Designator '" + name + "' must be type int!");
+	}
+
 // ----------------------------------------------------------- Designator ----------------------------------------------------------- //
 
 	public void visit(DesignatorField DesignatorField)
