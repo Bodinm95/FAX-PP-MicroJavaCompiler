@@ -221,7 +221,7 @@ ElseOpt ::= (ElseOption) ELSE Stmt:S1 {: RESULT=new ElseOption(S1); RESULT.setLi
 RetOpt ::= (ReturnOption) Expr:E1 {: RESULT=new ReturnOption(E1); RESULT.setLine(E1left); :}
         |  (EmptyReturnOption) {: RESULT=new EmptyReturnOption(); :} /* epsilon */;
 
-PrintOpt ::= (PrintOption) SEMI NUM:N1 {: RESULT=new PrintOption(N1); RESULT.setLine(N1left); :}
+PrintOpt ::= (PrintOption) COMMA NUM:N1 {: RESULT=new PrintOption(N1); RESULT.setLine(N1left); :}
           |  (EmptyPrintOption) {: RESULT=new EmptyPrintOption(); :} /* epsilon */;
 
 // ------------------------------------------------- //
