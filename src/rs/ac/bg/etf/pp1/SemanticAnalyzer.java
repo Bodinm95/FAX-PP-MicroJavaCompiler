@@ -23,7 +23,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	Struct methodType;
 	Struct retType;
 
-	List<FormParsPart> formParamList = new ArrayList<FormParsPart>();;
+	List<Obj> formParamList = new ArrayList<Obj>();;
 	List<Struct> actParamList = new ArrayList<Struct>();
 
 	String methodClass = "";
@@ -260,26 +260,22 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 // ----------------------------------------------- MethodDecl ----------------------------------------------------------- //
 
-	public String methodName(MethodDeclaration MethodDeclaration) {
+	public String methodName() {
 		StringBuilder name = new StringBuilder();
 
 		String methodName = currMethod.getName();
-		String returnName = methodType.equals(TabSym.noType) ? "void" : ((ReturnType)MethodDeclaration.getRetType()).getType().getName();
+		String returnName = methodType.equals(TabSym.noType) ? "void" : TabSym.findTypeName(methodType);
 
 		name.append(returnName + " " + methodName + "(");
 
 		if (!formParamList.isEmpty()) {
-			for (FormParsPart formParam : formParamList) {		// Append formal parameter names
-				if (formParam instanceof FormalParamPart) {
-					String paramType = ((FormalParamPart)formParam).getType().getName();
-					String paramName = ((FormalParamPart) formParam).getName();
+			for (Obj formParam : formParamList) {		// Append formal parameter names
+				String paramType = TabSym.findTypeName(formParam.getType());
+				String paramName = formParam.getName();
+				if (formParam.getType().getKind() != Struct.Array)
 					name.append(paramType + " " + paramName + ", ");
-				}
-				else {
-					String paramType = ((FormalParamPartArray)formParam).getType().getName();
-					String paramName = ((FormalParamPartArray) formParam).getName();
+				else
 					name.append(paramType + " " + paramName + "[], ");
-				}
 			}
 			name.setLength(name.length() - 2);;
 		}
@@ -322,7 +318,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(MethodDeclaration MethodDeclaration)
 	{
-		String name = methodName(MethodDeclaration);
+		String name = methodName();
 
 		TabSym.chainLocalSymbols(currMethod);
 		TabSym.closeScope();
@@ -417,7 +413,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!currType.equals(TabSym.nullType)) {
 			Obj formParam = TabSym.insert(Obj.Var, name, currType);
-			formParamList.add(FormalParamPart);
+			formParamList.add(formParam);
 			formParam.setFpPos(formParamList.size());	// formal param position
 
 			print_info("Formal parameter '" + typeName + " " + name + "' of method '" + currMethod.getName() + "' declared at line:" + line);
@@ -437,7 +433,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!currType.equals(TabSym.nullType)) {
 			Obj formParam = TabSym.insert(Obj.Var, name, new Struct(Struct.Array, currType));
-			formParamList.add(FormalParamPartArray);
+			formParamList.add(formParam);
 			formParam.setFpPos(formParamList.size());	// formal param position
 
 			print_info("Formal parameter '" + typeName + " " + name + "[]' of method '" + currMethod.getName() + "' declared at line:" + line);
