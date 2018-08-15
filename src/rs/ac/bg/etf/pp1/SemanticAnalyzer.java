@@ -522,6 +522,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 
 		if (field.getKind() == Obj.Fld) {
+			name = (field.getType().getKind() == Struct.Array ? name + "[]" : name);
 			String fieldName = classType + "." + name;
 			print_info("Class field '" + fieldName + "' access detected at line:" + line);
 		}
@@ -586,9 +587,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				break;
 
 			case Obj.Fld:
+				name = (symbol.getType().getKind() == Struct.Array ? name + "[]" : name);
 				String fieldName = currClass.getName() + "." + name;
 				String methName = currClass.getName() + "." + currMethod.getName() + (formParamList.isEmpty() ? "()" : "(...)");
-				print_info("Field '" + dataType + " " + fieldName + "' inside method '" + methName + "' detected at line:" + line);
+				print_info("Field '" + fieldName + "' inside method '" + methName + "' detected at line:" + line);
 				break;
 		}
 	}
