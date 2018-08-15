@@ -555,7 +555,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		else
 			print_info("Array '" + dataType + " " + array.getName() + "[]' element access detected at line:" + line);
 
-		DesignatorArray.obj = new Obj(Obj.Elem, array.getName(), array.getType().getElemType());
+		DesignatorArray.obj = new Obj(Obj.Elem, "", array.getType().getElemType());
 	}
 
 	public void visit(DesignatorIdent DesignatorIdent)
