@@ -70,4 +70,31 @@ public class TabSym extends Tab {
 		currentScope = currentScope.getOuter();
 		currentLevel--;
 	}
+
+	public static String findTypeName(Struct type) {
+		if (type == null)
+			return null;
+
+		if (type.getKind() == Struct.Array)
+			type = type.getElemType();
+
+		if (type.equals(intType))
+			return "int";
+		if (type.equals(charType))
+			return "char";
+		if (type.equals(boolType))
+			return "bool";
+		if (type.equals(noType))
+			return "void";
+		if (type.equals(nullType))
+			return "";
+
+		for (Scope s = currentScope; s != null; s = s.getOuter())
+			for (Obj currObj : s.values())
+				if (currObj.getKind() == Obj.Type)
+					if (currObj.getType().equals(type))
+						return currObj.getName();
+
+		return null;
+	}
 }
