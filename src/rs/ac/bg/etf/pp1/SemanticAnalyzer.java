@@ -541,11 +541,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 
 		if (array.getType().getKind() != Struct.Array) {
-			print_error(line, array.getName(), "Designator '" + array.getName() + "' is not an array type!");
+			print_error(line, array.getName() + "[]", "Designator '" + array.getName() + "' is not an array type!");
 			return;
 		}
 		if (!Expr.equals(TabSym.intType))
-			print_error(line, array.getName(), "Index must be type int!");
+			print_error(line, array.getName() + "[]", "Index must be type int!");
 		else
 			print_info("Array '" + array.getName() + "[]' element access detected at line:" + line);
 
