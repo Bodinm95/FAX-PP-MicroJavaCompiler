@@ -513,19 +513,22 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 		}
 
+		String classType = TabSym.findTypeName(classObj.getType());
 		Obj field = classObj.getType().getMembersTable().searchKey(name);
 
 		if (field == null) {
-			print_error(line, name, "Designator '" + name + "' is not a " + classObj.getName() + " class field!");
+			print_error(line, name, "Designator '" + name + "' is not a " + classType + " class field!");
 			return;
 		}
 
 		if (field.getKind() == Obj.Fld) {
-			String fieldName = classObj.getName() + "." + name;
+			String fieldName = classType + "." + name;
 			print_info("Class field '" + fieldName + "' access detected at line:" + line);
 		}
+		else {
+			methodClass = classType;	
+		}
 
-		methodClass = classObj.getName();
 		DesignatorField.obj = field;
 	}
 
