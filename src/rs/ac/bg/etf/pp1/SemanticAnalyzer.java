@@ -490,6 +490,42 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	{
 		
 	}
+// ----------------------------------------------------------- ActPars ----------------------------------------------------------- //
+
+	public void visit(ActualParamsList ActualParamsList)
+	{
+		actParamList.add(ActualParamsList.getExpr().struct);
+	}
+
+	public void visit(SingleActualParam SingleActualParam)
+	{
+		actParamList.add(SingleActualParam.getExpr().struct);
+	}
+
+	public void actParsCheck(int line, Obj func) {
+		String name = func.getName() + (actParamList.isEmpty() ? "()" : "(...)");
+
+		for (Obj param : func.getLocalSymbols())
+			if (param.getFpPos() > 0)
+				formParamList.add(param);
+
+		if (actParamList.size() != formParamList.size()) {
+			print_error(line, name, "Different number of formal and actual parameters!");
+			formParamList.clear();
+			actParamList.clear();
+			return;
+		}
+
+		for (int i = 0; i < actParamList.size(); i++)
+			if (!actParamList.get(i).assignableTo(formParamList.get(i).getType())) {
+				String actual = TabSym.findTypeName(actParamList.get(i));
+				String formal = TabSym.findTypeName(formParamList.get(i).getType());
+				print_error(line, name, "Actual '" + actual + "' parameter does not match formal '" + formal + "' parameter!");
+			}
+
+		formParamList.clear();
+		actParamList.clear();
+	}
 
 // ----------------------------------------------------------- DesignatorStatement ----------------------------------------------------------- //
 
@@ -529,7 +565,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 		}
 
-		actualParamCheck(line, procCall);
+		actParsCheck(line, procCall);
 
 		name = (methodClass.equals("") ? name : methodClass + "." + name);
 		methodClass = "";
@@ -795,28 +831,6 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		FactorDesignator.struct = FactorDesignator.getDesignator().obj.getType();
 	}
 
-	public void actualParamCheck(int line, Obj func) {
-		String name = func.getName() + (actParamList.isEmpty() ? "()" : "(...)");
-
-		List<Obj> formParamList = new ArrayList<Obj>();
-		for (Obj param : func.getLocalSymbols())
-			if (param.getFpPos() > 0)
-				formParamList.add(param);
-
-		if (actParamList.size() != formParamList.size()) {
-			print_error(line, name, "Different number of formal and actual parameters!");
-			actParamList.clear();
-			return;
-		}
-
-		for (int i = 0; i < actParamList.size(); i++)
-			if (!actParamList.get(i).assignableTo(formParamList.get(i).getType())) {
-				print_error(line, name, "Actual parameter " + (i + 1) + " does not match formal parameter!");
-			}
-
-		actParamList.clear();
-	}
-
 	public void visit(FactorProcCall FactorProcCall)
 	{
 		int line = FactorProcCall.getLine();
@@ -834,7 +848,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 		}
 
-		actualParamCheck(line, procCall);
+		actParsCheck(line, procCall);
 
 		name = (methodClass.equals("") ? name : methodClass + "." + name);
 		methodClass = "";
