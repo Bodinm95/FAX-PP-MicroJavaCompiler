@@ -75,5 +75,10 @@ program SemanticProgram
 
 		array = 10;        // assignment designator kind error
 		array[2] = true;   // invalid type assignment
+
+
+		// Actual Parameters test //
+		Math.sum(1, 2, 3);    // different number of parameters error
+		Math.sum(1, 'A');     // parameter mismatch error
 	}
 }
