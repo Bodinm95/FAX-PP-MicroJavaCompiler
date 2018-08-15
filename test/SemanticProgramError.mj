@@ -2,31 +2,26 @@ program SemanticProgram
 	const int N = 10;
 	int global;
 
-	class Object {
-		int ID;
-	}
 	class Math {
 		int PI;
+		Math funcArray[];
 		{
 			void sum(int a, int b)
 				int ret;
 				int arr[];
 			{
 				// Designator test //
-				ret = temp;     // Undeclared symbol error
-				ret = N;        // Symbolic constant detected
-				ret = global;   // Global variable detected
-				ret = ret;      // Local variable detected
-				ret = a;        // Formal argument detected
-				ret = PI;       // Field detected
+				ret = temp;         // Undeclared symbol error
+				ret = N;            // Symbolic constant detected
+				ret = global;       // Global variable detected
+				ret = ret;          // Local variable detected
+				ret = a;            // Formal argument detected
+				ret = PI;           // Field detected
+				ret = funcArray[2]; // Field array detected
 
-				ret = a[10];       // not an array error
-				ret = arr[true];   // index type error
-				ret = arr[10];     // Array element access detected
-
-				ret = b.PI;        // not a class type error
-				ret = Math.E;      // not a class field error
-				ret = Object.ID;   // class field access detected
+				ret = a[10];        // not an array error
+				ret = arr[true];    // index type error
+				ret = arr[10];      // array element access detected
 			}
 		}
 	}
@@ -37,6 +32,7 @@ program SemanticProgram
 		int array[];
 		int num;
 		Math math;
+		int foo;
 	{
 		// Factor, Term and Expression test //
 		array = new int['A'];    // size type error
@@ -54,9 +50,14 @@ program SemanticProgram
 		num = 10 * 'A';    // mulop arithmetic type error
 		num = - 'A';       // negative expression type error
 
-
 		// Condition test //
 		if (10 < 'A') return;         // incompatible comparison types error
 		if (math >= math) return;    // invalid relational operator error
+
+		// Designator test //
+		foo = num.PI;                        // not a class type error
+		foo = Math.E;                        // not a class field error
+		foo = Math.PI;                       // class field access detected
+		foo = math.funcArray[5].sum(1, 2);   // multiple class field and array access
 	}
 }
