@@ -447,368 +447,367 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 // ----------------------------------------------- Statement ----------------------------------------------------------- //
 
-		public void visit(BreakStatement BreakStatement)
-		{
-			int line = BreakStatement.getLine();
-			if (doWhile == false)
-				print_error(line, "break", "Break statement must be inside do-while loop!");
+	public void visit(BreakStatement BreakStatement)
+	{
+		int line = BreakStatement.getLine();
+		if (doWhile == false)
+			print_error(line, "break", "Break statement must be inside do-while loop!");
+	}
+
+	public void visit(ContinueStatement ContinueStatement)
+	{
+		int line = ContinueStatement.getLine();
+		if (doWhile == false)
+			print_error(line, "continue", "Continue statement must be inside do-while loop!");
+	}
+
+	public void visit(ReturnOption ReturnOption)
+	{
+		int line = ReturnOption.getLine();
+
+		if (currMethod == null) {
+			print_error(line, "return", "Return statement must be inside method or global function!");
+			return;
 		}
 
-		public void visit(ContinueStatement ContinueStatement)
-		{
-			int line = ContinueStatement.getLine();
-			if (doWhile == false)
-				print_error(line, "continue", "Continue statement must be inside do-while loop!");
+		retType = ReturnOption.getExpr().struct;
+	}
+
+	public void visit(EmptyReturnOption EmptyReturnOption)
+	{
+		int line = EmptyReturnOption.getLine();
+
+		if (currMethod == null) {
+			print_error(line, "return", "Return statement must be inside method or global function!");
+			return;
 		}
 
-		public void visit(ReturnOption ReturnOption)
-		{
-			int line = ReturnOption.getLine();
+		retType = TabSym.noType;
+	}
 
-			if (currMethod == null) {
-				print_error(line, "return", "Return statement must be inside method or global function!");
-				return;
-			}
+	public void visit(ReadStatement ReadStatement)
+	{
 
-			retType = ReturnOption.getExpr().struct;
-		}
+	}
 
-		public void visit(EmptyReturnOption EmptyReturnOption)
-		{
-			int line = EmptyReturnOption.getLine();
-
-			if (currMethod == null) {
-				print_error(line, "return", "Return statement must be inside method or global function!");
-				return;
-			}
-
-			retType = TabSym.noType;
-		}
-
-		public void visit(ReadStatement ReadStatement)
-		{
-
-		}
-
-		public void visit(PrintStatement PrintStatement)
-		{
-			
-		}
+	public void visit(PrintStatement PrintStatement)
+	{
+		
+	}
 
 // ----------------------------------------------------------- Designator ----------------------------------------------------------- //
 
-		public void visit(DesignatorField DesignatorField)
-		{
-			int line = DesignatorField.getLine();
-			String name = DesignatorField.getName();
+	public void visit(DesignatorField DesignatorField)
+	{
+		int line = DesignatorField.getLine();
+		String name = DesignatorField.getName();
 
-			Obj classObj = DesignatorField.getDesignator().obj;
-			DesignatorField.obj = TabSym.noObj;
+		Obj classObj = DesignatorField.getDesignator().obj;
+		DesignatorField.obj = TabSym.noObj;
 
-			if (classObj.equals(TabSym.noObj))	// Designator error pass up
-				return;
+		if (classObj.equals(TabSym.noObj))	// Designator error pass up
+			return;
 
-			if (classObj.getType().getKind() != Struct.Class) {
-				print_error(line, classObj.getName(), "Designator '" + classObj.getName() + "' is not a class type!");
-				return;
-			}
-
-			Obj field = classObj.getType().getMembersTable().searchKey(name);
-
-			if (field == null) {
-				print_error(line, name, "Designator '" + name + "' is not a " + classObj.getName() + " class field!");
-				return;
-			}
-
-			if (field.getKind() == Obj.Fld) {
-				String fieldName = classObj.getName() + "." + name;
-				print_info("Class field '" + fieldName + "' access detected at line:" + line);
-			}
-
-			methodClass = classObj.getName();
-			DesignatorField.obj = field;
+		if (classObj.getType().getKind() != Struct.Class) {
+			print_error(line, classObj.getName(), "Designator '" + classObj.getName() + "' is not a class type!");
+			return;
 		}
 
-		public void visit(DesignatorArray DesignatorArray)
-		{
-			int line = DesignatorArray.getLine();
+		Obj field = classObj.getType().getMembersTable().searchKey(name);
 
-			Obj array = DesignatorArray.getDesignator().obj;
-			Struct Expr = DesignatorArray.getExpr().struct;
-			DesignatorArray.obj = TabSym.noObj;
-
-			if (array.equals(TabSym.noObj))	// Designator error pass up
-				return;
-
-			if (array.getType().getKind() != Struct.Array) {
-				print_error(line, array.getName(), "Designator '" + array.getName() + "' is not an array type!");
-				return;
-			}
-			if (!Expr.equals(TabSym.intType))
-				print_error(line, array.getName(), "Index must be type int!");
-			else
-				print_info("Array '" + array.getName() + "[]' element access detected at line:" + line);
-
-			DesignatorArray.obj = new Obj(Obj.Elem, array.getName(), array.getType().getElemType());
+		if (field == null) {
+			print_error(line, name, "Designator '" + name + "' is not a " + classObj.getName() + " class field!");
+			return;
 		}
 
-		public void visit(DesignatorIdent DesignatorIdent)
-		{
-			int line = DesignatorIdent.getLine();
-			String name = DesignatorIdent.getName();
-
-			Obj symbol = TabSym.find(name);
-			DesignatorIdent.obj = symbol;
-
-			if (symbol.equals(TabSym.noObj)) {
-				print_error(line, name, "Symbol '" + name + "' undeclared!");
-				return;
-			}
-
-			switch (symbol.getKind()) {
-				case Obj.Con:
-					print_info("Symbolic constant '" + name + "' detected at line:" + line);
-					break;
-
-				case Obj.Var:
-					if (symbol.getType().getKind() == Struct.Array)
-						break;
-					String type = (symbol.getFpPos() > 0) ? "Formal argument" :
-					              (symbol.getLevel() == 0) ? "Global variable" : "Local variable";
-					print_info(type + " '" + name + "' detected at line:" + line);
-					break;
-
-				case Obj.Fld:
-					String fieldName = currClass.getName() + "." + name;
-					String methName = currClass.getName() + "." + currMethod.getName() + (formParamList.isEmpty() ? "()" : "(...)");
-					print_info("Field '" + fieldName + "' inside method '" + methName + "' detected at line:" + line);
-					break;
-			}
+		if (field.getKind() == Obj.Fld) {
+			String fieldName = classObj.getName() + "." + name;
+			print_info("Class field '" + fieldName + "' access detected at line:" + line);
 		}
+
+		methodClass = classObj.getName();
+		DesignatorField.obj = field;
+	}
+
+	public void visit(DesignatorArray DesignatorArray)
+	{
+		int line = DesignatorArray.getLine();
+
+		Obj array = DesignatorArray.getDesignator().obj;
+		Struct Expr = DesignatorArray.getExpr().struct;
+		DesignatorArray.obj = TabSym.noObj;
+
+		if (array.equals(TabSym.noObj))	// Designator error pass up
+			return;
+
+		if (array.getType().getKind() != Struct.Array) {
+			print_error(line, array.getName(), "Designator '" + array.getName() + "' is not an array type!");
+			return;
+		}
+		if (!Expr.equals(TabSym.intType))
+			print_error(line, array.getName(), "Index must be type int!");
+		else
+			print_info("Array '" + array.getName() + "[]' element access detected at line:" + line);
+
+		DesignatorArray.obj = new Obj(Obj.Elem, array.getName(), array.getType().getElemType());
+	}
+
+	public void visit(DesignatorIdent DesignatorIdent)
+	{
+		int line = DesignatorIdent.getLine();
+		String name = DesignatorIdent.getName();
+
+		Obj symbol = TabSym.find(name);
+		DesignatorIdent.obj = symbol;
+
+		if (symbol.equals(TabSym.noObj)) {
+			print_error(line, name, "Symbol '" + name + "' undeclared!");
+			return;
+		}
+
+		switch (symbol.getKind()) {
+			case Obj.Con:
+				print_info("Symbolic constant '" + name + "' detected at line:" + line);
+				break;
+
+			case Obj.Var:
+				if (symbol.getType().getKind() == Struct.Array)
+					break;
+				String type = (symbol.getFpPos() > 0) ? "Formal argument" :
+				              (symbol.getLevel() == 0) ? "Global variable" : "Local variable";
+				print_info(type + " '" + name + "' detected at line:" + line);
+				break;
+
+			case Obj.Fld:
+				String fieldName = currClass.getName() + "." + name;
+				String methName = currClass.getName() + "." + currMethod.getName() + (formParamList.isEmpty() ? "()" : "(...)");
+				print_info("Field '" + fieldName + "' inside method '" + methName + "' detected at line:" + line);
+				break;
+		}
+	}
 
 // ----------------------------------------------------------- Condition ----------------------------------------------------------- //
 
-		public void visit(ConditionFact ConditionFact)
-		{
-			int line = ConditionFact.getLine();
+	public void visit(ConditionFact ConditionFact)
+	{
+		int line = ConditionFact.getLine();
 
-			Struct Expr = ConditionFact.getExpr().struct;
+		Struct Expr = ConditionFact.getExpr().struct;
 
-			if (Expr == null)	// Expr error pass up
-				return;
+		if (Expr == null)	// Expr error pass up
+			return;
 
-			if (!Expr.equals(TabSym.boolType))
-				print_error(line, "", "Condition expression must have bool type!");
+		if (!Expr.equals(TabSym.boolType))
+			print_error(line, "", "Condition expression must have bool type!");
+	}
+
+	public void visit(ConditionFactRelop ConditionFactRelop)
+	{
+		int line = ConditionFactRelop.getLine();
+
+		String relop = "";
+		if (ConditionFactRelop.getRelop() instanceof RelopEQ) relop = "==";
+		else if (ConditionFactRelop.getRelop() instanceof RelopNEQ) relop = "!=";
+		else if (ConditionFactRelop.getRelop() instanceof RelopGR) relop = ">";
+		else if (ConditionFactRelop.getRelop() instanceof RelopGREQ) relop = ">=";
+		else if (ConditionFactRelop.getRelop() instanceof RelopLS) relop = "<";
+		else if (ConditionFactRelop.getRelop() instanceof RelopLSEQ) relop = "<=";
+
+		Struct ExprFirst = ConditionFactRelop.getExpr().struct;
+		Struct ExprSecond = ConditionFactRelop.getExpr1().struct;
+
+		if (ExprFirst == null || ExprSecond == null)	// Expr error pass up
+			return;
+
+		if (!ExprFirst.compatibleWith(ExprSecond)) {
+			print_error(line, relop, "Incompatible comparison types!");
+			return;
 		}
-
-		public void visit(ConditionFactRelop ConditionFactRelop)
-		{
-			int line = ConditionFactRelop.getLine();
-
-			String relop = "";
-			if (ConditionFactRelop.getRelop() instanceof RelopEQ) relop = "==";
-			else if (ConditionFactRelop.getRelop() instanceof RelopNEQ) relop = "!=";
-			else if (ConditionFactRelop.getRelop() instanceof RelopGR) relop = ">";
-			else if (ConditionFactRelop.getRelop() instanceof RelopGREQ) relop = ">=";
-			else if (ConditionFactRelop.getRelop() instanceof RelopLS) relop = "<";
-			else if (ConditionFactRelop.getRelop() instanceof RelopLSEQ) relop = "<=";
-
-			Struct ExprFirst = ConditionFactRelop.getExpr().struct;
-			Struct ExprSecond = ConditionFactRelop.getExpr1().struct;
-
-			if (ExprFirst == null || ExprSecond == null)	// Expr error pass up
-				return;
-
-			if (!ExprFirst.compatibleWith(ExprSecond)) {
-				print_error(line, relop, "Incompatible comparison types!");
-				return;
-			}
-			if (ExprFirst.isRefType() && !(relop.equals("==") || relop.equals("!=")))
-				print_error(line, relop, "Invalid relational operator, expected '==' or '!=' for reference types!");
-		}
+		if (ExprFirst.isRefType() && !(relop.equals("==") || relop.equals("!=")))
+			print_error(line, relop, "Invalid relational operator, expected '==' or '!=' for reference types!");
+	}
 
 // ----------------------------------------------------------- Expression ----------------------------------------------------------- //
 
-		public void visit(Expressions Expressions)
-		{
-			Expressions.struct = Expressions.getExprList().struct;
-		}
+	public void visit(Expressions Expressions)
+	{
+		Expressions.struct = Expressions.getExprList().struct;
+	}
 
-		public void visit(NegExpresions NegExpresions)
-		{
-			int line = NegExpresions.getLine();
+	public void visit(NegExpresions NegExpresions)
+	{
+		int line = NegExpresions.getLine();
 
-			Struct ExprList = NegExpresions.getExprList().struct;
-			NegExpresions.struct = null;
+		Struct ExprList = NegExpresions.getExprList().struct;
+		NegExpresions.struct = null;
 
-			if (ExprList == null)	// ExprList error pass up
-				return;
+		if (ExprList == null)	// ExprList error pass up
+			return;
 
-			if (ExprList.equals(TabSym.intType))
-				NegExpresions.struct = TabSym.intType;
-			else
-				print_error(line, "", "Incompatible type in negative expression, expected int!");
-		}
+		if (ExprList.equals(TabSym.intType))
+			NegExpresions.struct = TabSym.intType;
+		else
+			print_error(line, "", "Incompatible type in negative expression, expected int!");
+	}
 
-		public void visit(ExpressionList ExpressionList)
-		{
-			int line = ExpressionList.getLine();
-			String operand = (ExpressionList.getAddop() instanceof AddopAdd) ? "+" : "-";
+	public void visit(ExpressionList ExpressionList)
+	{
+		int line = ExpressionList.getLine();
+		String operand = (ExpressionList.getAddop() instanceof AddopAdd) ? "+" : "-";
 
-			Struct ExprList = ExpressionList.getExprList().struct;
-			Struct Term = ExpressionList.getTerm().struct;
-			ExpressionList.struct = null;
+		Struct ExprList = ExpressionList.getExprList().struct;
+		Struct Term = ExpressionList.getTerm().struct;
+		ExpressionList.struct = null;
 
-			if (ExprList == null || Term == null)	// Term error pass up
-				return;
+		if (ExprList == null || Term == null)	// Term error pass up
+			return;
 
-			if (ExprList.equals(Term) && ExprList.equals(TabSym.intType) && Term.equals(TabSym.intType))
-				ExpressionList.struct = TabSym.intType;
-			else
-				print_error(line, operand, "Incompatible types in arithmetic expression, expected int!");
-		}
+		if (ExprList.equals(Term) && ExprList.equals(TabSym.intType) && Term.equals(TabSym.intType))
+			ExpressionList.struct = TabSym.intType;
+		else
+			print_error(line, operand, "Incompatible types in arithmetic expression, expected int!");
+	}
 
-		public void visit(SingleExpression SingleExpression)
-		{
-			SingleExpression.struct = SingleExpression.getTerm().struct;
-		}
+	public void visit(SingleExpression SingleExpression)
+	{
+		SingleExpression.struct = SingleExpression.getTerm().struct;
+	}
 
 // ----------------------------------------------------------- Term ----------------------------------------------------------- //
 
-		public void visit(TermList TermList)
-		{
-			int line = TermList.getLine();
-			String operand = (TermList.getMulop() instanceof MulopMul) ? "*" :
-			                 (TermList.getMulop() instanceof MulopDiv) ? "/" : "%";
+	public void visit(TermList TermList)
+	{
+		int line = TermList.getLine();
+		String operand = (TermList.getMulop() instanceof MulopMul) ? "*" :
+		                 (TermList.getMulop() instanceof MulopDiv) ? "/" : "%";
 
-			Struct Term = TermList.getTerm().struct;
-			Struct Factor = TermList.getFactor().struct;
-			TermList.struct = null;
+		Struct Term = TermList.getTerm().struct;
+		Struct Factor = TermList.getFactor().struct;
+		TermList.struct = null;
 
-			if (Term == null || Factor == null)	// Factor error pass up
-				return;
+		if (Term == null || Factor == null)	// Factor error pass up
+			return;
 
-			if (Term.equals(Factor) && Term.equals(TabSym.intType) && Factor.equals(TabSym.intType))
-				TermList.struct = TabSym.intType;
-			else
-				print_error(line, operand, "Incompatible types in arithmetic expression, expected int!");
-		}
+		if (Term.equals(Factor) && Term.equals(TabSym.intType) && Factor.equals(TabSym.intType))
+			TermList.struct = TabSym.intType;
+		else
+			print_error(line, operand, "Incompatible types in arithmetic expression, expected int!");
+	}
 
-		public void visit(SingleTerm SingleTerm)
-		{
-			SingleTerm.struct = SingleTerm.getFactor().struct;
-		}
+	public void visit(SingleTerm SingleTerm)
+	{
+		SingleTerm.struct = SingleTerm.getFactor().struct;
+	}
 
 // ----------------------------------------------------------- Factor ----------------------------------------------------------- //		
 
-		public void visit(FactorDesignator FactorDesignator)
-		{
-			FactorDesignator.struct = FactorDesignator.getDesignator().obj.getType();
-		}
+	public void visit(FactorDesignator FactorDesignator)
+	{
+		FactorDesignator.struct = FactorDesignator.getDesignator().obj.getType();
+	}
 
-		public void actualParamCheck(int line, Obj func) {
-			String name = func.getName() + (actParamList.isEmpty() ? "()" : "(...)");
+	public void actualParamCheck(int line, Obj func) {
+		String name = func.getName() + (actParamList.isEmpty() ? "()" : "(...)");
 
-			List<Obj> formParamList = new ArrayList<Obj>();
-			for (Obj param : func.getLocalSymbols())
-				if (param.getFpPos() > 0)
-					formParamList.add(param);
+		List<Obj> formParamList = new ArrayList<Obj>();
+		for (Obj param : func.getLocalSymbols())
+			if (param.getFpPos() > 0)
+				formParamList.add(param);
 
-			if (actParamList.size() != formParamList.size()) {
-				print_error(line, name, "Different number of formal and actual parameters!");
-				actParamList.clear();
-				return;
-			}
-
-			for (int i = 0; i < actParamList.size(); i++)
-				if (!actParamList.get(i).assignableTo(formParamList.get(i).getType())) {
-					print_error(line, name, "Actual parameter " + (i + 1) + " does not match formal parameter!");
-				}
-
+		if (actParamList.size() != formParamList.size()) {
+			print_error(line, name, "Different number of formal and actual parameters!");
 			actParamList.clear();
+			return;
 		}
 
-		public void visit(FactorProcCall FactorProcCall)
-		{
-			int line = FactorProcCall.getLine();
-			String name = FactorProcCall.getDesignator().obj.getName() + (actParamList.isEmpty() ? "()" : "(...)");
-			String type = (methodClass.equals("") ? "Global function" : "Method");
-
-			Obj procCall = FactorProcCall.getDesignator().obj;
-			FactorProcCall.struct = null;
-
-			if (procCall.equals(TabSym.noObj))	// Undeclared designator error
-				return;
-
-			if (procCall.getKind() != Obj.Meth) {
-				print_error(line, name, "Designator '" + name + "' is not a declared function!");
-				return;
+		for (int i = 0; i < actParamList.size(); i++)
+			if (!actParamList.get(i).assignableTo(formParamList.get(i).getType())) {
+				print_error(line, name, "Actual parameter " + (i + 1) + " does not match formal parameter!");
 			}
 
-			actualParamCheck(line, procCall);
+		actParamList.clear();
+	}
 
-			name = (methodClass.equals("") ? name : methodClass + "." + name);
-			methodClass = "";
+	public void visit(FactorProcCall FactorProcCall)
+	{
+		int line = FactorProcCall.getLine();
+		String name = FactorProcCall.getDesignator().obj.getName() + (actParamList.isEmpty() ? "()" : "(...)");
+		String type = (methodClass.equals("") ? "Global function" : "Method");
 
-			print_info(type + " call '" + name + "' detected at line:" + line);
-			FactorProcCall.struct = procCall.getType();
+		Obj procCall = FactorProcCall.getDesignator().obj;
+		FactorProcCall.struct = null;
+
+		if (procCall.equals(TabSym.noObj))	// Undeclared designator error
+			return;
+
+		if (procCall.getKind() != Obj.Meth) {
+			print_error(line, name, "Designator '" + name + "' is not a declared function!");
+			return;
 		}
 
-		public void visit(FactorNum FactorNum)
-		{
-			FactorNum.struct = TabSym.intType;
+		actualParamCheck(line, procCall);
+
+		name = (methodClass.equals("") ? name : methodClass + "." + name);
+		methodClass = "";
+
+		print_info(type + " call '" + name + "' detected at line:" + line);
+		FactorProcCall.struct = procCall.getType();
+	}
+
+	public void visit(FactorNum FactorNum)
+	{
+		FactorNum.struct = TabSym.intType;
+	}
+
+	public void visit(FactorChar FactorChar)
+	{
+		FactorChar.struct = TabSym.charType;
+	}
+
+	public void visit(FactorBool FactorBool)
+	{
+		FactorBool.struct = TabSym.boolType;
+	}
+
+	public void visit(FactorNew FactorNew)
+	{
+		int line = FactorNew.getLine();
+		String name = FactorNew.getType().getName();
+		FactorNew.struct = null;
+
+		if (currType.equals(TabSym.noType))	// Type error
+			return;
+
+		if (currType.getKind() != Struct.Class) {
+			print_error(line, "", "Designator '" + name + "' is not a declared class!");
+			return;
 		}
 
-		public void visit(FactorChar FactorChar)
-		{
-			FactorChar.struct = TabSym.charType;
-		}
+		print_info("Creation of class " + name + " object detected at line:" + line);
+		FactorNew.struct = currType;
+	}
 
-		public void visit(FactorBool FactorBool)
-		{
-			FactorBool.struct = TabSym.boolType;
-		}
+	public void visit(FactorNewArray FactorNewArray)
+	{
+		int line = FactorNewArray.getLine();
+		String name = FactorNewArray.getType().getName();
 
-		public void visit(FactorNew FactorNew)
-		{
-			int line = FactorNew.getLine();
-			String name = FactorNew.getType().getName();
+		Struct Expr = FactorNewArray.getExpr().struct;
+		FactorNewArray.struct = null;
 
-			FactorNew.struct = null;
+		if (currType.equals(TabSym.noType))	// Type error
+			return;
 
-			if (currType.equals(TabSym.noType))	// Type error
-				return;
+		if (!Expr.equals(TabSym.intType))
+			print_error(line, "", "Array size must be type int!");
+		else 
+			print_info("Creation of " + name + " array detected at line:" + line);
 
-			if (currType.getKind() != Struct.Class) {
-				print_error(line, "", "Designator '" + name + "' is not a declared class!");
-				return;
-			}
+		FactorNewArray.struct = new Struct(Struct.Array, currType);
+	}
 
-			print_info("Creation of class " + name + " object detected at line:" + line);
-			FactorNew.struct = currType;
-		}
-
-		public void visit(FactorNewArray FactorNewArray)
-		{
-			int line = FactorNewArray.getLine();
-			String name = FactorNewArray.getType().getName();
-
-			Struct Expr = FactorNewArray.getExpr().struct;
-			FactorNewArray.struct = null;
-
-			if (currType.equals(TabSym.noType))	// Type error
-				return;
-
-			if (!Expr.equals(TabSym.intType))
-				print_error(line, "", "Array size must be type int!");
-			else 
-				print_info("Creation of " + name + " array detected at line:" + line);
-
-			FactorNewArray.struct = new Struct(Struct.Array, currType);
-		}
-
-		public void visit(FactorExpression FactorExpression)
-		{
-			FactorExpression.struct = FactorExpression.getExpr().struct;
-		}
+	public void visit(FactorExpression FactorExpression)
+	{
+		FactorExpression.struct = FactorExpression.getExpr().struct;
+	}
 }
