@@ -565,9 +565,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 		}
 
+		String dataType = TabSym.findTypeName(symbol.getType());
+
 		switch (symbol.getKind()) {
 			case Obj.Con:
-				print_info("Symbolic constant '" + name + "' detected at line:" + line);
+				print_info("Symbolic constant '" + dataType + " " + name + "' detected at line:" + line);
 				break;
 
 			case Obj.Var:
@@ -575,13 +577,13 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 					break;
 				String type = (symbol.getFpPos() > 0) ? "Formal argument" :
 				              (symbol.getLevel() == 0) ? "Global variable" : "Local variable";
-				print_info(type + " '" + name + "' detected at line:" + line);
+				print_info(type + " '" + dataType + " " + name + "' detected at line:" + line);
 				break;
 
 			case Obj.Fld:
 				String fieldName = currClass.getName() + "." + name;
 				String methName = currClass.getName() + "." + currMethod.getName() + (formParamList.isEmpty() ? "()" : "(...)");
-				print_info("Field '" + fieldName + "' inside method '" + methName + "' detected at line:" + line);
+				print_info("Field '" + dataType + " " + fieldName + "' inside method '" + methName + "' detected at line:" + line);
 				break;
 		}
 	}
