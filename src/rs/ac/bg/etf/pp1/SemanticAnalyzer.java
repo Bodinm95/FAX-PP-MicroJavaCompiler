@@ -263,11 +263,15 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 // ----------------------------------------------- MethodDecl ----------------------------------------------------------- //
 
-	public String methodName() {
+	public String methodName(Obj func, boolean full) {
 		StringBuilder name = new StringBuilder();
 
-		String methodName = currMethod.getName();
-		String returnName = methodType.equals(TabSym.noType) ? "void" : TabSym.findTypeName(methodType);
+		String methodName = func.getName();
+		String returnName = TabSym.findTypeName(func.getType());
+
+		for (Obj param : func.getLocalSymbols())
+			if (param.getFpPos() > 0)
+				formParamList.add(param);
 
 		name.append(returnName + " " + methodName + "(");
 
@@ -275,15 +279,19 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			for (Obj formParam : formParamList) {		// Append formal parameter names
 				String paramType = TabSym.findTypeName(formParam.getType());
 				String paramName = formParam.getName();
-				if (formParam.getType().getKind() != Struct.Array)
-					name.append(paramType + " " + paramName + ", ");
+				if (full)
+					if (formParam.getType().getKind() != Struct.Array)
+						name.append(paramType + " " + paramName + ", ");
+					else
+						name.append(paramType + " " + paramName + "[], ");
 				else
-					name.append(paramType + " " + paramName + "[], ");
+					name.append(paramType + ", ");
 			}
 			name.setLength(name.length() - 2);;
 		}
 		name.append(")");	
 
+		formParamList.clear();
 		return name.toString();
 	}
 
