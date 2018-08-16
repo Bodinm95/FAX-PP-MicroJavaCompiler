@@ -827,7 +827,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(ExpressionList ExpressionList)
 	{
 		int line = ExpressionList.getLine();
-		String operand = (ExpressionList.getAddop() instanceof AddopAdd) ? "+" : "-";
+		String operator = (ExpressionList.getAddop() instanceof AddopAdd) ? "+" : "-";
 
 		Struct ExprList = ExpressionList.getExprList().struct;
 		Struct Term = ExpressionList.getTerm().struct;
@@ -839,7 +839,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (ExprList.equals(Term) && ExprList.equals(TabSym.intType) && Term.equals(TabSym.intType))
 			ExpressionList.struct = TabSym.intType;
 		else
-			print_error(line, operand, "Incompatible types in arithmetic expression, expected int!");
+			print_error(line, operator, "Incompatible types in arithmetic expression, expected int!");
 	}
 
 	public void visit(SingleExpression SingleExpression)
@@ -852,7 +852,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(TermList TermList)
 	{
 		int line = TermList.getLine();
-		String operand = (TermList.getMulop() instanceof MulopMul) ? "*" :
+		String operator = (TermList.getMulop() instanceof MulopMul) ? "*" :
 		                 (TermList.getMulop() instanceof MulopDiv) ? "/" : "%";
 
 		Struct Term = TermList.getTerm().struct;
@@ -865,7 +865,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (Term.equals(Factor) && Term.equals(TabSym.intType) && Factor.equals(TabSym.intType))
 			TermList.struct = TabSym.intType;
 		else
-			print_error(line, operand, "Incompatible types in arithmetic expression, expected int!");
+			print_error(line, operator, "Incompatible types in arithmetic expression, expected int!");
 	}
 
 	public void visit(SingleTerm SingleTerm)
