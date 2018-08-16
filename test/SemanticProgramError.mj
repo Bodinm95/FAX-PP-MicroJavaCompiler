@@ -7,7 +7,7 @@ program SemanticProgram
 		int PI;
 		Math funcArray[];
 		{
-			void sum(int a, int b)
+			int sum(int a, int b)
 				int ret;
 				int arr[];
 			{
@@ -23,11 +23,20 @@ program SemanticProgram
 				ret = a[10];        // not an array error
 				ret = arr[true];    // index type error
 				ret = arr[10];      // array element access detected
+
+				return ret;
 			}
 		}
 	}
 {
-	void out(int num){ }
+	// Statement test //
+	void out(int num){
+		return 10;                  // void return error
+	}
+	int foo1(){ }                   // return missing error
+	int foo2(){ return; }           // must return type error
+	int foo3(){ return true; }      // incompatible return type error
+	int foo4(){ return 1 + 'A'; }   // invalid return expression error
 
 	void main()
 		int array[];
@@ -80,5 +89,17 @@ program SemanticProgram
 		// Actual Parameters test //
 		Math.sum(1, 2, 3);    // different number of parameters error
 		Math.sum(1, 'A');     // parameter mismatch error
+
+
+		// Statement test //
+		print(array);         // invalid print type error
+		print(array, 10);
+
+		read(array);                // read designator kind error
+		read(math.funcArray[0]);    // invalid read type error
+
+		do { do { continue; } while (true); break; } while (true);
+		break;           // break error
+		continue;        // continue error
 	}
 }
