@@ -167,7 +167,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 
 		if (!currType.equals(TabSym.noType)) {
-			int kind = (state.peek().equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
+			int kind = (state.peek() == Scope.CLASS) ? Obj.Fld : Obj.Var;
 			TabSym.insert(kind, name, currType);
 
 			switch (state.peek()) {
@@ -191,7 +191,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 
 		if (!currType.equals(TabSym.noType)) {
-			int kind = (state.peek().equals(Scope.CLASS)) ? Obj.Fld : Obj.Var;
+			int kind = (state.peek() == Scope.CLASS) ? Obj.Fld : Obj.Var;
 			TabSym.insert(kind, name, new Struct(Struct.Array, currType));
 
 			switch (state.peek()) {
