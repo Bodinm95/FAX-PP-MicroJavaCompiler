@@ -22,15 +22,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	Obj currMethod;
 
 	Struct methodType;
-	Struct retType;
+	boolean returnFound;
 
 	List<Obj> formParamList = new ArrayList<Obj>();;
 	List<Struct> actParamList = new ArrayList<Struct>();
 
 	String methodClass = "";
-
-	boolean doWhile = false;
-	int doWhileLevel = 0;
 
 	public void print_error(int line, String name, String msg) {
 		global_error = true;
@@ -383,6 +380,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		TabSym.openScope();
 		error = false;
+		returnFound = false;
 
 		switch (state.peek()) {
 		case GLOBAL:
@@ -452,54 +450,94 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	
 	}
 
-// ----------------------------------------------- Statement ----------------------------------------------------------- //
+// ----------------------------------------------------------- Statement ----------------------------------------------------------- //
+
+	public void visit(DoStatement DoStatement)
+	{
+		state.push(Scope.WHILE);
+	}
+
+	public void visit(WhileStatement WhileStatement)
+	{
+		state.pop();
+	}
 
 	public void visit(BreakStatement BreakStatement)
 	{
 		int line = BreakStatement.getLine();
-		if (doWhile == false)
+
+		if (state.peek() != Scope.WHILE)
 			print_error(line, "break", "Break statement must be inside do-while loop!");
 	}
 
 	public void visit(ContinueStatement ContinueStatement)
 	{
 		int line = ContinueStatement.getLine();
-		if (doWhile == false)
+
+		if (state.peek() != Scope.WHILE)
 			print_error(line, "continue", "Continue statement must be inside do-while loop!");
 	}
 
-	public void visit(ReturnOption ReturnOption)
+	public void visit(ReturnStatement ReturnStatement)
 	{
-		int line = ReturnOption.getLine();
+		int line = ReturnStatement.getLine();
 
 		if (currMethod == null) {
 			print_error(line, "return", "Return statement must be inside method or global function!");
 			return;
 		}
 
-		retType = ReturnOption.getExpr().struct;
-	}
+		String name = methodName(currMethod, false);
+		String dataType = TabSym.findTypeName(currMethod.getType());
 
-	public void visit(EmptyReturnOption EmptyReturnOption)
-	{
-		int line = EmptyReturnOption.getLine();
+		Struct methodType = currMethod.getType();
+		Struct retType = (ReturnStatement.getRetOpt() instanceof ReturnOption) ?
+		                    ((ReturnOption)ReturnStatement.getRetOpt()).getExpr().struct : null;
+		returnFound = true;
 
-		if (currMethod == null) {
-			print_error(line, "return", "Return statement must be inside method or global function!");
-			return;
-		}
+		if (methodType.equals(TabSym.noType))    // Void method
+			if (retType != null)
+				print_error(line, name, "Void functions must have empty or no return statements!");
 
-		retType = TabSym.noType;
+		if (!methodType.equals(TabSym.noType))   // Regular method
+			if (retType == null)
+				print_error(line, name, "Function must return a result of type " + dataType + "!");
+			else if (retType.equals(TabSym.noType))
+				print_error(line, name, "Invalid return expression!");
+			else if (!methodType.compatibleWith(retType))
+				print_error(line, name, "Incompatible return type, expected " + dataType + "!");
 	}
 
 	public void visit(ReadStatement ReadStatement)
 	{
+		int line = ReadStatement.getLine();
+		String name = ReadStatement.getDesignator().obj.getName();
 
+		int kind = ReadStatement.getDesignator().obj.getKind();
+		Struct input = ReadStatement.getDesignator().obj.getType();
+
+		if (ReadStatement.getDesignator().obj.equals(TabSym.noObj))	// Designator error pass up
+			return;
+
+		if (kind != Obj.Var && kind != Obj.Elem && kind != Obj.Fld || input.getKind() == Struct.Array) {
+			print_error(line, "read", "Designator '" + name + "' must denote a variable, an array element or an object field!");
+			return;
+		}
+		if (!input.equals(TabSym.intType) && !input.equals(TabSym.charType) && !input.equals(TabSym.boolType))
+			print_error(line, "read", "Invalid read input type, expected int, char or bool!");
 	}
 
 	public void visit(PrintStatement PrintStatement)
 	{
-		
+		int line = PrintStatement.getLine();
+
+		Struct Expr = PrintStatement.getExpr().struct;
+
+		if (Expr.equals(TabSym.noType))	// Expr error pass up
+			return;
+
+		if (!Expr.equals(TabSym.intType) && !Expr.equals(TabSym.charType) && !Expr.equals(TabSym.boolType))
+			print_error(line, "print", "Invalid print type, expected int, char or bool!");
 	}
 // ----------------------------------------------------------- ActPars ----------------------------------------------------------- //
 
