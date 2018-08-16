@@ -56,11 +56,12 @@ scan with {:
 	return s;
 :}
 
-terminal PROGRAM, BREAK, CONTINUE, CLASS, EXTENDS, IF, ELSE, DO, WHILE, RETURN, NEW, PRINT, READ, VOID;
+terminal PROGRAM, CLASS, EXTENDS, IF, ELSE, DO, WHILE, RETURN, NEW, PRINT, READ, VOID;
 terminal ADD, SUB, MUL, DIV, MOD, EQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR, ASSIGN, INC, DEC;
 terminal SEMI, COMMA, DOT;
 terminal LPAREN, RPAREN, LSQUARE, RSQUARE, LBRACE, RBRACE;
 terminal CONST;
+terminal String BREAK, CONTINUE;
 
 terminal Integer NUM;
 terminal Character CHAR;
@@ -208,8 +209,8 @@ StmtList ::= (StatementList) StmtList:S1 Stmt:S2 {: RESULT=new StatementList(S1,
 Stmt ::= (Statement) DesignatorStatement:D1 SEMI {: RESULT=new Statement(D1); RESULT.setLine(D1left); :}
       |  (IfStatement) IF LPAREN Cond:C1 RPAREN Stmt:S2 ElseOpt:E3 {: RESULT=new IfStatement(C1, S2, E3); RESULT.setLine(C1left); :}
       |  (WhileStatement) DO Stmt:S1 WHILE LPAREN Cond:C2 RPAREN SEMI {: RESULT=new WhileStatement(S1, C2); RESULT.setLine(S1left); :}
-      |  (BreakStatement) BREAK SEMI {: RESULT=new BreakStatement(); :}
-      |  (ContinueStatement) CONTINUE SEMI {: RESULT=new ContinueStatement(); :}
+      |  (BreakStatement) BREAK:B1 SEMI {: RESULT=new BreakStatement(B1); RESULT.setLine(B1left); :}
+      |  (ContinueStatement) CONTINUE:C1 SEMI {: RESULT=new ContinueStatement(C1); RESULT.setLine(C1left); :}
       |  (ReturnStatement) RETURN RetOpt:R1 SEMI {: RESULT=new ReturnStatement(R1); RESULT.setLine(R1left); :}
       |  (ReadStatement) READ LPAREN Designator:D1 RPAREN SEMI {: RESULT=new ReadStatement(D1); RESULT.setLine(D1left); :}
       |  (PrintStatement) PRINT LPAREN Expr:E1 PrintOpt:P2 RPAREN SEMI {: RESULT=new PrintStatement(E1, P2); RESULT.setLine(E1left); :}

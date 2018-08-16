@@ -1,13 +1,24 @@
 // generated with ast extension for cup
 // version 0.8
-// 15/7/2018 19:36:24
+// 16/7/2018 10:24:35
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class ContinueStatement extends Stmt {
 
-    public ContinueStatement () {
+    private String C1;
+
+    public ContinueStatement (String C1) {
+        this.C1=C1;
+    }
+
+    public String getC1() {
+        return C1;
+    }
+
+    public void setC1(String C1) {
+        this.C1=C1;
     }
 
     public void accept(Visitor visitor) {
@@ -29,6 +40,9 @@ public class ContinueStatement extends Stmt {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
         buffer.append("ContinueStatement(\n");
+
+        buffer.append(" "+tab+C1);
+        buffer.append("\n");
 
         buffer.append(tab);
         buffer.append(") [ContinueStatement]");

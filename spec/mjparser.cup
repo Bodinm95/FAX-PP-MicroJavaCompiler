@@ -56,11 +56,12 @@ scan with {:
 	return s;
 :}
 
-terminal PROGRAM, BREAK, CONTINUE, CLASS, EXTENDS, IF, ELSE, DO, WHILE, RETURN, NEW, PRINT, READ, VOID;
+terminal PROGRAM, CLASS, EXTENDS, IF, ELSE, DO, WHILE, RETURN, NEW, PRINT, READ, VOID;
 terminal ADD, SUB, MUL, DIV, MOD, EQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR, ASSIGN, INC, DEC;
 terminal SEMI, COMMA, DOT;
 terminal LPAREN, RPAREN, LSQUARE, RSQUARE, LBRACE, RBRACE;
 terminal CONST;
+terminal String BREAK, CONTINUE;
 
 terminal Integer NUM;
 terminal Character CHAR;
