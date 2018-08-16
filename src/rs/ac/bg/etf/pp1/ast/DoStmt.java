@@ -5,13 +5,11 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public abstract class Expr implements SyntaxNode {
+public abstract class DoStmt implements SyntaxNode {
 
     private SyntaxNode parent;
 
     private int line;
-
-    public rs.etf.pp1.symboltable.concepts.Struct struct = null;
 
     public SyntaxNode getParent() {
         return parent;

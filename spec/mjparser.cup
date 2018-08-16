@@ -99,6 +99,7 @@ nonterminal Type;
 
 nonterminal StmtList;
 nonterminal Stmt;
+nonterminal DoStmt;
 nonterminal ElseOpt;
 nonterminal RetOpt;
 nonterminal PrintOpt;
@@ -208,13 +209,15 @@ StmtList ::= (StatementList) StmtList Stmt
 
 Stmt ::= (Statement) DesignatorStatement SEMI
       |  (IfStatement) IF LPAREN Cond RPAREN Stmt ElseOpt
-      |  (WhileStatement) DO Stmt WHILE LPAREN Cond RPAREN SEMI
+      |  (WhileStatement) DoStmt Stmt WHILE LPAREN Cond RPAREN SEMI
       |  (BreakStatement) BREAK SEMI
       |  (ContinueStatement) CONTINUE SEMI
       |  (ReturnStatement) RETURN RetOpt SEMI
       |  (ReadStatement) READ LPAREN Designator RPAREN SEMI
       |  (PrintStatement) PRINT LPAREN Expr PrintOpt RPAREN SEMI
       |  (BlockStatement) LBRACE StmtList RBRACE;
+
+DoStmt ::= (DoStatement) DO;
 
 ElseOpt ::= (ElseOption) ELSE Stmt
          |  (EmptyElseOption) /* epsilon */;

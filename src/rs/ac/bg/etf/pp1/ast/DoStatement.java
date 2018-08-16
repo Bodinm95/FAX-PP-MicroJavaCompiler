@@ -5,9 +5,9 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class ErrorFormalParamPart extends FormParsPart {
+public class DoStatement extends DoStmt {
 
-    public ErrorFormalParamPart () {
+    public DoStatement () {
     }
 
     public void accept(Visitor visitor) {
@@ -28,10 +28,10 @@ public class ErrorFormalParamPart extends FormParsPart {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("ErrorFormalParamPart(\n");
+        buffer.append("DoStatement(\n");
 
         buffer.append(tab);
-        buffer.append(") [ErrorFormalParamPart]");
+        buffer.append(") [DoStatement]");
         return buffer.toString();
     }
 }
