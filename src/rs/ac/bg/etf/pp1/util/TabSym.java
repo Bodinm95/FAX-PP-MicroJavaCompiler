@@ -86,8 +86,6 @@ public class TabSym extends Tab {
 			return "bool";
 		if (type.equals(noType))
 			return "void";
-		if (type.equals(nullType))
-			return "";
 
 		for (Scope s = currentScope; s != null; s = s.getOuter())
 			for (Obj currObj : s.values())
