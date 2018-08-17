@@ -90,6 +90,7 @@ nonterminal ClassMethodDecl ClassMethodDecl;
 
 nonterminal MethodDeclList MethodDeclList;
 nonterminal MethodDecl MethodDecl;
+nonterminal MethodSign MethodSign;
 nonterminal MethodId MethodId;
 nonterminal RetType RetType;
 nonterminal FormPars FormPars;
@@ -183,7 +184,9 @@ ClassMethodDecl ::= (ClassMethodDeclaration) LBRACE MethodDeclList:M1 RBRACE {: 
 MethodDeclList ::= (MethodDeclarationList) MethodDeclList:M1 MethodDecl:M2 {: RESULT=new MethodDeclarationList(M1, M2); RESULT.setLine(M1left); :}
                 |  (EmptyMethodDeclarationList) {: RESULT=new EmptyMethodDeclarationList(); :} /* epsilon */;
 
-MethodDecl ::= (MethodDeclaration) RetType:R1 MethodId:M2 LPAREN FormPars:F3 RPAREN ListVarDecl:L4 LBRACE StmtList:S5 RBRACE {: RESULT=new MethodDeclaration(R1, M2, F3, L4, S5); RESULT.setLine(R1left); :};
+MethodDecl ::= (MethodDeclaration) MethodSign:M1 ListVarDecl:L2 LBRACE StmtList:S3 RBRACE {: RESULT=new MethodDeclaration(M1, L2, S3); RESULT.setLine(M1left); :};
+
+MethodSign ::= (MethodSignature) RetType:R1 MethodId:M2 LPAREN FormPars:F3 RPAREN {: RESULT=new MethodSignature(R1, M2, F3); RESULT.setLine(R1left); :};
 
 MethodId ::= (MethodId) IDENT:name {: RESULT=new MethodId(name); RESULT.setLine(nameleft); :};
 

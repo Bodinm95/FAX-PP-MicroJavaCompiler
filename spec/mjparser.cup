@@ -90,6 +90,7 @@ nonterminal ClassMethodDecl;
 
 nonterminal MethodDeclList;
 nonterminal MethodDecl;
+nonterminal MethodSign;
 nonterminal MethodId;
 nonterminal RetType;
 nonterminal FormPars;
@@ -183,7 +184,9 @@ ClassMethodDecl ::= (ClassMethodDeclaration) LBRACE MethodDeclList RBRACE
 MethodDeclList ::= (MethodDeclarationList) MethodDeclList MethodDecl
                 |  (EmptyMethodDeclarationList) /* epsilon */;
 
-MethodDecl ::= (MethodDeclaration) RetType MethodId LPAREN FormPars RPAREN ListVarDecl LBRACE StmtList RBRACE;
+MethodDecl ::= (MethodDeclaration) MethodSign ListVarDecl LBRACE StmtList RBRACE;
+
+MethodSign ::= (MethodSignature) RetType MethodId LPAREN FormPars RPAREN;
 
 MethodId ::= (MethodId) IDENT:name;
 

@@ -1,53 +1,31 @@
 // generated with ast extension for cup
 // version 0.8
-// 16/7/2018 10:48:40
+// 17/7/2018 10:59:10
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class MethodDeclaration extends MethodDecl {
 
-    private RetType RetType;
-    private MethodId MethodId;
-    private FormPars FormPars;
+    private MethodSign MethodSign;
     private ListVarDecl ListVarDecl;
     private StmtList StmtList;
 
-    public MethodDeclaration (RetType RetType, MethodId MethodId, FormPars FormPars, ListVarDecl ListVarDecl, StmtList StmtList) {
-        this.RetType=RetType;
-        if(RetType!=null) RetType.setParent(this);
-        this.MethodId=MethodId;
-        if(MethodId!=null) MethodId.setParent(this);
-        this.FormPars=FormPars;
-        if(FormPars!=null) FormPars.setParent(this);
+    public MethodDeclaration (MethodSign MethodSign, ListVarDecl ListVarDecl, StmtList StmtList) {
+        this.MethodSign=MethodSign;
+        if(MethodSign!=null) MethodSign.setParent(this);
         this.ListVarDecl=ListVarDecl;
         if(ListVarDecl!=null) ListVarDecl.setParent(this);
         this.StmtList=StmtList;
         if(StmtList!=null) StmtList.setParent(this);
     }
 
-    public RetType getRetType() {
-        return RetType;
+    public MethodSign getMethodSign() {
+        return MethodSign;
     }
 
-    public void setRetType(RetType RetType) {
-        this.RetType=RetType;
-    }
-
-    public MethodId getMethodId() {
-        return MethodId;
-    }
-
-    public void setMethodId(MethodId MethodId) {
-        this.MethodId=MethodId;
-    }
-
-    public FormPars getFormPars() {
-        return FormPars;
-    }
-
-    public void setFormPars(FormPars FormPars) {
-        this.FormPars=FormPars;
+    public void setMethodSign(MethodSign MethodSign) {
+        this.MethodSign=MethodSign;
     }
 
     public ListVarDecl getListVarDecl() {
@@ -71,26 +49,20 @@ public class MethodDeclaration extends MethodDecl {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(RetType!=null) RetType.accept(visitor);
-        if(MethodId!=null) MethodId.accept(visitor);
-        if(FormPars!=null) FormPars.accept(visitor);
+        if(MethodSign!=null) MethodSign.accept(visitor);
         if(ListVarDecl!=null) ListVarDecl.accept(visitor);
         if(StmtList!=null) StmtList.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(RetType!=null) RetType.traverseTopDown(visitor);
-        if(MethodId!=null) MethodId.traverseTopDown(visitor);
-        if(FormPars!=null) FormPars.traverseTopDown(visitor);
+        if(MethodSign!=null) MethodSign.traverseTopDown(visitor);
         if(ListVarDecl!=null) ListVarDecl.traverseTopDown(visitor);
         if(StmtList!=null) StmtList.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(RetType!=null) RetType.traverseBottomUp(visitor);
-        if(MethodId!=null) MethodId.traverseBottomUp(visitor);
-        if(FormPars!=null) FormPars.traverseBottomUp(visitor);
+        if(MethodSign!=null) MethodSign.traverseBottomUp(visitor);
         if(ListVarDecl!=null) ListVarDecl.traverseBottomUp(visitor);
         if(StmtList!=null) StmtList.traverseBottomUp(visitor);
         accept(visitor);
@@ -101,20 +73,8 @@ public class MethodDeclaration extends MethodDecl {
         buffer.append(tab);
         buffer.append("MethodDeclaration(\n");
 
-        if(RetType!=null)
-            buffer.append(RetType.toString("  "+tab));
-        else
-            buffer.append(tab+"  null");
-        buffer.append("\n");
-
-        if(MethodId!=null)
-            buffer.append(MethodId.toString("  "+tab));
-        else
-            buffer.append(tab+"  null");
-        buffer.append("\n");
-
-        if(FormPars!=null)
-            buffer.append(FormPars.toString("  "+tab));
+        if(MethodSign!=null)
+            buffer.append(MethodSign.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");
