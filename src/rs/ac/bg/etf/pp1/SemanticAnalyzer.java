@@ -15,7 +15,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	Stack<Scope> state = new Stack<Scope>();	
 
 	boolean global_error = false;
-	boolean error = false;
+	boolean class_error = false;
+	boolean method_error = false;
 
 	Struct currType;
 	Obj currClass;
@@ -30,7 +31,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void print_error(int line, String name, String msg) {
 		global_error = true;
-		error = true;
+		class_error = true;
+		method_error = true;
+
 		name = (name.equals("") ? name : "'" + name + "' ");
 		
 		System.err.println("Semantic error " + name + "at line:" + line + " - " + msg);
@@ -62,7 +65,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		ProgramId.obj = TabSym.insert(Obj.Prog, name, TabSym.noType);
 		TabSym.openScope();
 		
-		error = false;
+		global_error = false;
 		state.push(Scope.GLOBAL);
 
 		print_info("Program '" + name + "' declared at line:" + line);
@@ -212,7 +215,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		state.pop();
 		currClass = null;
 
-		print_info("Class '" + name + "' " + (error ? "" : "successfully ") + "processed.");
+		print_info("Class '" + name + "' " + (class_error ? "" : "successfully ") + "processed.");
 	}
 
 	public void visit(ClassId ClassId)
@@ -231,7 +234,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		TabSym.openScope();
 
-		error = false;
+		class_error = false;
 		state.push(Scope.CLASS);
 	}
 
@@ -273,11 +276,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		switch (state.peek()) {
 		case LOCAL:
 			state.pop();
-			print_info("Function '" + name + "' " + (error ? "" : "successfully ") + "processed.");
+			print_info("Function '" + name + "' " + (method_error ? "" : "successfully ") + "processed.");
 			break;
 		case METHOD:
 			state.pop();
-			print_info("Method '" + name + "' " + (error ? "" : "successfully ") + "processed.");
+			print_info("Method '" + name + "' " + (method_error ? "" : "successfully ") + "processed.");
 			break;
 		default :
 			break;
@@ -288,7 +291,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(MethodSignature MethodSignature)
 	{
-		if (!error) {
+		if (!method_error) {
 			// Save formal params from TabSym and close method scope used for inserting formal params
 			SymbolDataStructure formPars = TabSym.currentScope().getLocals();
 			TabSym.closeScope();
@@ -309,8 +312,6 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			}
 			formPars = null;
 		}
-		error = false;	// Reset error flags
-		returnFound = false;
 	}
 
 	public void visit(MethodId MethodId)
@@ -319,16 +320,17 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String name = MethodId.getName();
 		String type = TabSym.findTypeName(currType);
 
-		error = false;	// Reset method error
+		method_error = false;	// Reset method error
 
 		if (currType.equals(TabSym.errorType))	// Type error
-			error = true;
+			method_error = true;
 
 		if (TabSym.currentScope().findSymbol(name) != null)
 			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
 
 		currMethod = new Obj(Obj.Meth, name, currType);
 		currMethod.setLevel(0);
+		returnFound = false;
 
 		TabSym.openScope();
 
