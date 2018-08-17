@@ -1,15 +1,18 @@
 program SemanticProgram
 	const int N = 10;
-	int global;
+	// Variable test //
+	int global;  // global variable declared
 	bool flag;
 
 	class Math {
 		int PI;
-		Math funcArray[];
+		Math funcArray[];  // Field declared
 		{
 			int sum(int a, int b)
-				int ret;
-				int arr[];
+				// Variable test // 
+				int ret;    // local variable declared
+				int arr[];  // local array declared
+				int ret;    // already defined error
 			{
 				// Designator test //
 				ret = temp;         // Undeclared symbol error
