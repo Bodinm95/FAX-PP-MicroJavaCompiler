@@ -8,6 +8,7 @@ import rs.etf.pp1.symboltable.concepts.Struct;
 public class TabSym extends Tab {
 
 	public static final Struct boolType = new Struct(Struct.Bool);
+	public static final Struct errorType = new Struct(-1);
 
 	private static int currentLevel;
 
@@ -86,6 +87,8 @@ public class TabSym extends Tab {
 			return "bool";
 		if (type.equals(noType))
 			return "void";
+		if (type.equals(errorType))
+			return "err";
 
 		for (Scope s = currentScope; s != null; s = s.getOuter())
 			for (Obj currObj : s.values())
