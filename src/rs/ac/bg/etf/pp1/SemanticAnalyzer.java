@@ -89,8 +89,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(ConstDeclarationNum ConstDeclarationNum)
 	{
-		String name = ConstDeclarationNum.getName();
 		int line = ConstDeclarationNum.getLine();
+		String name = ConstDeclarationNum.getName();
 		int value = ConstDeclarationNum.getValue().intValue();
 
 		if (!currType.equals(TabSym.intType)) {
@@ -111,8 +111,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(ConstDeclarationChar ConstDeclarationChar)
 	{
-		String name = ConstDeclarationChar.getName();
 		int line = ConstDeclarationChar.getLine();
+		String name = ConstDeclarationChar.getName();
 		char value = ConstDeclarationChar.getValue().charValue();
 
 		if (!currType.equals(TabSym.charType)) {
@@ -133,8 +133,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(ConstDeclarationBool ConstDeclarationBool)
 	{
-		String name = ConstDeclarationBool.getName();
 		int line = ConstDeclarationBool.getLine();
+		String name = ConstDeclarationBool.getName();
 		String value = ConstDeclarationBool.getValue();
 
 		if (!currType.equals(TabSym.boolType)) {
