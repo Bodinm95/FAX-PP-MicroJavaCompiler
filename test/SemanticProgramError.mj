@@ -1,5 +1,15 @@
 program SemanticProgram
-	const int N = 10;
+
+	// Constant test //
+	const int N = 10;     // num constant declared
+	const bool B = true;  // bool constant declared
+	const char C = 'A';   // char constant declared
+
+	const int N = 10;   // already defined error
+	const int X = true; // expected bool error
+	const int Y = 'A';  // expected char error
+	const bool Z = 10;  // expected int error
+
 	// Variable test //
 	int global;  // global variable declared
 	bool flag;
@@ -9,11 +19,13 @@ program SemanticProgram
 		Math funcArray[];  // Field declared
 		{
 			int sum(int a, int b)
+
 				// Variable test // 
 				int ret;    // local variable declared
 				int arr[];  // local array declared
 				int ret;    // already defined error
 			{
+
 				// Designator test //
 				ret = temp;         // Undeclared symbol error
 				ret = N;            // Symbolic constant detected
@@ -30,6 +42,7 @@ program SemanticProgram
 				return ret;
 			}
 
+
 			// Method test //
 			asd sum(int a, dsa b) {    // type error
 				ret = 10 + b;          // symbol already defined error
@@ -41,6 +54,7 @@ program SemanticProgram
 	// Class Test //
 	class Math { { } }  // already defined error
 {
+
 	// Statement test //
 	void out(int num){
 		return 10;                  // void return error
