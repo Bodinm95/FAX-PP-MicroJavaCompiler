@@ -6,8 +6,8 @@ import java.util.Stack;
 
 import rs.ac.bg.etf.pp1.ast.*;
 import rs.ac.bg.etf.pp1.util.TabSym;
-import rs.etf.pp1.symboltable.*;
 import rs.etf.pp1.symboltable.concepts.*;
+import rs.etf.pp1.symboltable.structure.*;
 
 public class SemanticAnalyzer extends VisitorAdaptor {
 
@@ -21,7 +21,6 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	Obj currClass;
 	Obj currMethod;
 
-	Struct methodType;
 	boolean returnFound;
 
 	List<Obj> formParamList = new ArrayList<Obj>();;
@@ -71,11 +70,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(Type Type)
 	{
-		String name = Type.getName();
 		int line = Type.getLine();
-		
-		currType = TabSym.noType;
+		String name = Type.getName();
+
 		Obj typeObj = TabSym.find(name);
+		currType = TabSym.noType;
 
 		if (typeObj == TabSym.noObj || typeObj.getKind() != Obj.Type)
 			print_error(line, name, "'" + name + "' is not a valid type!");
@@ -258,7 +257,157 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		print_info("Class '" + currClass.getName() + "' extends class '" + name + "'");
 	}
 
-// ----------------------------------------------- MethodDecl ----------------------------------------------------------- //
+// ----------------------------------------------------------- MethodDecl ----------------------------------------------------------- //
+
+	public void visit(MethodDeclaration MethodDeclaration)
+	{
+		int line = MethodDeclaration.getLine();
+		String name = methodName(currMethod, true);
+
+		TabSym.chainLocalSymbols(currMethod);
+		TabSym.closeScope();
+
+		if (!currMethod.getType().equals(TabSym.noType) && returnFound == false)
+			print_error(line, name, "Return statement missing!");
+
+		switch (state.peek()) {
+		case LOCAL:
+			state.pop();
+			print_info("Function '" + name + "' " + (error ? "" : "successfully ") + "processed.");
+			break;
+		case METHOD:
+			state.pop();
+			print_info("Method '" + name + "' " + (error ? "" : "successfully ") + "processed.");
+			break;
+		default :
+			break;
+		}
+
+		currMethod = null;
+	}
+
+	public void visit(MethodSignature MethodSignature)
+	{
+		if (!error) {
+			// Save formal params from TabSym and close method scope used for inserting formal params
+			SymbolDataStructure formPars = TabSym.currentScope().getLocals();
+			TabSym.closeScope();
+
+			// Insert method object in TabSym and set number of formal params to 0
+			currMethod = TabSym.insert(currMethod.getKind(), currMethod.getName(), currMethod.getType());
+			currMethod.setLevel(0);
+			
+			TabSym.openScope();  // Open method scope
+
+			// Insert saved formal params to new method scope
+			if (formPars != null) {
+				for(Obj param : formPars.symbols()) {
+					Obj formParam = TabSym.insert(param.getKind(), param.getName(), param.getType());
+					formParam.setFpPos(param.getFpPos());   // Add saved formal param position to inserted param
+				}
+				currMethod.setLevel(formPars.numSymbols()); // Set number of formal params
+			}
+			formPars = null;
+		}
+		error = false;	// Reset error flags
+		returnFound = false;
+	}
+
+	public void visit(MethodId MethodId)
+	{
+		int line = MethodId.getLine();
+		String name = MethodId.getName();
+		String type = TabSym.findTypeName(currType);
+
+		error = false;	// Reset method error
+
+		if (currType.equals(TabSym.errorType))	// Type error
+			error = true;
+
+		if (TabSym.currentScope().findSymbol(name) != null)
+			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
+
+		currMethod = new Obj(Obj.Meth, name, currType);
+		currMethod.setLevel(0);
+
+		TabSym.openScope();
+
+		switch (state.peek()) {
+		case GLOBAL:
+			state.push(Scope.LOCAL);
+			print_info("Function '" + type + " " + name + "(...)' declared at line:" + line);
+			break;
+		case CLASS: 
+			state.push(Scope.METHOD);
+			print_info("Method '" + type + " " + name + "(...)' declared in class '" + currClass.getName() + "' at line:" + line);
+
+			Obj paramThis = TabSym.insert(Obj.Var, "this", currClass.getType());	// implicit class parameter this
+			paramThis.setFpPos(0);
+			currMethod.setLevel(1);
+			break;
+		default :
+			break;
+		}
+	}
+
+	public void visit(ReturnType ReturnType) 
+	{
+		if (currType.equals(TabSym.noType))	// Type error
+			currType = TabSym.errorType;
+	}
+
+	public void visit(ReturnTypeVoid ReturnTypeVoid)
+	{
+		currType = TabSym.noType;
+	}
+
+	public void visit(FormalParamPart FormalParamPart)
+	{
+		int line = FormalParamPart.getLine();
+		String name = FormalParamPart.getName();
+		String typeName = FormalParamPart.getType().getName();
+
+		String methodType = TabSym.findTypeName(currMethod.getType());
+		String methodName = currMethod.getName() + "(...)";
+		String methodKind = (state.peek() == Scope.METHOD) ? "method" : "function";
+
+		if (TabSym.currentScope().findSymbol(name) != null) {
+			print_error(line, name, "Formal parameter '" + name + "' already defined!");
+			return;
+		}
+		if (currType.equals(TabSym.noType))	// Type error
+			return;
+
+		Obj formParam = TabSym.insert(Obj.Var, name, currType);
+		formParam.setFpPos(currMethod.getLevel());      // Formal param position
+		currMethod.setLevel(currMethod.getLevel() + 1); // Formal params number++
+
+		print_info("Formal parameter '" + typeName + " " + name + "' of " + methodKind + " '" + methodType + " " + methodName + "' declared at line:" + line);
+	}
+
+	public void visit(FormalParamPartArray FormalParamPartArray)
+	{
+		int line = FormalParamPartArray.getLine();
+		String name = FormalParamPartArray.getName();
+		String typeName = FormalParamPartArray.getType().getName();
+
+		Obj formParam = TabSym.insert(Obj.Var, name, new Struct(Struct.Array, currType));
+		formParam.setFpPos(currMethod.getLevel());      // Formal param position
+		currMethod.setLevel(currMethod.getLevel() + 1); // Formal params number++
+
+		if (TabSym.currentScope().findSymbol(name) != null) {
+			print_error(line, name, "Formal parameter '" + name + "' already defined!");
+			return;
+		}
+		if (currType.equals(TabSym.noType))	// Type error
+			return;
+
+		String methodType = TabSym.findTypeName(currMethod.getType());
+		String methodName = currMethod.getName() + "(...)";
+		String methodKind = (state.peek() == Scope.METHOD) ? "method" : "function";
+
+		print_info("Formal parameter '" + typeName + " " + name + "[]' of " + methodKind + " '" + methodType + " " + methodName + "' declared at line:" + line);
+	}
 
 	public String methodName(Obj func, boolean full) {
 		StringBuilder name = new StringBuilder();
@@ -266,14 +415,14 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String methodName = func.getName();
 		String returnName = TabSym.findTypeName(func.getType());
 
-		for (Obj param : func.getLocalSymbols())
+		for (Obj param : TabSym.currentScope.values())
 			if (param.getFpPos() > 0)
 				formParamList.add(param);
 
 		name.append(returnName + " " + methodName + "(");
 
 		if (!formParamList.isEmpty()) {
-			for (Obj formParam : formParamList) {		// Append formal parameter names
+			for (Obj formParam : formParamList) {	// Append formal parameter names
 				String paramType = TabSym.findTypeName(formParam.getType());
 				String paramName = formParam.getName();
 				if (full)
@@ -286,168 +435,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			}
 			name.setLength(name.length() - 2);;
 		}
-		name.append(")");	
+		name.append(")");
 
 		formParamList.clear();
 		return name.toString();
-	}
-
-	public void returnTypeCheck(MethodDeclaration MethodDeclaration) {
-		String returnName = methodType.equals(TabSym.noType) ? "void" : ((ReturnType)MethodDeclaration.getRetType()).getType().getName();
-		String methodName = currMethod.getName() + (formParamList.isEmpty() ? "()" : "(...)");
-		String name = returnName + " " + methodName;
-		int line = MethodDeclaration.getLine();
-
-		if (retType == null || methodType.equals(TabSym.nullType)) {
-			print_error(line, name, "Invalid return type!");
-			TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
-			return;
-		}
-		if (methodType.equals(TabSym.noType))		// void method
-			if (!retType.equals(TabSym.noType)) {
-				print_error(line, name, "Void function must have empty or no return statements!");
-				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
-				return;
-			}
-
-		if (!methodType.equals(TabSym.noType)) {	// regular method
-			if (retType.equals(TabSym.noType)) {
-				print_error(line, name, "Return statement missing!");
-				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
-				return;
-			}
-			if (!methodType.compatibleWith(retType)) {
-				print_error(line, name, "Incompatible return type, expected " + returnName + "!");
-				TabSym.currentScope.getLocals().deleteKey(currMethod.getName());
-				return;
-			}
-		}
-	}
-
-	public void visit(MethodDeclaration MethodDeclaration)
-	{
-		String name = methodName();
-
-		TabSym.chainLocalSymbols(currMethod);
-		TabSym.closeScope();
-
-		returnTypeCheck(MethodDeclaration);
-
-		switch (state.peek()) {
-		case METHOD:
-			print_info("Method '" + name + "' " + (error ? "" : "successfully ") + "processed.");
-			state.pop();
-			currMethod.setLevel(formParamList.size() + 1);	// increment for implicit parameter this
-			break;
-		case LOCAL:
-			print_info("Function '" + name + "' " + (error ? "" : "successfully ") + "processed.");
-			state.pop();
-			currMethod.setLevel(formParamList.size());	// set number of formal parameters
-			break;
-		default :
-			break;
-		}
-
-		formParamList.clear();
-		currMethod = null;
-	}
-
-	public void visit(MethodId MethodId)
-	{
-		String name = MethodId.getName();
-		int line = MethodId.getLine();
-
-		if (TabSym.currentScope().findSymbol(name) != null || methodType.equals(TabSym.nullType)) {
-			currMethod = new Obj(Obj.Meth, name, methodType);
-			if (TabSym.currentScope().findSymbol(name) != null)
-				print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
-		}
-		else {
-			currMethod = TabSym.insert(Obj.Meth, name, methodType);
-			retType = TabSym.noType;
-
-			switch (state.peek()) {
-			case GLOBAL:
-				print_info("Function '" + name + "' declared at line:" + line);
-				break;
-			case CLASS: 
-				print_info("Method '" + name + "' declared in class '" + currClass.getName() + "' at line:" + line);
-				break;
-			default :
-				break;
-			}
-		}
-
-		TabSym.openScope();
-		error = false;
-		returnFound = false;
-
-		switch (state.peek()) {
-		case GLOBAL:
-			state.push(Scope.LOCAL);
-			break;
-		case CLASS: 
-			Obj paramThis = TabSym.insert(Obj.Var, "this", currClass.getType());	// implicit class parameter this
-			paramThis.setFpPos(0);
-			state.push(Scope.METHOD);
-			break;
-		default :
-			break;
-		}
-	}
-
-	public void visit(ReturnType ReturnType) 
-	{
-		if (currType.equals(Tab.noType))
-			methodType = Tab.nullType;
-		else
-			methodType = currType;
-	}
-
-	public void visit(ReturnTypeVoid ReturnTypeVoid)
-	{
-		methodType = TabSym.noType;
-	}
-
-	public void visit(FormalParamPart FormalParamPart)
-	{
-		String name = FormalParamPart.getName();
-		String typeName = FormalParamPart.getType().getName();
-		int line = FormalParamPart.getLine();
-
-		if (TabSym.currentScope().findSymbol(name) != null) {
-			print_error(line, name, "Formal parameter '" + name + "' already defined!");
-			return;
-		}
-
-		if (!currType.equals(TabSym.nullType)) {
-			Obj formParam = TabSym.insert(Obj.Var, name, currType);
-			formParamList.add(formParam);
-			formParam.setFpPos(formParamList.size());	// formal param position
-
-			print_info("Formal parameter '" + typeName + " " + name + "' of method '" + currMethod.getName() + "' declared at line:" + line);
-		}
-	}
-
-	public void visit(FormalParamPartArray FormalParamPartArray)
-	{
-		String name = FormalParamPartArray.getName();
-		String typeName = FormalParamPartArray.getType().getName();
-		int line = FormalParamPartArray.getLine();
-
-		if (TabSym.currentScope().findSymbol(name) != null) {
-			print_error(line, name, "Formal parameter '" + name + "' already defined!");
-			return;
-		}
-
-		if (!currType.equals(TabSym.nullType)) {
-			Obj formParam = TabSym.insert(Obj.Var, name, new Struct(Struct.Array, currType));
-			formParamList.add(formParam);
-			formParam.setFpPos(formParamList.size());	// formal param position
-
-			print_info("Formal parameter '" + typeName + " " + name + "[]' of method '" + currMethod.getName() + "' declared at line:" + line);
-		}
-	
 	}
 
 // ----------------------------------------------------------- Statement ----------------------------------------------------------- //
