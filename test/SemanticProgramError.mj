@@ -114,7 +114,7 @@ program SemanticProgram
 
 		// Actual Parameters test //
 		Math.sum(1, 2, 3);    // different number of parameters error
-		Math.sum(1, 'A');     // parameter mismatch error
+		Math.sum('A', 'A');   // parameter mismatch error
 
 
 		// Statement test //

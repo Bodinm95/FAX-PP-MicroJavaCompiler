@@ -530,7 +530,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 
 	public void actParsCheck(int line, Obj func) {
-		String name = func.getName() + (actParamList.isEmpty() ? "()" : "(...)");
+		String name = callName(func, 0);
 
 		for (Obj param : func.getLocalSymbols())
 			if (param.getFpPos() > 0)
@@ -545,6 +545,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		for (int i = 0; i < actParamList.size(); i++)
 			if (!actParamList.get(i).assignableTo(formParamList.get(i).getType())) {
+				name = callName(func, i + 1);
 				String actual = TabSym.findTypeName(actParamList.get(i));
 				String formal = TabSym.findTypeName(formParamList.get(i).getType());
 				print_error(line, name, "Actual '" + actual + "' parameter does not match formal '" + formal + "' parameter!");
@@ -552,6 +553,28 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		formParamList.clear();
 		actParamList.clear();
+	}
+
+	public String callName(Obj func, int error) {
+		StringBuilder name = new StringBuilder();
+
+		String methodName = func.getName();
+		name.append(methodName + "(");
+
+		if (!actParamList.isEmpty()) {
+			for (int i = 0; i < actParamList.size(); i++) {	// Append actual parameter types
+				Struct actParam = actParamList.get(i);
+				String paramType = TabSym.findTypeName(actParam);
+				if (i != error - 1)
+					name.append(paramType + ", ");
+				else
+					name.append("X, ");
+			}
+			name.setLength(name.length() - 2);;
+		}
+		name.append(")");
+
+		return name.toString();
 	}
 
 // ----------------------------------------------------------- DesignatorStatement ----------------------------------------------------------- //
@@ -579,7 +602,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(ProcCall ProcCall)
 	{
 		int line = ProcCall.getLine();
-		String name = ProcCall.getDesignator().obj.getName() + (actParamList.isEmpty() ? "()" : "(...)");
+		String name = callName(ProcCall.getDesignator().obj, 0);
 		String type = (methodClass.equals("") ? "Global function" : "Method");
 
 		Obj procCall = ProcCall.getDesignator().obj;
@@ -732,7 +755,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			case Obj.Fld:
 				name = (symbol.getType().getKind() == Struct.Array ? name + "[]" : name);
 				String fieldName = currClass.getName() + "." + name;
-				String methName = currClass.getName() + "." + currMethod.getName() + (formParamList.isEmpty() ? "()" : "(...)");
+				String methName = methodName(currMethod, false);
+				methName = currClass.getName() + "." + methName.substring(methName.indexOf(" ") + 1);
 				print_info("Field '" + fieldName + "' inside method '" + methName + "' detected at line:" + line);
 				break;
 		}
@@ -861,7 +885,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(FactorProcCall FactorProcCall)
 	{
 		int line = FactorProcCall.getLine();
-		String name = FactorProcCall.getDesignator().obj.getName() + (actParamList.isEmpty() ? "()" : "(...)");
+		String name = callName(FactorProcCall.getDesignator().obj, 0);
 		String type = (methodClass.equals("") ? "Global function" : "Method");
 
 		Obj procCall = FactorProcCall.getDesignator().obj;
