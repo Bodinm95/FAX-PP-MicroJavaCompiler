@@ -26,6 +26,12 @@ program SemanticProgram
 
 				return ret;
 			}
+
+			// Method test //
+			asd sum(int a, dsa b) {    // type error
+				ret = 10 + b;          // symbol already defined error
+				return;                // formal argument error
+			}
 		}
 	}
 {
