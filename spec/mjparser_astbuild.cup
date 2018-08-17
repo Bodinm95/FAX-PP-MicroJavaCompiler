@@ -69,7 +69,7 @@ terminal String BOOL;
 terminal String IDENT;
 
 nonterminal Prog Prog;
-nonterminal rs.etf.pp1.symboltable.concepts.Obj ProgId;
+nonterminal ProgId ProgId;
 
 nonterminal DeclList DeclList;
 nonterminal DeclPart DeclPart;

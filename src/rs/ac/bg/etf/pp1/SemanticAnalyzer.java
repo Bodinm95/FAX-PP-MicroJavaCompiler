@@ -19,6 +19,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	boolean method_error = false;
 
 	Struct currType;
+	Obj currProgram;
 	Obj currClass;
 	Obj currMethod;
 
@@ -47,27 +48,25 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(Program Program)
 	{
-		String name = ((ProgramId)Program.getProgId()).getName();
+		String name = currProgram.getName();
 
-		TabSym.chainLocalSymbols(Program.getProgId().obj);
+		TabSym.chainLocalSymbols(currProgram);
 		TabSym.closeScope();
 
 		state.pop();
-
 		print_info("Program '" + name + "' " + (global_error ? "" : "successfully ") + "processed.");
 	}
 
 	public void visit(ProgramId ProgramId)
 	{
-		String name = ProgramId.getName();
 		int line = ProgramId.getLine();
+		String name = ProgramId.getName();
 
-		ProgramId.obj = TabSym.insert(Obj.Prog, name, TabSym.noType);
-		TabSym.openScope();
-		
 		global_error = false;
-		state.push(Scope.GLOBAL);
+		currProgram = TabSym.insert(Obj.Prog, name, TabSym.noType);
+		TabSym.openScope();
 
+		state.push(Scope.GLOBAL);
 		print_info("Program '" + name + "' declared at line:" + line);
 	}
 
