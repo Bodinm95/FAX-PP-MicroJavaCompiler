@@ -56,12 +56,12 @@ scan with {:
 	return s;
 :}
 
-terminal PROGRAM, CLASS, EXTENDS, IF, ELSE, DO, WHILE, RETURN, NEW, PRINT, READ, VOID;
+terminal PROGRAM, CLASS, EXTENDS, IF, ELSE, DO, WHILE, NEW, PRINT, READ, VOID;
 terminal ADD, SUB, MUL, DIV, MOD, EQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR, ASSIGN, INC, DEC;
 terminal SEMI, COMMA, DOT;
 terminal LPAREN, RPAREN, LSQUARE, RSQUARE, LBRACE, RBRACE;
 terminal CONST;
-terminal String BREAK, CONTINUE;
+terminal String RETURN, BREAK, CONTINUE;
 
 terminal Integer NUM;
 terminal Character CHAR;
@@ -204,7 +204,7 @@ FormParsPart ::= (FormalParamPart) Type IDENT:name
               |  (ErrorFormalParamPart) error;
 
 Type ::= (Type) IDENT:name;
-
+	
 // ------------------------------------------------- //
 
 StmtList ::= (StatementList) StmtList Stmt

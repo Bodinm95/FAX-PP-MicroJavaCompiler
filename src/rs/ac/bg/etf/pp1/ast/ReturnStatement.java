@@ -1,17 +1,27 @@
 // generated with ast extension for cup
 // version 0.8
-// 17/7/2018 10:59:10
+// 17/7/2018 15:31:48
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class ReturnStatement extends Stmt {
 
+    private String R1;
     private RetOpt RetOpt;
 
-    public ReturnStatement (RetOpt RetOpt) {
+    public ReturnStatement (String R1, RetOpt RetOpt) {
+        this.R1=R1;
         this.RetOpt=RetOpt;
         if(RetOpt!=null) RetOpt.setParent(this);
+    }
+
+    public String getR1() {
+        return R1;
+    }
+
+    public void setR1(String R1) {
+        this.R1=R1;
     }
 
     public RetOpt getRetOpt() {
@@ -44,6 +54,9 @@ public class ReturnStatement extends Stmt {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
         buffer.append("ReturnStatement(\n");
+
+        buffer.append(" "+tab+R1);
+        buffer.append("\n");
 
         if(RetOpt!=null)
             buffer.append(RetOpt.toString("  "+tab));

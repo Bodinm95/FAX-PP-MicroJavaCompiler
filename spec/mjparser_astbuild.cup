@@ -56,12 +56,12 @@ scan with {:
 	return s;
 :}
 
-terminal PROGRAM, CLASS, EXTENDS, IF, ELSE, DO, WHILE, RETURN, NEW, PRINT, READ, VOID;
+terminal PROGRAM, CLASS, EXTENDS, IF, ELSE, DO, WHILE, NEW, PRINT, READ, VOID;
 terminal ADD, SUB, MUL, DIV, MOD, EQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR, ASSIGN, INC, DEC;
 terminal SEMI, COMMA, DOT;
 terminal LPAREN, RPAREN, LSQUARE, RSQUARE, LBRACE, RBRACE;
 terminal CONST;
-terminal String BREAK, CONTINUE;
+terminal String RETURN, BREAK, CONTINUE;
 
 terminal Integer NUM;
 terminal Character CHAR;
@@ -204,7 +204,7 @@ FormParsPart ::= (FormalParamPart) Type:T1 IDENT:name {: RESULT=new FormalParamP
               |  (ErrorFormalParamPart) error {: RESULT=new ErrorFormalParamPart(); :};
 
 Type ::= (Type) IDENT:name {: RESULT=new Type(name); RESULT.setLine(nameleft); :};
-
+	
 // ------------------------------------------------- //
 
 StmtList ::= (StatementList) StmtList:S1 Stmt:S2 {: RESULT=new StatementList(S1, S2); RESULT.setLine(S1left); :}
@@ -215,7 +215,7 @@ Stmt ::= (Statement) DesignatorStatement:D1 SEMI {: RESULT=new Statement(D1); RE
       |  (WhileStatement) DoStmt:D1 Stmt:S2 WHILE LPAREN Cond:C3 RPAREN SEMI {: RESULT=new WhileStatement(D1, S2, C3); RESULT.setLine(D1left); :}
       |  (BreakStatement) BREAK:B1 SEMI {: RESULT=new BreakStatement(B1); RESULT.setLine(B1left); :}
       |  (ContinueStatement) CONTINUE:C1 SEMI {: RESULT=new ContinueStatement(C1); RESULT.setLine(C1left); :}
-      |  (ReturnStatement) RETURN RetOpt:R1 SEMI {: RESULT=new ReturnStatement(R1); RESULT.setLine(R1left); :}
+      |  (ReturnStatement) RETURN:R1 RetOpt:R2 SEMI {: RESULT=new ReturnStatement(R1, R2); RESULT.setLine(R1left); :}
       |  (ReadStatement) READ LPAREN Designator:D1 RPAREN SEMI {: RESULT=new ReadStatement(D1); RESULT.setLine(D1left); :}
       |  (PrintStatement) PRINT LPAREN Expr:E1 PrintOpt:P2 RPAREN SEMI {: RESULT=new PrintStatement(E1, P2); RESULT.setLine(E1left); :}
       |  (BlockStatement) LBRACE StmtList:S1 RBRACE {: RESULT=new BlockStatement(S1); RESULT.setLine(S1left); :};
