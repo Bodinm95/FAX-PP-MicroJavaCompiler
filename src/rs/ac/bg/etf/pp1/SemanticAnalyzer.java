@@ -157,49 +157,51 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(VarDeclarationPart VarDeclarationPart)
 	{
-		String name = VarDeclarationPart.getName();
 		int line = VarDeclarationPart.getLine();
+		String name = VarDeclarationPart.getName();
+		String type = TabSym.findTypeName(currType);
 
 		if (TabSym.currentScope().findSymbol(name) != null) {
 			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
 			return;
 		}
+		if (currType.equals(TabSym.noType))	// Type error
+			return;
 
-		if (!currType.equals(TabSym.noType)) {
-			int kind = (state.peek() == Scope.CLASS) ? Obj.Fld : Obj.Var;
-			TabSym.insert(kind, name, currType);
+		int kind = (state.peek() == Scope.CLASS) ? Obj.Fld : Obj.Var;
+		TabSym.insert(kind, name, currType);
 
-			switch (state.peek()) {
-			case GLOBAL: print_info("Global variable '" + name + "' declared at line:" + line); break;
-			case LOCAL: print_info("Local variable '" + name + "' declared in function '" + currMethod.getName() + "' at line:" + line); break;
-			case CLASS: print_info("Field '" + name + "' declared in class '" + currClass.getName() + "' at line:" + line); break;
-			case METHOD: print_info("Local variable '" + name + "' declared in class '" + currClass.getName() + "' method '" + currMethod.getName() + "' at line:" + line); break;
-			default: break;
+		switch (state.peek()) {
+		case GLOBAL: print_info("Global variable '" + type + " " + name + "' declared at line:" + line); break;
+		case LOCAL: print_info("Local variable '" + type + " " + name + "' declared in function '" + methodName(currMethod, false) + "' at line:" + line); break;
+		case CLASS: print_info("Field '" + type + " " + name + "' declared in class '" + currClass.getName() + "' at line:" + line); break;
+		case METHOD: print_info("Local variable '" + type + " " + name + "' declared in class '" + currClass.getName() + "' method '" + methodName(currMethod, false) + "' at line:" + line); break;
+		default: break;
 			}
-		}
 	}
 
 	public void visit(VarDeclarationPartArray VarDeclarationPartArray)
 	{
-		String name = VarDeclarationPartArray.getName();
 		int line = VarDeclarationPartArray.getLine();
+		String name = VarDeclarationPartArray.getName();
+		String type = TabSym.findTypeName(currType);
 
 		if (TabSym.currentScope().findSymbol(name) != null) {
 			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
 			return;
 		}
+		if (currType.equals(TabSym.noType))	// Type error
+			return;
 
-		if (!currType.equals(TabSym.noType)) {
-			int kind = (state.peek() == Scope.CLASS) ? Obj.Fld : Obj.Var;
-			TabSym.insert(kind, name, new Struct(Struct.Array, currType));
+		int kind = (state.peek() == Scope.CLASS) ? Obj.Fld : Obj.Var;
+		TabSym.insert(kind, name, new Struct(Struct.Array, currType));
 
-			switch (state.peek()) {
-			case GLOBAL: print_info("Global variable '" + name + "[]' declared at line:" + line); break;
-			case LOCAL: print_info("Local variable '" + name + "[]' declared in function '" + currMethod.getName() +"' at line:" + line); break;
-			case CLASS: print_info("Field '" + name + "[]' declared in class '" + currClass.getName() + "' at line:" + line); break;
-			case METHOD: print_info("Local variable '" + name + "[]' declared in class '" + currClass.getName() + "' method '" + currMethod.getName() + "' at line:" + line); break;
-			default: break;
-			}
+		switch (state.peek()) {
+		case GLOBAL: print_info("Global variable '" + type + " " + name + "[]' declared at line:" + line); break;
+		case LOCAL: print_info("Local variable '" + type + " " + name + "[]' declared in function '" + methodName(currMethod, false) +"' at line:" + line); break;
+		case CLASS: print_info("Field '" + type + " " + name + "[]' declared in class '" + currClass.getName() + "' at line:" + line); break;
+		case METHOD: print_info("Local variable '" + type + " " + name + "[]' declared in class '" + currClass.getName() + "' method '" + methodName(currMethod, false) + "' at line:" + line); break;
+		default: break;
 		}
 	}
 
