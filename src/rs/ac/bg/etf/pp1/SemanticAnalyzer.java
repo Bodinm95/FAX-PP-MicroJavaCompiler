@@ -213,15 +213,17 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		TabSym.closeScope();
 
 		state.pop();
-		currClass = null;
-
 		print_info("Class '" + name + "' " + (class_error ? "" : "successfully ") + "processed.");
+
+		currClass = null;
 	}
 
 	public void visit(ClassId ClassId)
 	{
-		String name = ClassId.getName();
 		int line = ClassId.getLine();
+		String name = ClassId.getName();
+
+		class_error = false;	// reset class error
 
 		if (TabSym.currentScope().findSymbol(name) != null) {
 			currClass = new Obj(Obj.Type, name, new Struct(Struct.Class));
@@ -229,35 +231,17 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 		else {
 			currClass = TabSym.insert(Obj.Type, name, new Struct(Struct.Class));
-			print_info("Class '" + name + "' declared at line:" + line);
 		}
 
 		TabSym.openScope();
 
-		class_error = false;
 		state.push(Scope.CLASS);
+		print_info("Class '" + name + "' declared at line:" + line);
 	}
 
 	public void visit(ExtendsDeclaration ExtendsDeclaration)
 	{
-		String name = ExtendsDeclaration.getType().getName();
-		int line = ExtendsDeclaration.getLine();
-
-		Obj parent = TabSym.find(name);
-
-		if (parent == TabSym.noObj || parent.getType().getKind() != Struct.Class) {
-			print_error(line, name, "'" + name + "' is not a declared class!");
-			TabSym.currentScope.getOuter().getLocals().deleteKey(currClass.getName());
-
-			return;
-		}
-
-		for (Obj field : parent.getType().getMembers())
-			if (!field.getName().equals("this")) {
-				TabSym.insert(Obj.Fld, field.getName(), field.getType());
-			}
-
-		print_info("Class '" + currClass.getName() + "' extends class '" + name + "'");
+		// TO DO
 	}
 
 // ----------------------------------------------------------- MethodDecl ----------------------------------------------------------- //
