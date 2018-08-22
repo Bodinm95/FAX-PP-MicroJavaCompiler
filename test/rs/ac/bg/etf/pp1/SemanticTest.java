@@ -30,10 +30,13 @@ public class SemanticTest {
 			MJParser parser = new MJParser(lexer);
 			Symbol sym = parser.parse();
 
+			Program program = (sym.value instanceof Program) ? (Program)sym.value : null;
 			SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
 
 			TabSym.init();
-			program.traverseBottomUp(semanticAnalyzer);
+
+			if (program != null)
+				program.traverseBottomUp(semanticAnalyzer);
 
 			Tab.dump();
 
