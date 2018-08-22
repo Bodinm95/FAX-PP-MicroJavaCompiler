@@ -81,6 +81,10 @@ program SemanticProgram
 	int foo3(){ return true; }      // incompatible return type error
 	int foo4(){ return 1 + 'A'; }   // invalid return expression error
 
+
+	// Main Test //
+	int main () { }          // Main void error
+	void main (int a) { }    // Main parameters error
 	void main()
 		int array[];
 		int num;
