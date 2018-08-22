@@ -1,6 +1,6 @@
 program SemanticProgram
 
-	// Constant test //
+	// Constant Test //
 	const int N = 10;     // num constant declared
 	const bool B = true;  // bool constant declared
 	const char C = 'A';   // char constant declared
@@ -10,7 +10,7 @@ program SemanticProgram
 	const int Y = 'A';  // expected char error
 	const bool Z = 10;  // expected int error
 
-	// Variable test //
+	// Variable Test //
 	int global;  // global variable declared
 	bool flag;
 
@@ -20,13 +20,13 @@ program SemanticProgram
 		{
 			int sum(int a, int b)
 
-				// Variable test // 
+				// Variable Test // 
 				int ret;    // local variable declared
 				int arr[];  // local array declared
 				int ret;    // already defined error
 			{
 
-				// Designator test //
+				// Designator Test //
 				ret = temp;         // Undeclared symbol error
 				ret = N;            // Symbolic constant detected
 				ret = global;       // Global variable detected
@@ -43,19 +43,36 @@ program SemanticProgram
 			}
 
 
-			// Method test //
+			// Method Test //
 			asd sum(int a, dsa b) {    // type error
 				ret = 10 + b;          // symbol already defined error
 				return;                // formal argument error
 			}
+			int sum (int a, int b) { } // already defined error
 		}
 	}
 
 	// Class Test //
 	class Math { { } }  // already defined error
+
+	// Inheritance Test //
+	class AdvancedMath extends ASD { }    // not a class error
+	class AdvancedMath extends Math {{
+
+		void sum (int a, int b) { }            // Invalid override type error
+		int sum (int a) { return 1; }          // Invalid override number of params error
+		int sum (int a, char b) { return 1; }  // Invalid override param type error
+
+		int sum(int A, int B) {
+			return A + B;
+		}
+		int mul(int a, int b) {
+			return a * b;
+		}
+	}}
 {
 
-	// Statement test //
+	// Statement Test //
 	void out(int num){
 		return 10;                  // void return error
 	}
@@ -73,7 +90,7 @@ program SemanticProgram
 		int vector[];
 		int scalar;
 	{
-		// Factor, Term and Expression test //
+		// Factor, Term and Expression Test //
 		array = new int['A'];    // size type error
 		array = new asd[10];     // type error
 		array = new int[10];     // array creation
@@ -90,19 +107,19 @@ program SemanticProgram
 		num = - 'A';       // negative expression type error
 
 
-		// Condition test //
+		// Condition Test //
 		if (10 < 'A') return;         // incompatible comparison types error
 		if (math >= math) return;    // invalid relational operator error
 
 
-		// Designator test //
+		// Designator Test //
 		foo = num.PI;                        // not a class type error
 		foo = Math.E;                        // not a class field error
 		foo = Math.PI;                       // class field access detected
 		foo = math.funcArray[5].sum(1, 2);   // multiple class field and array access
 
 
-		// Designator Statement test //
+		// Designator Statement Test //
 		array++;    // invalid designator kind error
 		flag--;     // must be type int error
 		array[2]++;
@@ -115,12 +132,12 @@ program SemanticProgram
 		array[2] = true;   // invalid type assignment
 
 
-		// Actual Parameters test //
+		// Actual Parameters Test //
 		Math.sum(1, 2, 3);    // different number of parameters error
 		Math.sum('A', 'A');   // parameter mismatch error
 
 
-		// Statement test //
+		// Statement Test //
 		print(array);         // invalid print type error
 		print(array, 10);
 
@@ -132,7 +149,7 @@ program SemanticProgram
 		continue;        // continue error
 
 
-		// Vector test //
+		// Vector Test //
 		vector = array + vector;  // vector addition
 		num = array + vector;     // result type error
 		num = vector + scalar;    // addop arithmetic type error
