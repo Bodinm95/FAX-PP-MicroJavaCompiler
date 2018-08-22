@@ -245,7 +245,44 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(ExtendsDeclaration ExtendsDeclaration)
 	{
-		// TO DO
+		int line = ExtendsDeclaration.getLine();
+		String name = ExtendsDeclaration.getType().getName();
+
+		Obj parent = TabSym.find(name);
+
+		if (parent == TabSym.noObj || parent.getType().getKind() != Struct.Class) {
+			print_error(line, name, "'" + name + "' is not a declared class!");
+
+			if (TabSym.currentScope.getOuter().findSymbol(currClass.getName()) != null)	// remove invalid class object form symbol table
+				TabSym.currentScope.getOuter().getLocals().deleteKey(currClass.getName());
+			return;
+		}
+
+		for (Obj field : parent.getType().getMembers()) {
+			if (field.getKind() == Obj.Fld) {	// add inherited fields
+				TabSym.insert(Obj.Fld, field.getName(), field.getType());
+				}
+
+			if (field.getKind() == Obj.Meth) {	// add inherited methods
+				Obj method = TabSym.insert(field.getKind(), field.getName(), field.getType());
+				method.setLevel(field.getLevel());
+				method.setFpPos(1);	// inherited flag
+
+				TabSym.openScope();	// add method local symbols
+				for (Obj symbol : field.getLocalSymbols()) {
+					Obj param;
+					if (symbol.getName().equals("this"))
+						param = TabSym.insert(symbol.getKind(), symbol.getName(), currClass.getType());
+					else
+						param = TabSym.insert(symbol.getKind(), symbol.getName(), symbol.getType());
+					param.setFpPos(symbol.getFpPos());
+				}
+				TabSym.chainLocalSymbols(method);
+				TabSym.closeScope();
+			}
+		}
+
+		print_info("Class '" + currClass.getName() + "' extends class '" + name + "'");
 	}
 
 // ----------------------------------------------------------- MethodDecl ----------------------------------------------------------- //
@@ -268,7 +305,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			break;
 		case METHOD:
 			state.pop();
-			print_info("Method '" + name + "' " + (method_error ? "" : "successfully ") + "processed.");
+			print_info("Method '" + name + "' " + (method_error ? "" : "successfully ") + (currMethod.getFpPos() != 0 && !method_error ? "overridden." : "processed."));
 			break;
 		default :
 			break;
@@ -279,15 +316,23 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(MethodSignature MethodSignature)
 	{
+		int line = MethodSignature.getLine();
+
+		boolean override = checkOverride(line);
+
 		if (!method_error) {
 			// Save formal params from TabSym and close method scope used for inserting formal params
 			SymbolDataStructure formPars = TabSym.currentScope().getLocals();
 			TabSym.closeScope();
 
-			// Insert method object in TabSym and set number of formal params to 0
-			currMethod = TabSym.insert(currMethod.getKind(), currMethod.getName(), currMethod.getType());
+			// Insert method object in TabSym or get inherited method and set number of formal params to 0
+			if (override)
+				currMethod = TabSym.currentScope.findSymbol(currMethod.getName());
+			else
+				currMethod = TabSym.insert(currMethod.getKind(), currMethod.getName(), currMethod.getType());
+			currMethod.setLocals(null);
 			currMethod.setLevel(0);
-			
+
 			TabSym.openScope();  // Open method scope
 
 			// Insert saved formal params to new method scope
@@ -313,7 +358,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (currType.equals(TabSym.errorType))	// Type error
 			method_error = true;
 
-		if (TabSym.currentScope().findSymbol(name) != null)
+		currMethod = TabSym.currentScope().findSymbol(name);
+		if (currMethod != null && currMethod.getFpPos() == 0)
 			print_error(line, name, "Symbol '" + name + "' already defined in current scope!");
 
 		currMethod = new Obj(Obj.Meth, name, currType);
@@ -397,6 +443,43 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String methodKind = (state.peek() == Scope.METHOD) ? "method" : "function";
 
 		print_info("Formal parameter '" + typeName + " " + name + "[]' of " + methodKind + " '" + methodType + " " + methodName + "' declared at line:" + line);
+	}
+
+	public boolean checkOverride(int line) {
+		String name = methodName(currMethod, false);
+
+		Obj inherited = TabSym.currentScope.getOuter().findSymbol(currMethod.getName());
+
+		if (inherited == null || inherited.getFpPos() == 0)	// Method is not overridden
+			return false;
+
+		if (!currMethod.getType().assignableTo(inherited.getType()))
+			print_error(line, name, "Invalid override, incompatible return types!");
+
+		// Get formal parameters of both methods
+		List<Obj> overridePars = new ArrayList<Obj>();
+		for (Obj param : TabSym.currentScope().values())
+			if (param.getFpPos() > 0)
+				overridePars.add(param);
+		for (Obj param : inherited.getLocalSymbols())
+			if (param.getFpPos() > 0)
+				formParamList.add(param);
+
+		if (overridePars.size() != formParamList.size()) {
+			print_error(line, name, "Invalid override, different number of formal parameters!");
+			formParamList.clear();
+			return false;
+		}
+
+		for (int i = 0; i < formParamList.size(); i++)
+			if (!overridePars.get(i).getType().assignableTo(formParamList.get(i).getType())) {
+				print_error(line, name, "Invalid override, formal parameter types do not match!");
+				formParamList.clear();
+				return false;
+			}
+
+		formParamList.clear();
+		return true;
 	}
 
 	public String methodName(Obj func, boolean full) {
