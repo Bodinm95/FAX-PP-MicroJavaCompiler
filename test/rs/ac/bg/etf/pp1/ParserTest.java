@@ -41,7 +41,5 @@ public class ParserTest {
 
 	public static void main(String[] args) {
 		parse("test/ParserProgram.mj");
-		System.out.println("");
-		parse("test/ParserProgramError.mj");
 	}
 }

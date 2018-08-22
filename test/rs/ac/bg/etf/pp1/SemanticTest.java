@@ -19,7 +19,7 @@ public class SemanticTest {
 	public static void main(String[] args) {
 
 		Reader br = null;
-		File sourceCode = new File("test/SemanticProgramError.mj");
+		File sourceCode = new File("test/SemanticProgram.mj");
 
 		try {
 			System.out.println("Compiling source file: " + sourceCode.getAbsolutePath());

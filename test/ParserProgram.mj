@@ -8,8 +8,8 @@ program ParserProgram	// Program
 	// VarDecl //
 	int x, y, array[];
 	
-	int e, z;			// Global variable COMMA
-	int global;			// Global variable SEMI
+	int e globalErrorComma, z;			// Global variable Syntax Error recovery on COMMA
+	int err globalErrorSemi;			// Global variable Syntax Error recovery on SEMI
 	
 	// ClassDecl //
 	class TestOne extends Object {
@@ -38,26 +38,26 @@ program ParserProgram	// Program
 			}
 
 			// MetodDecl - FormPars //
-			void error(int num, int valid, bool flag) {	// Formal Parameter COMMA and RPAREN
+			void error(int as formErrComma, int valid, bool e formErrParen) {	// Formal Parameter Syntax Error recovery on COMMA and RPAREN
 			
 				valid = this.getVarOne();		// DesignatorStatement - Designator = IDENT.IDENT()
 				valid = this.varArray[1+2];		// DesignatorStatement - Designator = IDENT.IDENT[Expr]
 				
-				err = assign;		// Assignment expression SEMI
+				err = asda assignErrSemi;		// Assignment expression Syntax Error recovery on SEMI
 
-				if (condAnd && cond)		// If Condition AND
-					if (condOr || cond)		// If Condition OR
-						if (cond)		// If Condition RPAREN
+				if (cond errAnd && cond)		// If Condition Syntax Error recovery on AND
+					if (cond errOr || cond)		// If Condition Syntax Error recovery on OR
+						if (cond errParen)		// If Condition Syntax Error recovery on RPAREN
 							return;
 			}
 		}
 	}
 	
 	// ClassDecl //
-	class TestError extends Object {	// Class Extends statement
+	class TestError extends Object extendsErr {	// Class Extends Syntax Error recovery on LBRACE
 		
 		// VarDecl //
-		int x;		// Class Field
+		int x fieldErr;		// Class Field Syntax Error recovery on SEMI
 
 		{
 			void methodDecl() {
