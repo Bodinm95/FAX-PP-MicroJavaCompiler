@@ -594,7 +594,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (left.equals(TabSym.noObj) || right == TabSym.noType)	// Designator error pass up
 			return;
 
-		if (kind != Obj.Var && kind != Obj.Elem && kind != Obj.Fld || left.getType().getKind() == Struct.Array) {
+		if (kind != Obj.Var && kind != Obj.Elem && kind != Obj.Fld) {
 			print_error(line, name, "Designator '" + name + "' must denote a variable, an array element or an object field!");
 			return;
 		}
@@ -749,7 +749,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 			case Obj.Var:
 				if (symbol.getType().getKind() == Struct.Array)
-					break;
+					name = name + "[]";
 				String type = (symbol.getFpPos() > 0) ? "Formal argument" :
 				              (symbol.getLevel() == 0) ? "Global variable" : "Local variable";
 				print_info(type + " '" + dataType + " " + name + "' detected at line:" + line);
@@ -841,6 +841,15 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (ExprList == TabSym.noType || Term == TabSym.noType)	// Term error pass up
 			return;
 
+		// Vector addition
+		if (operator.equals("+") &&
+		    ExprList.getKind() == Struct.Array && Term.getKind() == Struct.Array &&
+		    ExprList.getElemType().equals(TabSym.intType) && Term.getElemType().equals(TabSym.intType))
+		{
+			ExpressionList.struct = new Struct(Struct.Array, TabSym.intType);
+			return;
+		}
+
 		if (ExprList.equals(Term) && ExprList.equals(TabSym.intType) && Term.equals(TabSym.intType))
 			ExpressionList.struct = TabSym.intType;
 		else
@@ -858,7 +867,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	{
 		int line = TermList.getLine();
 		String operator = (TermList.getMulop() instanceof MulopMul) ? "*" :
-		                 (TermList.getMulop() instanceof MulopDiv) ? "/" : "%";
+		                  (TermList.getMulop() instanceof MulopDiv) ? "/" : "%";
 
 		Struct Term = TermList.getTerm().struct;
 		Struct Factor = TermList.getFactor().struct;
@@ -866,6 +875,21 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (Term == TabSym.noType || Factor == TabSym.noType)	// Factor error pass up
 			return;
+
+		// Vector * Scalar multiplication
+		if (operator.equals("*") &&
+		    (Term.getKind() == Struct.Array && Term.getElemType().equals(TabSym.intType) && Factor.equals(TabSym.intType) ||
+		    Factor.getKind() == Struct.Array && Factor.getElemType().equals(TabSym.intType) && Term.equals(TabSym.intType)))
+		{
+			TermList.struct = new Struct(Struct.Array, TabSym.intType);
+			return;
+		}
+
+		// Vector * Vector multiplication
+		if (operator.equals("*") && Term.getKind() == Struct.Array && Factor.getKind() == Struct.Array) {
+			Term = Term.getElemType();
+			Factor = Factor.getElemType();
+		}
 
 		if (Term.equals(Factor) && Term.equals(TabSym.intType) && Factor.equals(TabSym.intType))
 			TermList.struct = TabSym.intType;
