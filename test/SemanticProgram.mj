@@ -69,6 +69,9 @@ program SemanticProgram
 		int num;
 		Math math;
 		int foo;
+
+		int vector[];
+		int scalar;
 	{
 		// Factor, Term and Expression test //
 		array = new int['A'];    // size type error
@@ -108,7 +111,7 @@ program SemanticProgram
 		out(10);           // statement global function call
 		Math.sum(1, 2);    // statement method call
 
-		array = 10;        // assignment designator kind error
+		N = 10;            // assignment designator kind error
 		array[2] = true;   // invalid type assignment
 
 
@@ -127,5 +130,21 @@ program SemanticProgram
 		do { do { continue; } while (true); break; } while (true);
 		break;           // break error
 		continue;        // continue error
+
+
+		// Vector test //
+		vector = array + vector;  // vector addition
+		num = array + vector;     // result type error
+		num = vector + scalar;    // addop arithmetic type error
+		num = array - vector;     // operand error
+
+		num = array * vector;     // vector vector multiplication
+		vector = array * vector;  // result type error
+		num = array / vector;     // operand error
+
+		vector = vector * scalar; // vector scalar multiplication
+		num = vector * scalar;    // result type error
+		vector = vector / scalar; // operand error
+		
 	}
 }
