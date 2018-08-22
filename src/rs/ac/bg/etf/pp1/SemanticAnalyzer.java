@@ -51,7 +51,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(Program Program)
 	{
+		int line = Program.getLine();
 		String name = currProgram.getName();
+
+		Obj main = TabSym.find("main");
+		if (main.equals(TabSym.noObj) || main.getKind() != Obj.Meth)
+			print_error(line, "main", "Main method missing!");
 
 		TabSym.chainLocalSymbols(currProgram);
 		TabSym.closeScope();
@@ -317,6 +322,14 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(MethodSignature MethodSignature)
 	{
 		int line = MethodSignature.getLine();
+
+		// Main method checks
+		if (currMethod.getName().equals("main")) {
+			if (!currMethod.getType().equals(TabSym.noType))
+				print_error(line, "main", "Main method must be type void!");
+			else if (currMethod.getLevel() > 0)
+				print_error(line, "main", "Main method must not have parameters!");
+		}
 
 		boolean override = checkOverride(line);
 
