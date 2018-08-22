@@ -18,6 +18,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	boolean class_error = false;
 	boolean method_error = false;
 
+	int error = 0;
+
 	Struct currType;
 	Obj currProgram;
 	Obj currClass;
@@ -34,6 +36,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		global_error = true;
 		class_error = true;
 		method_error = true;
+		error++;
 
 		name = (name.equals("") ? name : "'" + name + "' ");
 		

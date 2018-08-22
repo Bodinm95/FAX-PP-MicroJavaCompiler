@@ -24,8 +24,8 @@ public class ParserTest {
 			MJParser parser = new MJParser(lexer);
 			Symbol sym = parser.parse();
 
-			if (parser.error) {
-				System.err.println("\nParsing NOT successful: Syntax errors detected!");
+			if (parser.error > 0) {
+				System.err.println("\nParsing NOT successful: " + parser.error +" Syntax errors detected!");
 			}
 			else {
 				System.out.println("\nParsing successfully done!");

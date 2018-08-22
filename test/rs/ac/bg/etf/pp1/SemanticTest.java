@@ -30,7 +30,6 @@ public class SemanticTest {
 			MJParser parser = new MJParser(lexer);
 			Symbol sym = parser.parse();
 
-			Program program = (Program)sym.value;
 			SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
 
 			TabSym.init();
@@ -38,8 +37,8 @@ public class SemanticTest {
 
 			Tab.dump();
 
-			if (parser.error) {
-				System.err.println("\nParsing NOT successful: Syntax errors detected!");
+			if (parser.error > 0 || semanticAnalyzer.error > 0) {
+				System.err.println("\nParsing NOT successful: " + parser.error + " Syntax errors detected! " + semanticAnalyzer.error + " Semantic errors detected!");
 			}
 			else {
 				System.out.println("\nParsing successfully done!");

@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 
 parser code {:
 
-	boolean error = false;
+	int error = 0;
 
 	public void report_fatal_error(String message, Object info) throws java.lang.Exception {
 		done_parsing();
@@ -23,7 +23,7 @@ parser code {:
 	}
 
 	public void report_error(String message, Object info) {
-		error = true;
+		error++;
 		StringBuilder msg = new StringBuilder(message);
 		if (info instanceof Symbol && ((Symbol)info).value != null)
 			msg.append(" '" + ((Symbol)info).value.toString() + "'").append(" on line:").append(((Symbol)info).left);
