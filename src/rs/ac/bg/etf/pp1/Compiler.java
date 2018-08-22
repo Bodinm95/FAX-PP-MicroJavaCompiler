@@ -13,6 +13,8 @@ import rs.etf.pp1.symboltable.Tab;
 
 public class Compiler {
 
+	public static void tsdump() { TabSym.dump(); }
+
 	public static void main(String[] args) {
 
 		if (args.length < 1) {
@@ -44,7 +46,7 @@ public class Compiler {
 			if (program != null)
 				program.traverseBottomUp(semanticAnalyzer);
 
-			Tab.dump();
+			tsdump();
 
 			if (parser.error > 0 || semanticAnalyzer.error > 0) {
 				System.err.println("\nParsing NOT successful: " + parser.error + " Syntax errors detected! " + semanticAnalyzer.error + " Semantic errors detected!");
