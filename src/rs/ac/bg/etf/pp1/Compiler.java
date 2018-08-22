@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.Reader;
 
 import java_cup.runtime.Symbol;
+import rs.ac.bg.etf.pp1.ast.Program;
+import rs.ac.bg.etf.pp1.util.TabSym;
+import rs.etf.pp1.symboltable.Tab;
 
 public class Compiler {
 
@@ -29,12 +32,25 @@ public class Compiler {
 			MJParser parser = new MJParser(lexer);
 			Symbol sym = parser.parse();
 
-			if (parser.error) {
-				System.err.println("\nParsing NOT successful: Syntax errors detected!");
+			if (parser.error == 0)
+				System.out.println("\nSyntax tree:\n" + sym.value.toString());
+			System.out.println("");
+
+			Program program = (sym.value instanceof Program) ? (Program)sym.value : null;
+			SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+
+			TabSym.init();
+
+			if (program != null)
+				program.traverseBottomUp(semanticAnalyzer);
+
+			Tab.dump();
+
+			if (parser.error > 0 || semanticAnalyzer.error > 0) {
+				System.err.println("\nParsing NOT successful: " + parser.error + " Syntax errors detected! " + semanticAnalyzer.error + " Semantic errors detected!");
 			}
 			else {
 				System.out.println("\nParsing successfully done!");
-				System.out.println("\nSyntax tree:\n" + sym.value.toString());
 			}
 		}
 		catch (Exception e) { e.printStackTrace(); }
