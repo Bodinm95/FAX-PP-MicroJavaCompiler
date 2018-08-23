@@ -41,7 +41,13 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	public void visit(ProcCall ProcCall)
 	{
-		// TO DO
+		int destAdr = ProcCall.getDesignator().obj.getAdr() - Code.pc;
+
+		Code.put(Code.call);
+		Code.put2(destAdr);
+
+		if (ProcCall.getDesignator().obj.getType() != Tab.noType)	// Remove eventual return value from stack
+			Code.put(Code.pop);
 	}
 
 	public void visit(Increment Increment)
@@ -118,7 +124,10 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	public void visit(FactorProcCall FactorProcCall)
 	{
-		// TO DO
+		int destAdr = FactorProcCall.getDesignator().obj.getAdr() - Code.pc;
+
+		Code.put(Code.call);
+		Code.put2(destAdr);
 	}
 
 	public void visit(FactorNum FactorNum)
