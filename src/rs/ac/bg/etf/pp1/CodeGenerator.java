@@ -62,7 +62,7 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	public void visit(FactorBool FactorBool)
 	{
-		if(FactorBool.getValue().equals("1"))
+		if(FactorBool.getValue().equals("true"))
 			Code.loadConst(1);
 		else
 			Code.loadConst(0);
