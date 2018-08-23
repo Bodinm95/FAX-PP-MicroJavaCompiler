@@ -228,7 +228,7 @@ ElseOpt ::= (ElseOption) ELSE Stmt
 RetOpt ::= (ReturnOption) Expr
         |  (EmptyReturnOption) /* epsilon */;
 
-PrintOpt ::= (PrintOption) COMMA NUM
+PrintOpt ::= (PrintOption) COMMA NUM:value
           |  (EmptyPrintOption) /* epsilon */;
 
 // ------------------------------------------------- //
