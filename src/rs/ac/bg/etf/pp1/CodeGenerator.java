@@ -3,9 +3,44 @@ package rs.ac.bg.etf.pp1;
 import rs.ac.bg.etf.pp1.ast.VisitorAdaptor;
 import rs.ac.bg.etf.pp1.util.TabSym;
 import rs.etf.pp1.mj.runtime.Code;
+import rs.etf.pp1.symboltable.concepts.Obj;
 import rs.ac.bg.etf.pp1.ast.*;
 
 public class CodeGenerator extends VisitorAdaptor {
+
+// ----------------------------------------------------------- DesignatorStatement ----------------------------------------------------------- //
+
+	public void visit(Assignment Assignment)
+	{
+		Code.store(Assignment.getDesignator().obj);
+	}
+
+	public void visit(ProcCall ProcCall)
+	{
+		// TO DO
+	}
+
+	public void visit(Increment Increment)
+	{
+		if (Increment.getDesignator().obj.getKind() == Obj.Elem)
+			Code.put(Code.dup2);
+
+		Code.load(Increment.getDesignator().obj);
+		Code.loadConst(1);
+		Code.put(Code.add);
+		Code.store(Increment.getDesignator().obj);
+	}
+
+	public void visit(Decrement Decrement)
+	{
+		if (Decrement.getDesignator().obj.getKind() == Obj.Elem)
+			Code.put(Code.dup2);
+
+		Code.load(Decrement.getDesignator().obj);
+		Code.loadConst(1);
+		Code.put(Code.sub);
+		Code.store(Decrement.getDesignator().obj);
+	}
 
 // ----------------------------------------------------------- Designator ----------------------------------------------------------- //
 
