@@ -437,6 +437,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		formParam.setFpPos(currMethod.getLevel());      // Formal param position
 		currMethod.setLevel(currMethod.getLevel() + 1); // Formal params number++
 
+		if (methodKind.equals("function"))	// if global function inc formal param number
+			formParam.setFpPos(formParam.getFpPos() + 1);
+
 		print_info("Formal parameter '" + typeName + " " + name + "' of " + methodKind + " '" + methodType + " " + methodName + "' declared at line:" + line);
 	}
 
@@ -446,9 +449,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		String name = FormalParamPartArray.getName();
 		String typeName = FormalParamPartArray.getType().getName();
 
-		Obj formParam = TabSym.insert(Obj.Var, name, new Struct(Struct.Array, currType));
-		formParam.setFpPos(currMethod.getLevel());      // Formal param position
-		currMethod.setLevel(currMethod.getLevel() + 1); // Formal params number++
+		String methodType = TabSym.findTypeName(currMethod.getType());
+		String methodName = currMethod.getName() + "(...)";
+		String methodKind = (state.peek() == Scope.METHOD) ? "method" : "function";
 
 		if (TabSym.currentScope().findSymbol(name) != null) {
 			print_error(line, name, "Formal parameter '" + name + "' already defined!");
@@ -457,9 +460,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (currType.equals(TabSym.noType))	// Type error
 			return;
 
-		String methodType = TabSym.findTypeName(currMethod.getType());
-		String methodName = currMethod.getName() + "(...)";
-		String methodKind = (state.peek() == Scope.METHOD) ? "method" : "function";
+		Obj formParam = TabSym.insert(Obj.Var, name, new Struct(Struct.Array, currType));
+		formParam.setFpPos(currMethod.getLevel());      // Formal param position
+		currMethod.setLevel(currMethod.getLevel() + 1); // Formal params number++
+
+		if (methodKind.equals("function"))	// if global function inc formal param number
+			formParam.setFpPos(formParam.getFpPos() + 1);
 
 		print_info("Formal parameter '" + typeName + " " + name + "[]' of " + methodKind + " '" + methodType + " " + methodName + "' declared at line:" + line);
 	}
