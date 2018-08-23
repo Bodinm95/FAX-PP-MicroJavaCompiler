@@ -11,6 +11,7 @@ import java_cup.runtime.Symbol;
 import rs.ac.bg.etf.pp1.ast.Program;
 import rs.ac.bg.etf.pp1.util.TabSym;
 import rs.etf.pp1.mj.runtime.Code;
+import rs.etf.pp1.mj.runtime.disasm;
 import rs.etf.pp1.symboltable.Tab;
 
 public class CodeGenTest {
@@ -54,7 +55,11 @@ public class CodeGenTest {
 				if (objectFile.exists())
 					objectFile.delete();
 
+				Code.mainPc = 0;
 				Code.write(new FileOutputStream(objectFile));
+
+				System.out.println("\nDisassembling object file:");
+				disasm.main(new String[] {"test/CodeGenProgram.obj"});
 			}
 		}
 		catch (Exception e) { e.printStackTrace(); }
