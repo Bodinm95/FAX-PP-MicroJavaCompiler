@@ -51,6 +51,9 @@ public class CodeGenTest {
 				CodeGenerator codegen = new CodeGenerator();
 				program.traverseBottomUp(codegen);
 
+				if (objectFile.exists())
+					objectFile.delete();
+
 				Code.write(new FileOutputStream(objectFile));
 			}
 		}
