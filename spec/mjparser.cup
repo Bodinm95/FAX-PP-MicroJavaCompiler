@@ -107,6 +107,7 @@ nonterminal PrintOpt;
 
 nonterminal DesignatorStatement;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator;
+nonterminal ArrayDesignator;
 nonterminal ActPars;
 nonterminal ActParsList;
 
@@ -240,8 +241,10 @@ DesignatorStatement ::= (Assignment) Designator ASSIGN Expr
                      |  (Decrement) Designator DEC;
 
 Designator ::= (DesignatorField) Designator DOT IDENT:name
-            |  (DesignatorArray) Designator LSQUARE Expr RSQUARE
+            |  (DesignatorArray) ArrayDesignator LSQUARE Expr RSQUARE
             |  (DesignatorIdent) IDENT:name;
+
+ArrayDesignator ::= (ArrayDesignator) Designator;
 
 ActPars ::= (ActualParams) ActParsList
          |  (EmptyActualParams) /* epsilon */;

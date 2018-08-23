@@ -1,28 +1,28 @@
 // generated with ast extension for cup
 // version 0.8
-// 23/7/2018 16:43:48
+// 23/7/2018 21:9:26
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class DesignatorArray extends Designator {
 
-    private Designator Designator;
+    private ArrayDesignator ArrayDesignator;
     private Expr Expr;
 
-    public DesignatorArray (Designator Designator, Expr Expr) {
-        this.Designator=Designator;
-        if(Designator!=null) Designator.setParent(this);
+    public DesignatorArray (ArrayDesignator ArrayDesignator, Expr Expr) {
+        this.ArrayDesignator=ArrayDesignator;
+        if(ArrayDesignator!=null) ArrayDesignator.setParent(this);
         this.Expr=Expr;
         if(Expr!=null) Expr.setParent(this);
     }
 
-    public Designator getDesignator() {
-        return Designator;
+    public ArrayDesignator getArrayDesignator() {
+        return ArrayDesignator;
     }
 
-    public void setDesignator(Designator Designator) {
-        this.Designator=Designator;
+    public void setArrayDesignator(ArrayDesignator ArrayDesignator) {
+        this.ArrayDesignator=ArrayDesignator;
     }
 
     public Expr getExpr() {
@@ -38,18 +38,18 @@ public class DesignatorArray extends Designator {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(Designator!=null) Designator.accept(visitor);
+        if(ArrayDesignator!=null) ArrayDesignator.accept(visitor);
         if(Expr!=null) Expr.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(Designator!=null) Designator.traverseTopDown(visitor);
+        if(ArrayDesignator!=null) ArrayDesignator.traverseTopDown(visitor);
         if(Expr!=null) Expr.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(Designator!=null) Designator.traverseBottomUp(visitor);
+        if(ArrayDesignator!=null) ArrayDesignator.traverseBottomUp(visitor);
         if(Expr!=null) Expr.traverseBottomUp(visitor);
         accept(visitor);
     }
@@ -59,8 +59,8 @@ public class DesignatorArray extends Designator {
         buffer.append(tab);
         buffer.append("DesignatorArray(\n");
 
-        if(Designator!=null)
-            buffer.append(Designator.toString("  "+tab));
+        if(ArrayDesignator!=null)
+            buffer.append(ArrayDesignator.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

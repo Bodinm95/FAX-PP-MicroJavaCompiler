@@ -804,7 +804,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	{
 		int line = DesignatorArray.getLine();
 
-		Obj array = DesignatorArray.getDesignator().obj;
+		Obj array = DesignatorArray.getArrayDesignator().getDesignator().obj;
 		Struct Expr = DesignatorArray.getExpr().struct;
 		DesignatorArray.obj = TabSym.noObj;
 
