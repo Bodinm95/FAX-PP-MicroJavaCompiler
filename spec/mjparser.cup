@@ -274,9 +274,9 @@ Term ::= (TermList) Term Mulop Factor
 
 Factor ::= (FactorDesignator) Designator
         |  (FactorProcCall) Designator LPAREN ActPars RPAREN
-        |  (FactorNum) NUM
-        |  (FactorChar) CHAR
-        |  (FactorBool) BOOL
+        |  (FactorNum) NUM:value
+        |  (FactorChar) CHAR:value
+        |  (FactorBool) BOOL:value
         |  (FactorNew) NEW Type
         |  (FactorNewArray) NEW Type LSQUARE Expr RSQUARE
         |  (FactorExpression) LPAREN Expr RPAREN;

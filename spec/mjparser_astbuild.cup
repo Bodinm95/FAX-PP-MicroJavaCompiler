@@ -274,9 +274,9 @@ Term ::= (TermList) Term:T1 Mulop:M2 Factor:F3 {: RESULT=new TermList(T1, M2, F3
 
 Factor ::= (FactorDesignator) Designator:D1 {: RESULT=new FactorDesignator(D1); RESULT.setLine(D1left); :}
         |  (FactorProcCall) Designator:D1 LPAREN ActPars:A2 RPAREN {: RESULT=new FactorProcCall(D1, A2); RESULT.setLine(D1left); :}
-        |  (FactorNum) NUM:N1 {: RESULT=new FactorNum(N1); RESULT.setLine(N1left); :}
-        |  (FactorChar) CHAR:C1 {: RESULT=new FactorChar(C1); RESULT.setLine(C1left); :}
-        |  (FactorBool) BOOL:B1 {: RESULT=new FactorBool(B1); RESULT.setLine(B1left); :}
+        |  (FactorNum) NUM:value {: RESULT=new FactorNum(value); RESULT.setLine(valueleft); :}
+        |  (FactorChar) CHAR:value {: RESULT=new FactorChar(value); RESULT.setLine(valueleft); :}
+        |  (FactorBool) BOOL:value {: RESULT=new FactorBool(value); RESULT.setLine(valueleft); :}
         |  (FactorNew) NEW Type:T1 {: RESULT=new FactorNew(T1); RESULT.setLine(T1left); :}
         |  (FactorNewArray) NEW Type:T1 LSQUARE Expr:E2 RSQUARE {: RESULT=new FactorNewArray(T1, E2); RESULT.setLine(T1left); :}
         |  (FactorExpression) LPAREN Expr:E1 RPAREN {: RESULT=new FactorExpression(E1); RESULT.setLine(E1left); :};
