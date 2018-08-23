@@ -4,6 +4,8 @@ import rs.etf.pp1.symboltable.Tab;
 import rs.etf.pp1.symboltable.concepts.Obj;
 import rs.etf.pp1.symboltable.concepts.Scope;
 import rs.etf.pp1.symboltable.concepts.Struct;
+import rs.etf.pp1.symboltable.visitors.DumpSymbolTableVisitor;
+import rs.etf.pp1.symboltable.visitors.SymbolTableVisitor;
 
 public class TabSym extends Tab {
 
@@ -70,6 +72,20 @@ public class TabSym extends Tab {
 	public static void closeScope() {
 		currentScope = currentScope.getOuter();
 		currentLevel--;
+	}
+
+	public static void dump(SymbolTableVisitor stv) {
+		System.out.println("=====================SYMBOL TABLE DUMP=========================");
+		if (stv == null)
+			stv = new PrintSymbolTableVisitor();
+		for (Scope s = currentScope; s != null; s = s.getOuter()) {
+			s.accept(stv);
+		}
+		System.out.println(stv.getOutput());
+	}
+
+	public static void dump() {
+		dump(null);
 	}
 
 	public static String findTypeName(Struct type) {
