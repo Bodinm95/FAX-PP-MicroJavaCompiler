@@ -7,6 +7,18 @@ import rs.ac.bg.etf.pp1.ast.*;
 
 public class CodeGenerator extends VisitorAdaptor {
 
+// ----------------------------------------------------------- Designator ----------------------------------------------------------- //
+
+	public void visit(DesignatorField DesignatorField)
+	{
+		Code.load(DesignatorField.getDesignator().obj);
+	}
+
+	public void visit(ArrayDesignator ArrayDesignator)
+	{
+		Code.load(ArrayDesignator.getDesignator().obj);
+	}
+
 // ----------------------------------------------------------- Expression ----------------------------------------------------------- //
 
 	public void visit(NegExpresions NegExpresions)
