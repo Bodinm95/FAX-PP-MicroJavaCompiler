@@ -18,7 +18,7 @@ public class CodeGenTest {
 	public static void main(String[] args) {
 
 		Reader br = null;
-		File sourceCode = new File("test/SemanticProgram.mj");
+		File sourceCode = new File("test/CodeGenProgram.mj");
 
 		try {
 			System.out.println("Compiling source file: " + sourceCode.getAbsolutePath());
