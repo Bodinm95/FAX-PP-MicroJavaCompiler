@@ -7,6 +7,20 @@ import rs.ac.bg.etf.pp1.ast.*;
 
 public class CodeGenerator extends VisitorAdaptor {
 
+// ----------------------------------------------------------- Term ----------------------------------------------------------- //
+
+	public void visit(TermList TermList)
+	{
+		// TO DO Vector Addition
+
+		if (TermList.getMulop() instanceof MulopMul)
+			Code.put(Code.mul);
+		if (TermList.getMulop() instanceof MulopDiv)
+			Code.put(Code.div);
+		if (TermList.getMulop() instanceof MulopMod)
+			Code.put(Code.rem);
+	}
+
 // ----------------------------------------------------------- Factor ----------------------------------------------------------- //
 
 	public void visit(FactorDesignator FactorDesignator)
