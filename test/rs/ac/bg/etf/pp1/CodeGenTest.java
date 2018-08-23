@@ -37,7 +37,7 @@ public class CodeGenTest {
 			if (program != null)
 				program.traverseBottomUp(semanticAnalyzer);
 
-			Tab.dump();
+			TabSym.dump();
 
 			if (parser.error > 0 || semanticAnalyzer.error > 0) {
 				System.err.println("\nParsing NOT successful: " + parser.error + " Syntax errors detected! " + semanticAnalyzer.error + " Semantic errors detected!");
