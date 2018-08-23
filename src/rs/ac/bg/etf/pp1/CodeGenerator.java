@@ -8,6 +8,30 @@ import rs.ac.bg.etf.pp1.ast.*;
 
 public class CodeGenerator extends VisitorAdaptor {
 
+// ----------------------------------------------------------- MethodDecl ----------------------------------------------------------- //
+
+	public void visit(MethodDeclaration MethodDeclaration)
+	{
+		if (Code.buf[Code.pc - 1] != Code.return_) {	// Check if return instruction is already there
+		Code.put(Code.exit);
+		Code.put(Code.return_);
+		}
+	}
+
+	public void visit(MethodId MethodId)
+	{
+		Obj currMethod = MethodId.obj;
+
+		if (currMethod.getName().equalsIgnoreCase("main"))
+			Code.mainPc = Code.pc;
+
+		currMethod.setAdr(Code.pc);
+
+		Code.put(Code.enter);
+		Code.put(currMethod.getLevel());
+		Code.put(currMethod.getLocalSymbols().size());
+	}
+
 // ----------------------------------------------------------- DesignatorStatement ----------------------------------------------------------- //
 
 	public void visit(Assignment Assignment)
