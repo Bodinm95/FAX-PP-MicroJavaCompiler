@@ -90,6 +90,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "'" + name + "' is not a valid type!");
 		else
 			currType = typeObj.getType();
+
+		Type.struct = currType;
 	}
 
 // ----------------------------------------------- ConstDecl ----------------------------------------------------------- //
@@ -998,7 +1000,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		SingleTerm.struct = SingleTerm.getFactor().struct;
 	}
 
-// ----------------------------------------------------------- Factor ----------------------------------------------------------- //		
+// ----------------------------------------------------------- Factor ----------------------------------------------------------- //
 
 	public void visit(FactorDesignator FactorDesignator)
 	{
