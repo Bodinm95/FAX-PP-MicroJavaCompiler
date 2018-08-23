@@ -7,6 +7,23 @@ import rs.ac.bg.etf.pp1.ast.*;
 
 public class CodeGenerator extends VisitorAdaptor {
 
+// ----------------------------------------------------------- Expression ----------------------------------------------------------- //
+
+	public void visit(NegExpresions NegExpresions)
+	{
+		Code.put(Code.neg);
+	}
+
+	public void visit(ExpressionList ExpressionList)
+	{
+		// TO DO Vector Multiplication
+
+		if (ExpressionList.getAddop() instanceof AddopAdd)
+			Code.put(Code.add);
+		if (ExpressionList.getAddop() instanceof AddopSub)
+			Code.put(Code.sub);
+	}
+
 // ----------------------------------------------------------- Term ----------------------------------------------------------- //
 
 	public void visit(TermList TermList)
