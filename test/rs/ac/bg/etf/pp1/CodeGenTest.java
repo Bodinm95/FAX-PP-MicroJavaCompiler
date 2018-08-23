@@ -55,7 +55,6 @@ public class CodeGenTest {
 				if (objectFile.exists())
 					objectFile.delete();
 
-				Code.mainPc = 0;
 				Code.write(new FileOutputStream(objectFile));
 
 				System.out.println("\nDisassembling object file:");

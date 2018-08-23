@@ -91,6 +91,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		else
 			currType = typeObj.getType();
 
+		// Set type struct to Syntax Node for code generation
 		Type.struct = currType;
 	}
 
@@ -317,6 +318,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		default :
 			break;
 		}
+
+		// Set method object to Syntax Node for code generation
+		((MethodSignature)MethodDeclaration.getMethodSign()).getMethodId().obj = currMethod;
 
 		currMethod = null;
 	}

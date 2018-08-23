@@ -91,7 +91,7 @@ nonterminal ClassMethodDecl ClassMethodDecl;
 nonterminal MethodDeclList MethodDeclList;
 nonterminal MethodDecl MethodDecl;
 nonterminal MethodSign MethodSign;
-nonterminal MethodId MethodId;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj MethodId;
 nonterminal RetType RetType;
 nonterminal FormPars FormPars;
 nonterminal FormParsList FormParsList;
