@@ -29,7 +29,7 @@ public class CodeGenTest {
 			MJParser parser = new MJParser(lexer);
 			Symbol sym = parser.parse();
 
-			Program program = (sym.value instanceof Program) ? (Program)sym.value : null;
+			Program program = (sym != null && sym.value instanceof Program) ? (Program)sym.value : null;
 			SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
 
 			TabSym.init();
