@@ -91,8 +91,9 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.put(Code.load_1);
 		Code.put(Code.arraylength);
 		Code.put(Code.jcc + Code.eq);    // if (len(A) != len(B)
-		Code.put2(6);
-		Code.put(Code.const_n + 0);
+		Code.put2(7);
+		Code.put(Code.trap);
+		Code.put(0);
 		Code.put(Code.exit);
 		Code.put(Code.return_);          // return 0;
 		Code.put(Code.load_1);
@@ -133,8 +134,9 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.put(Code.load_1);
 		Code.put(Code.arraylength);
 		Code.put(Code.jcc + Code.eq);    // if (len(A) != len(B)
-		Code.put2(6);
-		Code.put(Code.const_n + 0);
+		Code.put2(7);
+		Code.put(Code.trap);
+		Code.put(0);
 		Code.put(Code.exit);
 		Code.put(Code.return_);          // return 0;
 		Code.put(Code.load_1);
