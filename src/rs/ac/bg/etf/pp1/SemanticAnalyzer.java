@@ -47,7 +47,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		System.out.println(msg);
 		System.out.println("");
 	}
-// ----------------------------------------------- Program ----------------------------------------------------------- //
+// ----------------------------------------------------------- Program ----------------------------------------------------------- //
 
 	public void visit(Program Program)
 	{
@@ -98,7 +98,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Type.struct = currType;
 	}
 
-// ----------------------------------------------- ConstDecl ----------------------------------------------------------- //
+// ----------------------------------------------------------- ConstDecl ----------------------------------------------------------- //
 
 	public void visit(ConstDeclarationNum ConstDeclarationNum)
 	{
@@ -166,7 +166,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		print_info("Symbolic bool constant '" + name + " = " + value + "' declared at line:" + line);
 	}
 
-// ----------------------------------------------- VarDecl ----------------------------------------------------------- //
+// ----------------------------------------------------------- VarDecl ----------------------------------------------------------- //
 
 	public void visit(VarDeclarationPart VarDeclarationPart)
 	{
@@ -218,7 +218,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 	}
 
-// ----------------------------------------------- ClassDecl ----------------------------------------------------------- //
+// ----------------------------------------------------------- ClassDecl ----------------------------------------------------------- //
 
 	public void visit(ClassDeclaration ClassDeclaration)
 	{
