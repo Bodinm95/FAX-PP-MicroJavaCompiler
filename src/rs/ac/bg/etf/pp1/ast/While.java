@@ -5,9 +5,9 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class EmptyClassMethodDeclaration extends ClassMethodDecl {
+public class While extends WhileStmt {
 
-    public EmptyClassMethodDeclaration () {
+    public While () {
     }
 
     public void accept(Visitor visitor) {
@@ -28,10 +28,10 @@ public class EmptyClassMethodDeclaration extends ClassMethodDecl {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("EmptyClassMethodDeclaration(\n");
+        buffer.append("While(\n");
 
         buffer.append(tab);
-        buffer.append(") [EmptyClassMethodDeclaration]");
+        buffer.append(") [While]");
         return buffer.toString();
     }
 }

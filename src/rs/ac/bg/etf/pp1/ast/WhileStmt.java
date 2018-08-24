@@ -5,7 +5,7 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public abstract class Relop implements SyntaxNode {
+public abstract class WhileStmt implements SyntaxNode {
 
     private SyntaxNode parent;
 

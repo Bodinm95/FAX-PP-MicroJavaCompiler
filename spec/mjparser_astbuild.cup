@@ -101,6 +101,7 @@ nonterminal rs.etf.pp1.symboltable.concepts.Struct Type;
 nonterminal StmtList StmtList;
 nonterminal Stmt Stmt;
 nonterminal DoStmt DoStmt;
+nonterminal WhileStmt WhileStmt;
 nonterminal IfStmt IfStmt;
 nonterminal ElseStmt ElseStmt;
 nonterminal ElseOpt ElseOpt;
@@ -218,7 +219,7 @@ StmtList ::= (StatementList) StmtList:S1 Stmt:S2 {: RESULT=new StatementList(S1,
 
 Stmt ::= (Statement) DesignatorStatement:D1 SEMI {: RESULT=new Statement(D1); RESULT.setLine(D1left); :}
       |  (IfStatement) IfStmt:I1 LPAREN Condition:C2 RPAREN Stmt:S3 ElseOpt:E4 {: RESULT=new IfStatement(I1, C2, S3, E4); RESULT.setLine(I1left); :}
-      |  (WhileStatement) DoStmt:D1 Stmt:S2 WHILE LPAREN Condition:C3 RPAREN SEMI {: RESULT=new WhileStatement(D1, S2, C3); RESULT.setLine(D1left); :}
+      |  (WhileStatement) DoStmt:D1 Stmt:S2 WhileStmt:W3 LPAREN Condition:C4 RPAREN SEMI {: RESULT=new WhileStatement(D1, S2, W3, C4); RESULT.setLine(D1left); :}
       |  (BreakStatement) BREAK:B1 SEMI {: RESULT=new BreakStatement(B1); RESULT.setLine(B1left); :}
       |  (ContinueStatement) CONTINUE:C1 SEMI {: RESULT=new ContinueStatement(C1); RESULT.setLine(C1left); :}
       |  (ReturnStatement) RETURN:R1 RetOpt:R2 SEMI {: RESULT=new ReturnStatement(R1, R2); RESULT.setLine(R1left); :}
@@ -227,6 +228,8 @@ Stmt ::= (Statement) DesignatorStatement:D1 SEMI {: RESULT=new Statement(D1); RE
       |  (BlockStatement) LBRACE StmtList:S1 RBRACE {: RESULT=new BlockStatement(S1); RESULT.setLine(S1left); :};
 
 DoStmt ::= (DoStatement) DO {: RESULT=new DoStatement(); :};
+
+WhileStmt ::= (While) WHILE {: RESULT=new While(); :};
 
 IfStmt ::= (If) IF {: RESULT=new If(); :};
 

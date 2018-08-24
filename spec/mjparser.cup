@@ -101,6 +101,7 @@ nonterminal rs.etf.pp1.symboltable.concepts.Struct Type;
 nonterminal StmtList;
 nonterminal Stmt;
 nonterminal DoStmt;
+nonterminal WhileStmt;
 nonterminal IfStmt;
 nonterminal ElseStmt;
 nonterminal ElseOpt;
@@ -218,7 +219,7 @@ StmtList ::= (StatementList) StmtList Stmt
 
 Stmt ::= (Statement) DesignatorStatement SEMI
       |  (IfStatement) IfStmt LPAREN Condition RPAREN Stmt ElseOpt
-      |  (WhileStatement) DoStmt Stmt WHILE LPAREN Condition RPAREN SEMI
+      |  (WhileStatement) DoStmt Stmt WhileStmt LPAREN Condition RPAREN SEMI
       |  (BreakStatement) BREAK SEMI
       |  (ContinueStatement) CONTINUE SEMI
       |  (ReturnStatement) RETURN RetOpt SEMI
@@ -227,6 +228,8 @@ Stmt ::= (Statement) DesignatorStatement SEMI
       |  (BlockStatement) LBRACE StmtList RBRACE;
 
 DoStmt ::= (DoStatement) DO;
+
+WhileStmt ::= (While) WHILE;
 
 IfStmt ::= (If) IF;
 
