@@ -26,7 +26,9 @@ public class TabSym extends Tab {
 		universe.addToLocals(chrObj = new Obj(Obj.Meth, "chr", charType, 0, 1));
 		{
 			openScope();
-			currentScope.addToLocals(new Obj(Obj.Var, "i", intType, 0, 1));
+			Obj param = new Obj(Obj.Var, "i", intType, 0, 1);
+			param.setFpPos(1);
+			currentScope.addToLocals(param);
 			chrObj.setLocals(currentScope.getLocals());
 			closeScope();
 		}
@@ -34,7 +36,9 @@ public class TabSym extends Tab {
 		universe.addToLocals(ordObj = new Obj(Obj.Meth, "ord", intType, 0, 1));
 		{
 			openScope();
-			currentScope.addToLocals(new Obj(Obj.Var, "ch", charType, 0, 1));
+			Obj param = new Obj(Obj.Var, "ch", charType, 0, 1);
+			param.setFpPos(1);
+			currentScope.addToLocals(param);
 			ordObj.setLocals(currentScope.getLocals());
 			closeScope();
 		} 
@@ -43,7 +47,9 @@ public class TabSym extends Tab {
 		universe.addToLocals(lenObj = new Obj(Obj.Meth, "len", intType, 0, 1));
 		{
 			openScope();
-			currentScope.addToLocals(new Obj(Obj.Var, "arr", new Struct(Struct.Array, noType), 0, 1));
+			Obj param = new Obj(Obj.Var, "arr", new Struct(Struct.Array, noType), 0, 1);
+			param.setFpPos(1);
+			currentScope.addToLocals(param);
 			lenObj.setLocals(currentScope.getLocals());
 			closeScope();
 		}
