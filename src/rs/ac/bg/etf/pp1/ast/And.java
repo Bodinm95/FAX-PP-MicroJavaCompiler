@@ -5,20 +5,27 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class FactorNum extends Factor {
+public class And implements SyntaxNode {
 
-    private Integer value;
-
-    public FactorNum (Integer value) {
-        this.value=value;
+    private SyntaxNode parent;
+    private int line;
+    public And () {
     }
 
-    public Integer getValue() {
-        return value;
+    public SyntaxNode getParent() {
+        return parent;
     }
 
-    public void setValue(Integer value) {
-        this.value=value;
+    public void setParent(SyntaxNode parent) {
+        this.parent=parent;
+    }
+
+    public int getLine() {
+        return line;
+    }
+
+    public void setLine(int line) {
+        this.line=line;
     }
 
     public void accept(Visitor visitor) {
@@ -39,13 +46,10 @@ public class FactorNum extends Factor {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("FactorNum(\n");
-
-        buffer.append(" "+tab+value);
-        buffer.append("\n");
+        buffer.append("And(\n");
 
         buffer.append(tab);
-        buffer.append(") [FactorNum]");
+        buffer.append(") [And]");
         return buffer.toString();
     }
 }

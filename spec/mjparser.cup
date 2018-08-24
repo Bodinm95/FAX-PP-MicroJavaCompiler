@@ -114,6 +114,8 @@ nonterminal ActParsList;
 nonterminal Cond;
 nonterminal CondTerm;
 nonterminal CondFact;
+nonterminal And;
+nonterminal Or;
 
 nonterminal rs.etf.pp1.symboltable.concepts.Struct Expr;
 nonterminal rs.etf.pp1.symboltable.concepts.Struct ExprList;
@@ -254,11 +256,15 @@ ActParsList ::= (ActualParamsList) ActParsList COMMA Expr
 
 // ------------------------------------------------- //
 
-Cond ::= (Conditions) Cond OR CondTerm
+Cond ::= (Conditions) Cond Or CondTerm
       |  (SingleCondition) CondTerm;
 
-CondTerm ::= (ConditionTerms) CondTerm AND CondFact
+Or ::= (Or) OR;
+
+CondTerm ::= (ConditionTerms) CondTerm And CondFact
           |  (SingleConditionTerm) CondFact;
+
+And ::= (And) AND;
 
 CondFact ::= (ConditionFact) Expr
           |  (ConditionFactRelop) Expr Relop Expr

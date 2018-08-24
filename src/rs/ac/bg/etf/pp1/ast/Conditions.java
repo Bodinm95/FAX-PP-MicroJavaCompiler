@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 23/7/2018 22:19:45
+// 24/7/2018 15:22:49
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -8,11 +8,14 @@ package rs.ac.bg.etf.pp1.ast;
 public class Conditions extends Cond {
 
     private Cond Cond;
+    private Or Or;
     private CondTerm CondTerm;
 
-    public Conditions (Cond Cond, CondTerm CondTerm) {
+    public Conditions (Cond Cond, Or Or, CondTerm CondTerm) {
         this.Cond=Cond;
         if(Cond!=null) Cond.setParent(this);
+        this.Or=Or;
+        if(Or!=null) Or.setParent(this);
         this.CondTerm=CondTerm;
         if(CondTerm!=null) CondTerm.setParent(this);
     }
@@ -23,6 +26,14 @@ public class Conditions extends Cond {
 
     public void setCond(Cond Cond) {
         this.Cond=Cond;
+    }
+
+    public Or getOr() {
+        return Or;
+    }
+
+    public void setOr(Or Or) {
+        this.Or=Or;
     }
 
     public CondTerm getCondTerm() {
@@ -39,17 +50,20 @@ public class Conditions extends Cond {
 
     public void childrenAccept(Visitor visitor) {
         if(Cond!=null) Cond.accept(visitor);
+        if(Or!=null) Or.accept(visitor);
         if(CondTerm!=null) CondTerm.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
         if(Cond!=null) Cond.traverseTopDown(visitor);
+        if(Or!=null) Or.traverseTopDown(visitor);
         if(CondTerm!=null) CondTerm.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
         if(Cond!=null) Cond.traverseBottomUp(visitor);
+        if(Or!=null) Or.traverseBottomUp(visitor);
         if(CondTerm!=null) CondTerm.traverseBottomUp(visitor);
         accept(visitor);
     }
@@ -61,6 +75,12 @@ public class Conditions extends Cond {
 
         if(Cond!=null)
             buffer.append(Cond.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
+        buffer.append("\n");
+
+        if(Or!=null)
+            buffer.append(Or.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

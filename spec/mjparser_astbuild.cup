@@ -114,6 +114,8 @@ nonterminal ActParsList ActParsList;
 nonterminal Cond Cond;
 nonterminal CondTerm CondTerm;
 nonterminal CondFact CondFact;
+nonterminal And And;
+nonterminal Or Or;
 
 nonterminal rs.etf.pp1.symboltable.concepts.Struct Expr;
 nonterminal rs.etf.pp1.symboltable.concepts.Struct ExprList;
@@ -254,11 +256,15 @@ ActParsList ::= (ActualParamsList) ActParsList:A1 COMMA Expr:E2 {: RESULT=new Ac
 
 // ------------------------------------------------- //
 
-Cond ::= (Conditions) Cond:C1 OR CondTerm:C2 {: RESULT=new Conditions(C1, C2); RESULT.setLine(C1left); :}
+Cond ::= (Conditions) Cond:C1 Or:O2 CondTerm:C3 {: RESULT=new Conditions(C1, O2, C3); RESULT.setLine(C1left); :}
       |  (SingleCondition) CondTerm:C1 {: RESULT=new SingleCondition(C1); RESULT.setLine(C1left); :};
 
-CondTerm ::= (ConditionTerms) CondTerm:C1 AND CondFact:C2 {: RESULT=new ConditionTerms(C1, C2); RESULT.setLine(C1left); :}
+Or ::= (Or) OR {: RESULT=new Or(); :};
+
+CondTerm ::= (ConditionTerms) CondTerm:C1 And:A2 CondFact:C3 {: RESULT=new ConditionTerms(C1, A2, C3); RESULT.setLine(C1left); :}
           |  (SingleConditionTerm) CondFact:C1 {: RESULT=new SingleConditionTerm(C1); RESULT.setLine(C1left); :};
+
+And ::= (And) AND {: RESULT=new And(); :};
 
 CondFact ::= (ConditionFact) Expr:E1 {: RESULT=new ConditionFact(E1); RESULT.setLine(E1left); :}
           |  (ConditionFactRelop) Expr:E1 Relop:R2 Expr:E3 {: RESULT=new ConditionFactRelop(E1, R2, E3); RESULT.setLine(E1left); :}
