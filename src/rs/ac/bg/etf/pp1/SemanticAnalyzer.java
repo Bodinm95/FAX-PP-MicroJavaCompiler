@@ -230,6 +230,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		state.pop();
 		print_info("Class '" + name + "' " + (class_error ? "" : "successfully ") + "processed.");
 
+		// Set class object to Syntax Node for code generation
+		ClassDeclaration.obj = currClass;
+
 		currClass = null;
 	}
 
