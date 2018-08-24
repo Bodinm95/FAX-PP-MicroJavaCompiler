@@ -27,6 +27,53 @@ public class CodeGenerator extends VisitorAdaptor {
 	Stack<List<Integer>> BreakStack = new Stack<>();
 	Stack<List<Integer>> ContinueStack = new Stack<>();
 
+// ----------------------------------------------------------- Program ----------------------------------------------------------- //
+
+	public void visit(Program Program)
+	{
+		Code.dataSize = Program.getLine();	// Get number of globals written to line field of Program class
+	}
+
+	public void visit(ProgramId ProgramId)
+	{
+		codeChr();
+		codeOrd();
+		codeLen();
+	}
+
+	// Generate code for chr function - converts int to char
+	public void codeChr() {
+		TabSym.chrObj.setAdr(Code.pc);
+		Code.put(Code.enter);
+		Code.put(1);
+		Code.put(1);
+		Code.put(Code.load_n + 0);
+		Code.put(Code.exit);
+		Code.put(Code.return_);
+	}
+
+	// Generate code for ord function - converts char to int
+	public void codeOrd() {
+		TabSym.ordObj.setAdr(Code.pc);
+		Code.put(Code.enter);
+		Code.put(1);
+		Code.put(1);
+		Code.put(Code.load_n + 0);
+		Code.put(Code.exit);
+		Code.put(Code.return_);
+	}
+
+	// Generate code for len function - returns array length
+	public void codeLen() {
+		Code.put(Code.enter);
+		Code.put(1);
+		Code.put(1);
+		Code.put(Code.load_n + 0);
+		Code.put(Code.arraylength);
+		Code.put(Code.exit);
+		Code.put(Code.return_);
+	}
+
 // ----------------------------------------------------------- MethodDecl ----------------------------------------------------------- //
 
 	public void visit(MethodDeclaration MethodDeclaration)
