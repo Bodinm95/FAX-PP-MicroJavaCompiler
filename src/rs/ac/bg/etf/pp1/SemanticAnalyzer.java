@@ -58,6 +58,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (main.equals(TabSym.noObj) || main.getKind() != Obj.Meth)
 			print_error(line, "main", "Main method missing!");
 
+		// Set number of globals in line field of class Program for code generation
+		Program.setLine(TabSym.currentScope.getnVars());
+
 		TabSym.chainLocalSymbols(currProgram);
 		TabSym.closeScope();
 
@@ -1033,6 +1036,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "Designator '" + name + "' is not a declared function!");
 			return;
 		}
+
+		if (procCall.getType().equals(TabSym.noType))
+			print_error(line, name, "Invalid use of void function call!");
 
 		actParsCheck(line, procCall);
 
