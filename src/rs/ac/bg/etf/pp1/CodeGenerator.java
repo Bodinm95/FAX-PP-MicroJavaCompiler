@@ -51,6 +51,131 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.put(currMethod.getLocalSymbols().size());
 	}
 
+// ----------------------------------------------------------- Statement ----------------------------------------------------------- //
+
+	public void visit(IfStatement IfStatement)
+	{
+		if (!AndQueue.isEmpty())	// Fix previous jumps to if end
+			for (int addr : AndQueue)
+				Code.fixup(addr);
+		AndQueue.clear();
+		AndQueue = null;
+
+		if (!IfStack.isEmpty())
+			AndQueue = IfStack.pop();   // Restore previous if statement AndQueue
+	}
+
+	public void visit(If If)
+	{
+		if (AndQueue != null)
+			IfStack.push(AndQueue);  // Save previous AndQueue
+
+		AndQueue = new ArrayList<Integer>();  // Make new AndQueue for next if statement
+
+		IfCondition = true;
+	}
+
+	public void visit(Else Else)
+	{
+		Code.putJump(0);   // Put empty unconditional jump to skip else branch
+
+		if (!AndQueue.isEmpty())	// Fix previous jumps to else
+			for (int addr : AndQueue)
+				Code.fixup(addr);
+		AndQueue.clear();
+
+		AndQueue.add(Code.pc - 2);   // Save address of empty skip jump
+	}
+
+	public void visit(WhileStatement WhileStatement)
+	{
+		if (!AndQueue.isEmpty())	// Fix previous jumps to while end
+			for (int addr : AndQueue)
+				Code.fixup(addr);
+		AndQueue.clear();
+		AndQueue = null;
+
+		if (!BreakStack.peek().isEmpty())	// Fix previous break jumps
+			for (int addr : BreakStack.peek())
+				Code.fixup(addr);
+		BreakStack.pop();
+
+		if (!IfStack.isEmpty())
+			AndQueue = IfStack.pop();   // Restore eventual previous if statement AndQueue
+	}
+
+	public void visit(While While)
+	{
+		if (AndQueue != null)
+			IfStack.push(AndQueue);  // Save eventual previous if statement AndQueue
+
+		AndQueue = new ArrayList<Integer>();  // Make new AndQueue for while condition statement
+
+		if (!ContinueStack.peek().isEmpty())	// Fix previous continue jumps
+			for (int addr : ContinueStack.peek())
+				Code.fixup(addr);
+		ContinueStack.pop();
+
+		WhileCondition = true;
+	}
+
+	public void visit(DoStatement DoStatement)
+	{
+		WhileStack.add(Code.pc);  // Save do-while loop start address
+
+		ContinueStack.push(new ArrayList<Integer>());  // Make new continue jump list
+		BreakStack.push(new ArrayList<Integer>());     // Make new break jump list
+	}
+
+	public void visit(BreakStatement BreakStatement)
+	{
+		Code.putJump(0);
+		BreakStack.peek().add(Code.pc - 2);
+	}
+
+	public void visit(ContinueStatement ContinueStatement)
+	{
+		Code.putJump(0);
+		ContinueStack.peek().add(Code.pc - 2);
+	}
+
+	public void visit(ReturnStatement ReturnStatement)
+	{
+		Code.put(Code.exit);
+		Code.put(Code.return_);
+	}
+
+	public void visit(ReadStatement ReadStatement)
+	{
+		if (ReadStatement.getDesignator().obj.getType().equals(TabSym.charType))
+			Code.put(Code.bread);
+		else
+			Code.put(Code.read);
+
+		Code.store(ReadStatement.getDesignator().obj);
+	}
+
+	public void visit(PrintStatement PrintStatement)
+	{
+		int width = (PrintStatement.getPrintOpt() instanceof PrintOption) ? ((PrintOption)PrintStatement.getPrintOpt()).getValue() : 0;
+
+		if (PrintStatement.getExpr().struct.equals(TabSym.intType)) {
+			width = (width == 0) ? 5 : width;
+			Code.loadConst(width);
+			Code.put(Code.print);
+		}
+		if (PrintStatement.getExpr().struct.equals(TabSym.charType)) {
+			width = (width == 0) ? 5 : width;
+			Code.loadConst(width);
+			Code.put(Code.bprint);
+		}
+		if (PrintStatement.getExpr().struct.equals(TabSym.boolType)) {
+			width = (width == 0) ? 1 : width;
+			Code.loadConst(width);
+			Code.put(Code.print);
+		}
+	}
+
 // ----------------------------------------------------------- DesignatorStatement ----------------------------------------------------------- //
 
 	public void visit(Assignment Assignment)
