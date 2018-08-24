@@ -3,10 +3,29 @@ package rs.ac.bg.etf.pp1;
 import rs.ac.bg.etf.pp1.ast.VisitorAdaptor;
 import rs.ac.bg.etf.pp1.util.TabSym;
 import rs.etf.pp1.mj.runtime.Code;
+import rs.etf.pp1.symboltable.Tab;
 import rs.etf.pp1.symboltable.concepts.Obj;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 import rs.ac.bg.etf.pp1.ast.*;
 
 public class CodeGenerator extends VisitorAdaptor {
+
+	int Relop;
+	List<Integer> AndQueue;
+	List<Integer> OrQueue = new ArrayList<Integer>();
+
+	boolean IfCondition = false;
+	boolean WhileCondition = false;
+
+	Stack<List<Integer>> IfStack = new Stack<>();
+	Stack<Integer> WhileStack = new Stack<>();
+
+	Stack<List<Integer>> BreakStack = new Stack<>();
+	Stack<List<Integer>> ContinueStack = new Stack<>();
 
 // ----------------------------------------------------------- MethodDecl ----------------------------------------------------------- //
 
@@ -82,6 +101,88 @@ public class CodeGenerator extends VisitorAdaptor {
 	public void visit(ArrayDesignator ArrayDesignator)
 	{
 		Code.load(ArrayDesignator.getDesignator().obj);
+	}
+
+// ----------------------------------------------------------- Condition ----------------------------------------------------------- //
+
+	public void visit(Condition Condition)
+	{
+		if (IfCondition) {
+			Code.putFalseJump(Relop, 0);  // Put empty inverse jump to else branch or if end
+			AndQueue.add(Code.pc - 2);    // Save address for later fixup
+
+			if (!OrQueue.isEmpty())   // Fix previous OR jumps
+				for (int addr : OrQueue)
+					Code.fixup(addr);
+			OrQueue.clear();
+
+			IfCondition = false;
+		}
+
+		if (WhileCondition) {
+			int startAddr = WhileStack.pop();                   // Get do-while loop start address
+			Code.putFalseJump(Code.inverse[Relop], startAddr);  // Put jump to do-while start
+
+			WhileCondition = false;
+		}
+	}
+
+	public void visit(Or Or)
+	{
+		if (IfCondition) {
+			Code.putFalseJump(Code.inverse[Relop], 0);  // Put empty jump to then branch
+			OrQueue.add(Code.pc - 2);                   // Save address for later fixup
+
+			if (!AndQueue.isEmpty())   // Fix previous AND jumps
+				for (int addr : AndQueue)
+					Code.fixup(addr);
+			AndQueue.clear();
+		}
+
+		if (WhileCondition) {
+			int startAddr = WhileStack.peek();                  // Get do-while loop start address
+			Code.putFalseJump(Code.inverse[Relop], startAddr);  // Put jump to do-while start
+
+			if (!AndQueue.isEmpty())   // Fix previous AND jumps
+				for (int addr : AndQueue)
+					Code.fixup(addr);
+			AndQueue.clear();
+		}
+	}
+
+	public void visit(And And)
+	{
+		if (IfCondition) {
+			Code.putFalseJump(Relop, 0);  // Put empty inverse jump to else branch or if end or next OR condition
+			AndQueue.add(Code.pc - 2);    // Save address for later fixup
+		}
+
+		if (WhileCondition) {
+			Code.putFalseJump(Relop, 0);  // Put empty inverse jump to while end or next OR condition
+			AndQueue.add(Code.pc - 2);    // Save address for later fixup
+		}
+	}
+
+	public void visit(ConditionFact ConditionFact)
+	{
+		Code.loadConst(1);
+		Relop = Code.eq;
+	}
+
+	public void visit(ConditionFactRelop ConditionFactRelop)
+	{
+		if (ConditionFactRelop.getRelop() instanceof RelopEQ)
+			Relop = Code.eq;
+		if (ConditionFactRelop.getRelop() instanceof RelopNEQ)
+			Relop = Code.ne;
+		if (ConditionFactRelop.getRelop() instanceof RelopGR)
+			Relop = Code.gt;
+		if (ConditionFactRelop.getRelop() instanceof RelopGREQ)
+			Relop = Code.ge;
+		if (ConditionFactRelop.getRelop() instanceof RelopLS)
+			Relop = Code.lt;
+		if (ConditionFactRelop.getRelop() instanceof RelopLSEQ)
+			Relop = Code.le;
 	}
 
 // ----------------------------------------------------------- Expression ----------------------------------------------------------- //
