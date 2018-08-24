@@ -1,31 +1,31 @@
 // generated with ast extension for cup
 // version 0.8
-// 24/7/2018 15:22:49
+// 24/7/2018 16:18:50
 
 
 package rs.ac.bg.etf.pp1.ast;
 
 public class IfStatement extends Stmt {
 
-    private Cond Cond;
+    private Condition Condition;
     private Stmt Stmt;
     private ElseOpt ElseOpt;
 
-    public IfStatement (Cond Cond, Stmt Stmt, ElseOpt ElseOpt) {
-        this.Cond=Cond;
-        if(Cond!=null) Cond.setParent(this);
+    public IfStatement (Condition Condition, Stmt Stmt, ElseOpt ElseOpt) {
+        this.Condition=Condition;
+        if(Condition!=null) Condition.setParent(this);
         this.Stmt=Stmt;
         if(Stmt!=null) Stmt.setParent(this);
         this.ElseOpt=ElseOpt;
         if(ElseOpt!=null) ElseOpt.setParent(this);
     }
 
-    public Cond getCond() {
-        return Cond;
+    public Condition getCondition() {
+        return Condition;
     }
 
-    public void setCond(Cond Cond) {
-        this.Cond=Cond;
+    public void setCondition(Condition Condition) {
+        this.Condition=Condition;
     }
 
     public Stmt getStmt() {
@@ -49,20 +49,20 @@ public class IfStatement extends Stmt {
     }
 
     public void childrenAccept(Visitor visitor) {
-        if(Cond!=null) Cond.accept(visitor);
+        if(Condition!=null) Condition.accept(visitor);
         if(Stmt!=null) Stmt.accept(visitor);
         if(ElseOpt!=null) ElseOpt.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
-        if(Cond!=null) Cond.traverseTopDown(visitor);
+        if(Condition!=null) Condition.traverseTopDown(visitor);
         if(Stmt!=null) Stmt.traverseTopDown(visitor);
         if(ElseOpt!=null) ElseOpt.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
-        if(Cond!=null) Cond.traverseBottomUp(visitor);
+        if(Condition!=null) Condition.traverseBottomUp(visitor);
         if(Stmt!=null) Stmt.traverseBottomUp(visitor);
         if(ElseOpt!=null) ElseOpt.traverseBottomUp(visitor);
         accept(visitor);
@@ -73,8 +73,8 @@ public class IfStatement extends Stmt {
         buffer.append(tab);
         buffer.append("IfStatement(\n");
 
-        if(Cond!=null)
-            buffer.append(Cond.toString("  "+tab));
+        if(Condition!=null)
+            buffer.append(Condition.toString("  "+tab));
         else
             buffer.append(tab+"  null");
         buffer.append("\n");

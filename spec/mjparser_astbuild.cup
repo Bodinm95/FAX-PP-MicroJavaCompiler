@@ -114,6 +114,7 @@ nonterminal ActParsList ActParsList;
 nonterminal Cond Cond;
 nonterminal CondTerm CondTerm;
 nonterminal CondFact CondFact;
+nonterminal Condition Condition;
 nonterminal And And;
 nonterminal Or Or;
 
@@ -214,8 +215,8 @@ StmtList ::= (StatementList) StmtList:S1 Stmt:S2 {: RESULT=new StatementList(S1,
           |  (EmptyStatementList) {: RESULT=new EmptyStatementList(); :} /* epsilon */;
 
 Stmt ::= (Statement) DesignatorStatement:D1 SEMI {: RESULT=new Statement(D1); RESULT.setLine(D1left); :}
-      |  (IfStatement) IF LPAREN Cond:C1 RPAREN Stmt:S2 ElseOpt:E3 {: RESULT=new IfStatement(C1, S2, E3); RESULT.setLine(C1left); :}
-      |  (WhileStatement) DoStmt:D1 Stmt:S2 WHILE LPAREN Cond:C3 RPAREN SEMI {: RESULT=new WhileStatement(D1, S2, C3); RESULT.setLine(D1left); :}
+      |  (IfStatement) IF LPAREN Condition:C1 RPAREN Stmt:S2 ElseOpt:E3 {: RESULT=new IfStatement(C1, S2, E3); RESULT.setLine(C1left); :}
+      |  (WhileStatement) DoStmt:D1 Stmt:S2 WHILE LPAREN Condition:C3 RPAREN SEMI {: RESULT=new WhileStatement(D1, S2, C3); RESULT.setLine(D1left); :}
       |  (BreakStatement) BREAK:B1 SEMI {: RESULT=new BreakStatement(B1); RESULT.setLine(B1left); :}
       |  (ContinueStatement) CONTINUE:C1 SEMI {: RESULT=new ContinueStatement(C1); RESULT.setLine(C1left); :}
       |  (ReturnStatement) RETURN:R1 RetOpt:R2 SEMI {: RESULT=new ReturnStatement(R1, R2); RESULT.setLine(R1left); :}
@@ -255,6 +256,8 @@ ActParsList ::= (ActualParamsList) ActParsList:A1 COMMA Expr:E2 {: RESULT=new Ac
              |  (SingleActualParam) Expr:E1 {: RESULT=new SingleActualParam(E1); RESULT.setLine(E1left); :};
 
 // ------------------------------------------------- //
+
+Condition ::= (Condition) Cond:C1 {: RESULT=new Condition(C1); RESULT.setLine(C1left); :};
 
 Cond ::= (Conditions) Cond:C1 Or:O2 CondTerm:C3 {: RESULT=new Conditions(C1, O2, C3); RESULT.setLine(C1left); :}
       |  (SingleCondition) CondTerm:C1 {: RESULT=new SingleCondition(C1); RESULT.setLine(C1left); :};

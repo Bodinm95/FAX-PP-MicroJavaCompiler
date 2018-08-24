@@ -5,24 +5,23 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class MethodId implements SyntaxNode {
+public class Condition implements SyntaxNode {
 
     private SyntaxNode parent;
     private int line;
-    public rs.etf.pp1.symboltable.concepts.Obj obj = null;
+    private Cond Cond;
 
-    private String name;
-
-    public MethodId (String name) {
-        this.name=name;
+    public Condition (Cond Cond) {
+        this.Cond=Cond;
+        if(Cond!=null) Cond.setParent(this);
     }
 
-    public String getName() {
-        return name;
+    public Cond getCond() {
+        return Cond;
     }
 
-    public void setName(String name) {
-        this.name=name;
+    public void setCond(Cond Cond) {
+        this.Cond=Cond;
     }
 
     public SyntaxNode getParent() {
@@ -46,26 +45,32 @@ public class MethodId implements SyntaxNode {
     }
 
     public void childrenAccept(Visitor visitor) {
+        if(Cond!=null) Cond.accept(visitor);
     }
 
     public void traverseTopDown(Visitor visitor) {
         accept(visitor);
+        if(Cond!=null) Cond.traverseTopDown(visitor);
     }
 
     public void traverseBottomUp(Visitor visitor) {
+        if(Cond!=null) Cond.traverseBottomUp(visitor);
         accept(visitor);
     }
 
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("MethodId(\n");
+        buffer.append("Condition(\n");
 
-        buffer.append(" "+tab+name);
+        if(Cond!=null)
+            buffer.append(Cond.toString("  "+tab));
+        else
+            buffer.append(tab+"  null");
         buffer.append("\n");
 
         buffer.append(tab);
-        buffer.append(") [MethodId]");
+        buffer.append(") [Condition]");
         return buffer.toString();
     }
 }

@@ -114,6 +114,7 @@ nonterminal ActParsList;
 nonterminal Cond;
 nonterminal CondTerm;
 nonterminal CondFact;
+nonterminal Condition;
 nonterminal And;
 nonterminal Or;
 
@@ -214,8 +215,8 @@ StmtList ::= (StatementList) StmtList Stmt
           |  (EmptyStatementList) /* epsilon */;
 
 Stmt ::= (Statement) DesignatorStatement SEMI
-      |  (IfStatement) IF LPAREN Cond RPAREN Stmt ElseOpt
-      |  (WhileStatement) DoStmt Stmt WHILE LPAREN Cond RPAREN SEMI
+      |  (IfStatement) IF LPAREN Condition RPAREN Stmt ElseOpt
+      |  (WhileStatement) DoStmt Stmt WHILE LPAREN Condition RPAREN SEMI
       |  (BreakStatement) BREAK SEMI
       |  (ContinueStatement) CONTINUE SEMI
       |  (ReturnStatement) RETURN RetOpt SEMI
@@ -255,6 +256,8 @@ ActParsList ::= (ActualParamsList) ActParsList COMMA Expr
              |  (SingleActualParam) Expr;
 
 // ------------------------------------------------- //
+
+Condition ::= (Condition) Cond;
 
 Cond ::= (Conditions) Cond Or CondTerm
       |  (SingleCondition) CondTerm;
