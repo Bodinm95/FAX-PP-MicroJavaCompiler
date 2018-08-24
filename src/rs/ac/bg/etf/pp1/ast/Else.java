@@ -5,20 +5,9 @@
 
 package rs.ac.bg.etf.pp1.ast;
 
-public class FactorChar extends Factor {
+public class Else extends ElseStmt {
 
-    private Character value;
-
-    public FactorChar (Character value) {
-        this.value=value;
-    }
-
-    public Character getValue() {
-        return value;
-    }
-
-    public void setValue(Character value) {
-        this.value=value;
+    public Else () {
     }
 
     public void accept(Visitor visitor) {
@@ -39,13 +28,10 @@ public class FactorChar extends Factor {
     public String toString(String tab) {
         StringBuffer buffer=new StringBuffer();
         buffer.append(tab);
-        buffer.append("FactorChar(\n");
-
-        buffer.append(" "+tab+value);
-        buffer.append("\n");
+        buffer.append("Else(\n");
 
         buffer.append(tab);
-        buffer.append(") [FactorChar]");
+        buffer.append(") [Else]");
         return buffer.toString();
     }
 }
