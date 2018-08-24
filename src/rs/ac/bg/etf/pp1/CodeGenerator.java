@@ -5,6 +5,7 @@ import rs.ac.bg.etf.pp1.util.TabSym;
 import rs.etf.pp1.mj.runtime.Code;
 import rs.etf.pp1.symboltable.Tab;
 import rs.etf.pp1.symboltable.concepts.Obj;
+import rs.etf.pp1.symboltable.concepts.Struct;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,10 @@ public class CodeGenerator extends VisitorAdaptor {
 	Stack<List<Integer>> BreakStack = new Stack<>();
 	Stack<List<Integer>> ContinueStack = new Stack<>();
 
+	int vector_add;
+	int vector_mul;
+	int scalar_mul;
+
 // ----------------------------------------------------------- Program ----------------------------------------------------------- //
 
 	public void visit(Program Program)
@@ -39,6 +44,7 @@ public class CodeGenerator extends VisitorAdaptor {
 		codeChr();
 		codeOrd();
 		codeLen();
+		codeVector();
 	}
 
 	// Generate code for chr function - converts int to char
@@ -72,6 +78,121 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.put(Code.arraylength);
 		Code.put(Code.exit);
 		Code.put(Code.return_);
+	}
+
+	// Generate code for vector arithmetic functions
+	public void codeVector() {
+		vector_add = Code.pc;
+		Code.put(Code.enter);            // int[] vector_add(int A[], int B[])
+		Code.put(2);                     // int i;
+		Code.put(4);                     // int result[];
+		Code.put(Code.load_n + 0);
+		Code.put(Code.arraylength);
+		Code.put(Code.load_1);
+		Code.put(Code.arraylength);
+		Code.put(Code.jcc + Code.eq);    // if (len(A) != len(B)
+		Code.put2(6);
+		Code.put(Code.const_n + 0);
+		Code.put(Code.exit);
+		Code.put(Code.return_);          // return 0;
+		Code.put(Code.load_1);
+		Code.put(Code.arraylength);      // i = len(B);
+		Code.put(Code.store_2);
+		Code.put(Code.load_2);
+		Code.put(Code.newarray);         // result = new int[i];
+		Code.put(1);
+		Code.put(Code.store_3);
+		Code.put(Code.load_2);           // do
+		Code.put(Code.const_1);
+		Code.put(Code.sub);              // i--;
+		Code.put(Code.store_2);
+		Code.put(Code.load_3);
+		Code.put(Code.load_2);
+		Code.put(Code.load_n + 0);
+		Code.put(Code.load_2);
+		Code.put(Code.aload);
+		Code.put(Code.load_1);
+		Code.put(Code.load_2);
+		Code.put(Code.aload);
+		Code.put(Code.add);
+		Code.put(Code.astore);           // result[i] = A[i] + B[i]
+		Code.put(Code.load_2);
+		Code.put(Code.const_n + 0);
+		Code.put(Code.jcc + Code.gt);    // while (i > 0);
+		Code.put2(-16);
+		Code.put(Code.load_3);
+		Code.put(Code.exit);
+		Code.put(Code.return_);          // return result;
+
+		vector_mul = Code.pc;
+		Code.put(Code.enter);            // int[] vector_mul(int A[], int B[])
+		Code.put(2);                     // int i;
+		Code.put(4);                     // int result;
+		Code.put(Code.load_n + 0);
+		Code.put(Code.arraylength);
+		Code.put(Code.load_1);
+		Code.put(Code.arraylength);
+		Code.put(Code.jcc + Code.eq);    // if (len(A) != len(B)
+		Code.put2(6);
+		Code.put(Code.const_n + 0);
+		Code.put(Code.exit);
+		Code.put(Code.return_);          // return 0;
+		Code.put(Code.load_1);
+		Code.put(Code.arraylength);      // i = len(B);
+		Code.put(Code.store_2);
+		Code.put(Code.load_2);           // do
+		Code.put(Code.const_1);
+		Code.put(Code.sub);              // i--;
+		Code.put(Code.store_2);
+		Code.put(Code.load_3);
+		Code.put(Code.load_n + 0);
+		Code.put(Code.load_2);
+		Code.put(Code.aload);
+		Code.put(Code.load_1);
+		Code.put(Code.load_2);
+		Code.put(Code.aload);
+		Code.put(Code.mul);
+		Code.put(Code.add);
+		Code.put(Code.store_3);           // result += A[i] * B[i]
+		Code.put(Code.load_2);
+		Code.put(Code.const_n + 0);
+		Code.put(Code.jcc + Code.gt);    // while (i > 0);
+		Code.put2(-16);
+		Code.put(Code.load_3);
+		Code.put(Code.exit);
+		Code.put(Code.return_);          // return result;
+
+		scalar_mul = Code.pc;
+		Code.put(Code.enter);            // int[] scalar_mul(int A[], int S)
+		Code.put(2);                     // int i;
+		Code.put(4);                     // int result[];
+		Code.put(Code.load_n + 0);
+		Code.put(Code.arraylength);      // i = len(A);
+		Code.put(Code.store_2);
+		Code.put(Code.load_2);
+		Code.put(Code.newarray);         // result = new int[i];
+		Code.put(1);
+		Code.put(Code.store_3);
+		Code.put(Code.load_2);           // do
+		Code.put(Code.const_1);
+		Code.put(Code.sub);              // i--;
+		Code.put(Code.store_2);
+		Code.put(Code.load_3);
+		Code.put(Code.load_2);
+		Code.put(Code.load_n + 0);
+		Code.put(Code.load_2);
+		Code.put(Code.aload);
+		Code.put(Code.load_1);
+		Code.put(Code.mul);
+		Code.put(Code.astore);           // result[i] = A[i] * S
+		Code.put(Code.load_2);
+		Code.put(Code.const_n + 0);
+		Code.put(Code.jcc + Code.gt);    // while (i > 0);
+		Code.put2(-16);
+		Code.put(Code.load_3);
+		Code.put(Code.exit);
+		Code.put(Code.return_);          // return result;
+		
 	}
 
 // ----------------------------------------------------------- MethodDecl ----------------------------------------------------------- //
@@ -366,7 +487,12 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	public void visit(ExpressionList ExpressionList)
 	{
-		// TO DO Vector Multiplication
+		if (ExpressionList.getExprList().struct.getKind() == Struct.Array && ExpressionList.getTerm().struct.getKind() == Struct.Array) {
+			int destAddr = vector_add - Code.pc;
+			Code.put(Code.call);
+			Code.put2(destAddr);
+			return;
+		}
 
 		if (ExpressionList.getAddop() instanceof AddopAdd)
 			Code.put(Code.add);
@@ -378,7 +504,24 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	public void visit(TermList TermList)
 	{
-		// TO DO Vector Addition
+		if (TermList.getTerm().struct.getKind() == Struct.Array && TermList.getFactor().struct.getKind() == Struct.Array) {
+			int destAddr = vector_mul - Code.pc;
+			Code.put(Code.call);
+			Code.put2(destAddr);
+			return;
+		}
+
+		if (TermList.getTerm().struct.getKind() == Struct.Array || TermList.getFactor().struct.getKind() == Struct.Array) {
+			if (TermList.getFactor().struct.getKind() == Struct.Array) {
+				// Switch formal arguments on stack: int array -> array int
+				Code.put(Code.dup_x1);
+				Code.put(Code.pop);
+			}
+			int destAddr = scalar_mul - Code.pc;
+			Code.put(Code.call);
+			Code.put2(destAddr);
+			return;
+		}
 
 		if (TermList.getMulop() instanceof MulopMul)
 			Code.put(Code.mul);
