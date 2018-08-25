@@ -1,0 +1,175 @@
+program CodeGenTest
+		int scalar;
+		int arrA[], arrB[], arrC[]; int arrD[];
+
+	class A{
+		int i;
+		{
+			int getI(int A, int B) { return A + B + i; }
+		}
+	}
+	class B{
+		A a[];
+	}
+	class C{
+		B b;
+	}
+
+	class TCalc { // TaxCalculator
+		int tax_val; // [0,100] interval
+		{
+			int calc(int cost) { return cost*(1+tax_val); }
+			int tax() { return tax_val; }
+		}
+	}
+	class ATCalc extends TCalc { // Tax including amortization
+		int a;  // [0,100] interval
+		{
+			//@Overriden 
+			int calc(int c) { a = 2; return (c*a)*(1*tax_val); }
+			int amtz() { return a; }
+		}
+	}
+{
+	int sum (int a, int b) {
+		return a + b;
+	}
+
+	void oomj()
+		TCalc c1, c2;
+		int price;
+	{
+		price = 1000;
+		c1 = new TCalc;
+		c1.tax_val = 10;
+		c2 = new ATCalc;
+		c2.tax_val = 18;
+		print(c1.calc(price), 7);
+		print(c2.calc(price), 7);
+
+		c1.calc(10);
+	}
+
+	void func(int len) int adr; int size; int pars[]; {
+		size = len;
+		pars = new int[size];
+		do {
+			size--;
+			pars[size] = size;
+		} while(size > 0);
+		adr = len;
+		do {
+			adr = pars[size];
+			size++;
+		} while(size < len);
+		len = adr;
+	}
+
+	void main()
+		int num;
+		C c;
+		int array[];
+		int flag;
+	{
+		num = 1 + (2 * 3);
+		num = num + 1;
+
+		print(num, 3);
+
+		c = new C;
+		c.b = new B;
+		c.b.a = new A[3];
+		c.b.a[0] = new A;
+		c.b.a[1] = new A;
+		c.b.a[2] = new A;
+
+		c.b.a[2].i = sum(num, 1);
+		num = c.b.a[2].i;
+
+		print(c.b.a[2].i);
+		print(num);
+
+		num = 0;
+		num = c.b.a[2].getI(1, 2);
+	
+		print(sum(5,7));
+
+		if ( 1 > 2 && 3 > 4 || 5 > 6 && 7 > 8)
+			num = 1;
+		else
+			num = 2;
+		num = 3;
+
+		if (1 > 2) {
+			if (3 < 4)
+				num = 0;
+			num = 1;
+		}
+		else 
+			if (5 < 6)
+				num = 2;
+		num = 3;
+
+		do
+			num = 0;
+		while ( 1 > 2 && 3 > 4 || 5 > 6 && 7 > 8);
+
+		do {
+			print(num);
+			num++;
+		} while (num <= 10);
+
+		
+		do {
+			if (flag == 0) {
+				num = -1;
+				do {
+					num++;
+					if (num == 10)
+						break;
+					if (num % 2 == 0)
+						continue;
+					print(num);
+				} while (true);
+			}
+			else {
+				num = -1;
+					do {
+						num++;
+						if (num == 10)
+							break;
+						if (num % 2 != 0)
+							continue;
+						print(num);
+					} while (true);
+			}
+			flag++;
+		} while (flag < 2);
+
+		num = 0;
+		arrA = new int[5];
+		arrB = new int[5];
+		do {
+			arrA[num] = num;
+			arrB[num] = num;
+			num++;
+		} while(num < 5);
+
+		arrC = arrA + arrB;
+
+		num = sum(2, 3);
+		arrD = arrA * num;
+
+		num = 0;
+		do {
+			print(arrC[num]);
+			print(arrD[num]);
+			num++;
+		} while(num < 5);
+
+		num = arrA * arrB;
+		print(num);
+
+		oomj();
+	}
+}
