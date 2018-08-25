@@ -183,7 +183,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 
 		int kind = (state.peek() == Scope.CLASS) ? Obj.Fld : Obj.Var;
-		TabSym.insert(kind, name, currType);
+		Obj symbol = TabSym.insert(kind, name, currType);
+		if (symbol.getKind() == Obj.Fld)
+			symbol.setAdr(symbol.getAdr() + 1);
 
 		switch (state.peek()) {
 		case GLOBAL: print_info("Global variable '" + type + " " + name + "' declared at line:" + line); break;
@@ -275,7 +277,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		for (Obj field : parent.getType().getMembers()) {
 			if (field.getKind() == Obj.Fld) {	// add inherited fields
-				TabSym.insert(Obj.Fld, field.getName(), field.getType());
+				Obj object = TabSym.insert(Obj.Fld, field.getName(), field.getType());
+				object.setAdr(field.getAdr());
 				}
 
 			if (field.getKind() == Obj.Meth) {	// add inherited methods
