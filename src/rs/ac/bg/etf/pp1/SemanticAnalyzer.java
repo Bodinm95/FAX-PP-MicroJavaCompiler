@@ -296,6 +296,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			}
 		}
 
+		// Set parent class object to Syntax Node for code generation
+		ExtendsDeclaration.obj = parent;
+
 		print_info("Class '" + currClass.getName() + "' extends class '" + name + "'");
 	}
 

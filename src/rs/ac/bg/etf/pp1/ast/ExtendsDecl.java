@@ -1,6 +1,6 @@
 // generated with ast extension for cup
 // version 0.8
-// 25/7/2018 0:15:35
+// 25/7/2018 1:19:32
 
 
 package rs.ac.bg.etf.pp1.ast;
@@ -10,6 +10,8 @@ public abstract class ExtendsDecl implements SyntaxNode {
     private SyntaxNode parent;
 
     private int line;
+
+    public rs.etf.pp1.symboltable.concepts.Obj obj = null;
 
     public SyntaxNode getParent() {
         return parent;

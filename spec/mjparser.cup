@@ -85,7 +85,7 @@ nonterminal ListVarDecl;
 
 nonterminal rs.etf.pp1.symboltable.concepts.Obj ClassDecl;
 nonterminal ClassId;
-nonterminal ExtendsDecl;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj ExtendsDecl;
 nonterminal ClassMethodDecl;
 
 nonterminal MethodDeclList;
