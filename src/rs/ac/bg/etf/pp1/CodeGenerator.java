@@ -2,6 +2,7 @@ package rs.ac.bg.etf.pp1;
 
 import rs.ac.bg.etf.pp1.ast.VisitorAdaptor;
 import rs.ac.bg.etf.pp1.util.TabSym;
+import rs.ac.bg.etf.pp1.util.MethodTable;
 import rs.etf.pp1.mj.runtime.Code;
 import rs.etf.pp1.symboltable.Tab;
 import rs.etf.pp1.symboltable.concepts.Obj;
@@ -32,11 +33,17 @@ public class CodeGenerator extends VisitorAdaptor {
 	int vector_mul;
 	int scalar_mul;
 
+	MethodTable MethodTable = new MethodTable();
+
+	boolean method = false;
+
+	int invoke_call;
+
 // ----------------------------------------------------------- Program ----------------------------------------------------------- //
 
 	public void visit(Program Program)
 	{
-		Code.dataSize = Program.getLine();	// Get number of globals written to line field of Program class
+		Code.dataSize += Program.getLine();	// Get number of globals written to line field of Program class
 	}
 
 	public void visit(ProgramId ProgramId)
@@ -45,6 +52,7 @@ public class CodeGenerator extends VisitorAdaptor {
 		codeOrd();
 		codeLen();
 		codeVector();
+		codeInvokeCall();
 	}
 
 	// Generate code for chr function - converts int to char
@@ -190,13 +198,76 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.put(Code.load_2);
 		Code.put(Code.const_n + 0);
 		Code.put(Code.jcc + Code.gt);    // while (i > 0);
-		Code.put2(-16);
+		Code.put2(-14);
 		Code.put(Code.load_3);
 		Code.put(Code.exit);
 		Code.put(Code.return_);          // return result;
 		
 	}
 
+	// Generate code for getting class object address for stack before invokevirtual
+	public void codeInvokeCall() {
+		invoke_call = Code.pc;
+		Code.put(Code.enter);         // void invoke(int num)
+		Code.put(1);                  // int adr; int len;
+		Code.put(4);                  // int actPars[];
+		Code.put(Code.load_n);
+		Code.put(Code.store_2);       // len = num;
+		Code.put(Code.load_2);
+		Code.put(Code.newarray);
+		Code.put(1);
+		Code.put(Code.store_3);       // actPars = new int[len];
+		Code.put(Code.load_2);        // do
+		Code.put(Code.const_1);
+		Code.put(Code.sub);           // len--;
+		Code.put(Code.store_2);
+		Code.put(Code.store_1);       // adr = pop();
+		Code.put(Code.load_3);
+		Code.put(Code.load_2);
+		Code.put(Code.load_1);
+		Code.put(Code.astore);        // actPars[len] = adr;
+		Code.put(Code.load_2);
+		Code.put(Code.const_n);
+		Code.put(Code.jcc + Code.gt); // while(len >= 0);
+		Code.put2(-11);
+		Code.put(Code.store_1);       // adr = pop();
+		Code.put(Code.load_1);        // push(adr);
+		Code.put(Code.load_3);        // do
+		Code.put(Code.load_2);
+		Code.put(Code.aload);         // push(actPars[len]);
+		Code.put(Code.load_2);
+		Code.put(Code.const_1);
+		Code.put(Code.add);           // len++;
+		Code.put(Code.store_2);
+		Code.put(Code.load_2);
+		Code.put(Code.load_n);
+		Code.put(Code.jcc + Code.lt); // while (len < num);
+		Code.put2(-9);
+		Code.put(Code.load_1);        // push(adr);
+		Code.put(Code.exit);
+		Code.put(Code.return_);
+	}
+// ----------------------------------------------------------- ClassDecl ----------------------------------------------------------- //
+	
+	public void visit(ClassDeclaration ClassDeclaration)
+	{
+		ClassDeclaration.obj.setAdr(Code.dataSize); // Set virtual function table address
+
+		// Fix eventual not overridden inherited methods addresses
+		if (ClassDeclaration.getExtendsDecl() instanceof ExtendsDeclaration) {
+			Obj parent = ClassDeclaration.getExtendsDecl().obj;
+			for (Obj method : ClassDeclaration.obj.getType().getMembers()) {
+				if (method.getKind() == Obj.Meth && method.getAdr() == 0)
+					method.setAdr(parent.getType().getMembersTable().searchKey(method.getName()).getAdr());
+			}
+		}
+
+		for (Obj method : ClassDeclaration.obj.getType().getMembers())  // Generate class virtual function table
+			if (method.getKind() == Obj.Meth)
+				MethodTable.addFunctionEntry(method.getName(), method.getAdr());
+		MethodTable.addTableTerminator();
+	}
+	
 // ----------------------------------------------------------- MethodDecl ----------------------------------------------------------- //
 
 	public void visit(MethodDeclaration MethodDeclaration)
@@ -211,8 +282,14 @@ public class CodeGenerator extends VisitorAdaptor {
 	{
 		Obj currMethod = MethodId.obj;
 
-		if (currMethod.getName().equalsIgnoreCase("main"))
+		if (currMethod.getName().equalsIgnoreCase("main")) {
 			Code.mainPc = Code.pc;
+
+			// Initialize virtual function tables code
+			for (Byte codeByte : MethodTable.table)
+				Code.buf[Code.pc++] = codeByte.byteValue();
+			MethodTable.table.clear();
+		}
 
 		currMethod.setAdr(Code.pc);
 
@@ -355,12 +432,34 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	public void visit(ProcCall ProcCall)
 	{
-		int destAdr = ProcCall.getDesignator().obj.getAdr() - Code.pc;
+		Obj func = ProcCall.getDesignator().obj;
+		if (method) {
+			// Load class object for getting virtual function field
+			if (func.getLevel() == 1) {
+				Code.put(Code.dup);
+			}
+			else {
+				Code.loadConst(func.getLevel() - 1);
+				int destAddr = invoke_call - Code.pc;
+				Code.put(Code.call);
+				Code.put2(destAddr);
+			}
+			Code.put(Code.getfield);  // Load virtual function table address
+			Code.put2(0);
+			Code.put(Code.invokevirtual);  // Invoke virtual function
+			for (int i = 0; i < func.getName().length(); i++)
+				Code.put4(func.getName().charAt(i));
+			Code.put4(-1);
 
-		Code.put(Code.call);
-		Code.put2(destAdr);
+			method = false;
+		}
+		else {
+			int destAdr = func.getAdr() - Code.pc;
 
-		if (ProcCall.getDesignator().obj.getType() != Tab.noType)	// Remove eventual return value from stack
+			Code.put(Code.call);
+			Code.put2(destAdr);
+		}
+		if (func.getType() != Tab.noType)	// Remove eventual return value from stack
 			Code.put(Code.pop);
 	}
 
@@ -391,6 +490,9 @@ public class CodeGenerator extends VisitorAdaptor {
 	public void visit(DesignatorField DesignatorField)
 	{
 		Code.load(DesignatorField.getDesignator().obj);
+
+		if (DesignatorField.obj.getKind() == Obj.Meth)
+			method = true;	// set method flag
 	}
 
 	public void visit(ArrayDesignator ArrayDesignator)
@@ -548,10 +650,33 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	public void visit(FactorProcCall FactorProcCall)
 	{
-		int destAdr = FactorProcCall.getDesignator().obj.getAdr() - Code.pc;
+		Obj func = FactorProcCall.getDesignator().obj;
+		if (method) {
+			// Load class object for getting virtual function field
+			if (func.getLevel() == 1) {
+				Code.put(Code.dup);
+			}
+			else {
+				Code.loadConst(func.getLevel() - 1);
+				int destAddr = invoke_call - Code.pc;
+				Code.put(Code.call);
+				Code.put2(destAddr);
+			}
+			Code.put(Code.getfield);  // Load virtual function table address
+			Code.put2(0);
+			Code.put(Code.invokevirtual);  // Invoke virtual function
+			for (int i = 0; i < func.getName().length(); i++)
+				Code.put4(func.getName().charAt(i));
+			Code.put4(-1);
 
-		Code.put(Code.call);
-		Code.put2(destAdr);
+			method = false;
+		}
+		else {
+			int destAdr = func.getAdr() - Code.pc;
+
+			Code.put(Code.call);
+			Code.put2(destAdr);
+		}
 	}
 
 	public void visit(FactorNum FactorNum)
@@ -575,7 +700,14 @@ public class CodeGenerator extends VisitorAdaptor {
 	public void visit(FactorNew FactorNew)
 	{
 		Code.put(Code.new_);
-		Code.put2(FactorNew.struct.getNumberOfFields() * 4);
+		Code.put2((FactorNew.struct.getNumberOfFields() + 1) * 4);
+
+		// initialize virtual function table pointer
+		Obj classObj = TabSym.findTypeObject(FactorNew.struct);
+		Code.put(Code.dup);
+		Code.loadConst(classObj.getAdr());
+		Code.put(Code.putfield);
+		Code.put2(0);
 	}
 
 	public void visit(FactorNewArray FactorNewArray)
