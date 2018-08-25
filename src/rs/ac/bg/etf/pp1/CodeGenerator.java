@@ -398,6 +398,12 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.load(ArrayDesignator.getDesignator().obj);
 	}
 
+	public void visit(DesignatorIdent DesignatorIdent)
+	{
+		if (DesignatorIdent.obj.getKind() == Obj.Fld)  // Load implicit class parameter this
+			Code.put(Code.load_n + 0);
+	}
+
 // ----------------------------------------------------------- Condition ----------------------------------------------------------- //
 
 	public void visit(Condition Condition)
