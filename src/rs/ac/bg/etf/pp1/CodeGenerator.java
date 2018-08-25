@@ -412,7 +412,7 @@ public class CodeGenerator extends VisitorAdaptor {
 			Code.put(Code.print);
 		}
 		if (PrintStatement.getExpr().struct.equals(TabSym.charType)) {
-			width = (width == 0) ? 5 : width;
+			width = (width == 0) ? 1 : width;
 			Code.loadConst(width);
 			Code.put(Code.bprint);
 		}
