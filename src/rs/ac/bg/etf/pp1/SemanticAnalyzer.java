@@ -1,6 +1,7 @@
 package rs.ac.bg.etf.pp1;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -715,6 +716,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			print_error(line, name, "Designator '" + name + "' must denote a variable, an array element or an object field!");
 			return;
 		}
+		if (classAssignableTo(left.getType(), right))
+			return;
 		if (!right.assignableTo(left.getType()))
 			print_error(line, name, "Invalid assignment, incompatible types!");
 	}
@@ -779,6 +782,43 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 		if (!type.equals(TabSym.intType))
 			print_error(line, name + "--", "Designator '" + name + "' must be type int!");
+	}
+
+	public boolean classAssignableTo(Struct dest, Struct src) {
+		if (dest.getKind() != Struct.Class || src.getKind() != Struct.Class)
+			return false;
+
+		if (dest.getMembers().size() > src.getMembers().size())
+			return false;
+
+		Iterator<Obj> destMembers = dest.getMembers().iterator();
+		Iterator<Obj> srcMembers = src.getMembers().iterator();
+
+		for (int i = 0; i < dest.getMembers().size(); i++) {
+			Obj destField = destMembers.next();
+			Obj srcField = srcMembers.next();
+			if (destField.getKind() != srcField.getKind() || !destField.getName().equals(srcField.getName()) || !destField.getType().equals(srcField.getType()) ||
+			    destField.getAdr() != srcField.getAdr() || destField.getLevel() != srcField.getLevel())
+				return false;
+			if (destField.getKind() == Obj.Meth && !checkFormalParams(destField, srcField))
+				return false;
+				
+		}
+		return true;
+	}
+
+	public boolean checkFormalParams(Obj dest, Obj src) {
+		Iterator<Obj> destSymbols = dest.getLocalSymbols().iterator();
+		Iterator<Obj> srcSymbols = src.getLocalSymbols().iterator();
+
+		for (int i = 0; i < dest.getLocalSymbols().size(); i++) {
+			Obj destParam = destSymbols.next();
+			Obj srcParam = srcSymbols.next();
+			if (destParam.getFpPos() == srcParam.getFpPos() && destParam.getFpPos() > 0)
+				if (!destParam.getType().equals(srcParam.getType()))
+					return false;
+		}
+		return true;
 	}
 
 // ----------------------------------------------------------- Designator ----------------------------------------------------------- //
