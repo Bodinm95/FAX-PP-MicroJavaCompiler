@@ -120,4 +120,22 @@ public class TabSym extends Tab {
 
 		return null;
 	}
+
+	public static Obj findTypeObject(Struct type) {
+		if (type == null)
+			return null;
+
+		if (type.getKind() == Struct.Array)
+			type = type.getElemType();
+
+		for (Scope s = currentScope; s != null; s = s.getOuter())
+			for (Obj currSym : s.values())
+				if (currSym.getKind() == Obj.Prog)
+					for (Obj currObj : currSym.getLocalSymbols())
+							if (currObj.getKind() == Obj.Type)
+									if (currObj.getType().equals(type))
+										return currObj;
+
+		return null;
+	}
 }
