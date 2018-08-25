@@ -210,7 +210,9 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 
 		int kind = (state.peek() == Scope.CLASS) ? Obj.Fld : Obj.Var;
-		TabSym.insert(kind, name, new Struct(Struct.Array, currType));
+		Obj symbol = TabSym.insert(kind, name, new Struct(Struct.Array, currType));
+		if (symbol.getKind() == Obj.Fld)
+			symbol.setAdr(symbol.getAdr() + 1);
 
 		switch (state.peek()) {
 		case GLOBAL: print_info("Global variable '" + type + " " + name + "[]' declared at line:" + line); break;
