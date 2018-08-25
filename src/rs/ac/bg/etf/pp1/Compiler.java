@@ -2,6 +2,7 @@ package rs.ac.bg.etf.pp1;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -9,6 +10,9 @@ import java.io.Reader;
 import java_cup.runtime.Symbol;
 import rs.ac.bg.etf.pp1.ast.Program;
 import rs.ac.bg.etf.pp1.util.TabSym;
+import rs.etf.pp1.mj.runtime.Code;
+import rs.etf.pp1.mj.runtime.Run;
+import rs.etf.pp1.mj.runtime.disasm;
 import rs.etf.pp1.symboltable.Tab;
 
 public class Compiler {
@@ -53,6 +57,24 @@ public class Compiler {
 			}
 			else {
 				System.out.println("\nParsing successfully done!");
+
+
+				File objectFile = new File(args[1]);
+				System.out.println("\nGenerating object file: " + objectFile.getAbsolutePath());
+
+				CodeGenerator codegen = new CodeGenerator();
+				program.traverseBottomUp(codegen);
+
+				if (objectFile.exists())
+					objectFile.delete();
+
+				Code.write(new FileOutputStream(objectFile));
+
+				System.out.println("\nDisassembling object file:");
+				disasm.main(new String[] {args[1]});
+
+				System.out.println("\nRunning object file:");
+				Run.main(new String[] {args[1]});
 			}
 		}
 		catch (Exception e) { e.printStackTrace(); }
